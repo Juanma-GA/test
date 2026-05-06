@@ -32,6 +32,10 @@
   border-bottom: 1px solid #e5e7eb;
   background-color: #f9fafb;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .title {
@@ -39,6 +43,24 @@
   font-weight: 600;
   color: #1f2937;
   margin: 0;
+}
+
+.closeBtn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.closeBtn:hover {
+  color: #1f2937;
 }
 
 .actionButtons {

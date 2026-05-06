@@ -4,9 +4,12 @@ import styles from './Header.module.css';
 /**
  * Header component with application title and statistics badges
  * Displays real-time counts of BRDP records by validation status
+ * @param {Object} props - Component props
+ * @param {Function} props.onChatClick - Callback when chat button is clicked
+ * @param {boolean} props.chatOpen - Whether chat panel is currently open
  * @returns {JSX.Element} Header element with title, stat badges, and chat button
  */
-export default function Header() {
+export default function Header({ onChatClick, chatOpen }) {
   const { stats } = useBRDPs();
 
   return (
@@ -14,10 +17,10 @@ export default function Header() {
       <div className={styles.container}>
         <h1 className={styles.title}>BRDP Manager</h1>
         <button
-          className={styles.chatButton}
-          title="Open AI Assistant (click on a record to ask AI)"
+          onClick={onChatClick}
+          className={`${styles.chatButton} ${chatOpen ? styles.chatActive : ''}`}
+          title={chatOpen ? "Close AI Assistant" : "Open AI Assistant"}
           aria-label="Open AI Assistant"
-          disabled
         >
           💬
         </button>

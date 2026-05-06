@@ -27,6 +27,7 @@ function TypingIndicator() {
  * @param {string} props.error - Error message if any
  * @param {boolean} props.isConfigured - Whether API is configured
  * @param {Function} props.onNavigateSettings - Navigate to settings
+ * @param {Function} props.onClose - Callback to close panel
  * @param {boolean} props.detailPanelOpen - Whether detail panel is open
  * @returns {JSX.Element} Chat panel
  */
@@ -38,6 +39,7 @@ export default function ChatPanel({
   error,
   isConfigured,
   onNavigateSettings,
+  onClose,
   detailPanelOpen,
 }) {
   const [input, setInput] = useState('');
@@ -74,6 +76,14 @@ export default function ChatPanel({
       {/* Header */}
       <div className={styles.header}>
         <h3 className={styles.title}>Ask AI</h3>
+        <button
+          onClick={onClose}
+          className={styles.closeBtn}
+          aria-label="Close chat panel"
+          title="Close"
+        >
+          ✕
+        </button>
       </div>
 
       {/* Action Buttons */}

@@ -170,6 +170,7 @@ export default function BRDPPage() {
           error={error}
           isConfigured={isConfigured}
           onNavigateSettings={handleNavigateSettings}
+          onClose={handleCloseChat}
           detailPanelOpen={!!selectedBrdp}
         />
       )}
