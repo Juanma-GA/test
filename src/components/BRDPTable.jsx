@@ -32,29 +32,119 @@ function ValidationBadge({ status }) {
 }
 
 /**
+ * Sort indicator component
+ * Shows arrow icon for sort direction
+ * @param {string} sortDir - Sort direction ('asc', 'desc', or '')
+ * @returns {JSX.Element|null} Sort arrow icon or null
+ */
+function SortIndicator({ sortDir }) {
+  if (!sortDir) return null;
+  return <span className={styles.sortArrow}>{sortDir === 'asc' ? '↑' : '↓'}</span>;
+}
+
+/**
  * BRDP Table component
- * Displays BRDP records in a table with selectable rows
+ * Displays BRDP records with sorting and pagination
  * @param {Object} props - Component props
- * @param {Array} props.brdps - Array of BRDP records
+ * @param {Array} props.rows - Array of BRDP records to display (already paginated)
  * @param {Function} props.onSelect - Callback when row is clicked
  * @param {string} [props.selectedId] - ID of currently selected row
- * @returns {JSX.Element} Table displaying BRDP records
+ * @param {Function} props.onSort - Callback when column header is clicked
+ * @param {string} props.sortField - Current sort field
+ * @param {string} props.sortDir - Current sort direction
+ * @param {number} props.currentPage - Current page number
+ * @param {number} props.totalPages - Total number of pages
+ * @param {number} props.total - Total records matching filter/search
+ * @param {Function} props.onPageChange - Callback to change page
+ * @param {boolean} props.noResults - Whether there are no results to display
+ * @returns {JSX.Element} Table displaying BRDP records with pagination
  */
-export default function BRDPTable({ brdps, onSelect, selectedId }) {
+export default function BRDPTable({
+  rows,
+  onSelect,
+  selectedId,
+  onSort,
+  sortField,
+  sortDir,
+  currentPage,
+  totalPages,
+  total,
+  onPageChange,
+  noResults,
+}) {
+  /**
+   * Get sort direction for a column
+   * Cycles: none → asc → desc → none
+   * @param {string} field - Column field name
+   * @returns {string} Next sort direction
+   */
+  const getNextSortDir = (field) => {
+    if (sortField !== field) return 'asc';
+    if (sortDir === 'asc') return 'desc';
+    if (sortDir === 'desc') return '';
+    return 'asc';
+  };
+
+  /**
+   * Handle sort header click
+   * @param {string} field - Column field to sort by
+   */
+  const handleSort = (field) => {
+    const nextDir = getNextSortDir(field);
+    onSort(field, nextDir);
+  };
+
+  /**
+   * Get class for sortable header
+   * @param {string} field - Column field name
+   * @returns {string} Combined class name
+   */
+  const getHeaderClass = (field) => {
+    if (field !== 'id' && field !== 'validation') return '';
+    let cls = styles.sortableHeader;
+    if (sortField === field) {
+      cls += ` ${styles.sorted}`;
+    }
+    return cls;
+  };
+
+  if (noResults) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.emptyState}>
+          <p className={styles.emptyMessage}>No results found</p>
+          <p className={styles.emptyHint}>Try adjusting your search or filters</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       <table className={styles.table}>
         <thead>
           <tr>
-            <th>BRDP Identifier</th>
+            <th
+              className={getHeaderClass('id')}
+              onClick={() => handleSort('id')}
+            >
+              BRDP Identifier
+              {sortField === 'id' && <SortIndicator sortDir={sortDir} />}
+            </th>
             <th>Definition</th>
             <th>Proposal</th>
-            <th>Validation</th>
+            <th
+              className={getHeaderClass('validation')}
+              onClick={() => handleSort('validation')}
+            >
+              Validation
+              {sortField === 'validation' && <SortIndicator sortDir={sortDir} />}
+            </th>
             <th>Comment</th>
           </tr>
         </thead>
         <tbody>
-          {brdps.map((brdp) => (
+          {rows.map((brdp) => (
             <tr
               key={brdp.id}
               className={selectedId === brdp.id ? styles.selected : ''}
@@ -77,9 +167,30 @@ export default function BRDPTable({ brdps, onSelect, selectedId }) {
           ))}
         </tbody>
       </table>
+
       <div className={styles.footer}>
-        {brdps.length} {brdps.length === 1 ? 'record' : 'records'}
+        <div className={styles.footerInfo}>
+          {total} {total === 1 ? 'record' : 'records'} | Page {currentPage} of{' '}
+          {totalPages}
+        </div>
+        <div className={styles.pagination}>
+          <button
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={styles.paginationBtn}
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className={styles.paginationBtn}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
 }
+
