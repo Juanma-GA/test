@@ -193,23 +193,23 @@
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
   background-color: white;
-  color: #6b7280;
-  font-weight: 500;
+  color: #374151;
+  font-weight: 600;
   font-size: 0.875rem;
-  cursor: not-allowed;
+  cursor: pointer;
   transition: all 0.2s;
 }
 
-.aiButton:disabled {
-  opacity: 0.6;
-  background-color: #f3f4f6;
-}
-
-.aiButton:not(:disabled):hover {
+.aiButton:hover {
   background-color: #2563eb;
   color: white;
   border-color: #2563eb;
-  cursor: pointer;
+}
+
+.aiButton:disabled {
+  opacity: 0.5;
+  background-color: #f3f4f6;
+  cursor: not-allowed;
 }
 
 /* Responsive design */

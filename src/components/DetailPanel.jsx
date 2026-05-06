@@ -28,9 +28,10 @@ function ValidationBadge({ status }) {
  * @param {Object} props - Component props
  * @param {Object} props.brdp - BRDP record to display
  * @param {Function} props.onClose - Callback when panel closes
+ * @param {Function} props.onOpenChat - Callback to open chat panel
  * @returns {JSX.Element} Detail panel with full record information
  */
-export default function DetailPanel({ brdp, onClose }) {
+export default function DetailPanel({ brdp, onClose, onOpenChat }) {
   const { getNote, saveNote } = useLocalNotes();
   const [notes, setNotes] = useState('');
   const [notesDirty, setNotesDirty] = useState(false);
@@ -138,7 +139,11 @@ export default function DetailPanel({ brdp, onClose }) {
 
         {/* Footer */}
         <div className={styles.footer}>
-          <button className={styles.aiButton} disabled title="Coming in a future session">
+          <button
+            className={styles.aiButton}
+            onClick={onOpenChat}
+            title="Ask AI about this BRDP"
+          >
             Ask AI about this BRDP
           </button>
         </div>

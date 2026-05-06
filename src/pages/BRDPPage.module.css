@@ -5,6 +5,55 @@
   overflow: hidden;
 }
 
+/* Layout: only container (default) */
+.layoutDefault {
+  flex-direction: row;
+}
+
+.layoutDefault .container {
+  width: 100%;
+  flex: 1;
+}
+
+/* Layout: container + chat only */
+.layoutChatOnly {
+  flex-direction: row;
+}
+
+.layoutChatOnly .container {
+  width: 65%;
+  flex: 0 0 65%;
+}
+
+/* Layout: container + detail + chat */
+.layoutThreePanel {
+  flex-direction: row;
+}
+
+.layoutThreePanel .container {
+  width: 50%;
+  flex: 0 0 50%;
+}
+
+/* Responsive - chat panel goes full width on mobile */
+@media (max-width: 900px) {
+  .pageContainer {
+    position: relative;
+  }
+
+  .layoutDefault .container {
+    width: 100%;
+  }
+
+  .layoutChatOnly .container {
+    width: 100%;
+  }
+
+  .layoutThreePanel .container {
+    width: 100%;
+  }
+}
+
 .container {
   flex: 1;
   display: flex;

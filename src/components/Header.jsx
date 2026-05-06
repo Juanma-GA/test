@@ -4,7 +4,7 @@ import styles from './Header.module.css';
 /**
  * Header component with application title and statistics badges
  * Displays real-time counts of BRDP records by validation status
- * @returns {JSX.Element} Header element with title and stat badges
+ * @returns {JSX.Element} Header element with title, stat badges, and chat button
  */
 export default function Header() {
   const { stats } = useBRDPs();
@@ -13,6 +13,14 @@ export default function Header() {
     <header className={styles.header}>
       <div className={styles.container}>
         <h1 className={styles.title}>BRDP Manager</h1>
+        <button
+          className={styles.chatButton}
+          title="Open AI Assistant (click on a record to ask AI)"
+          aria-label="Open AI Assistant"
+          disabled
+        >
+          💬
+        </button>
         <div className={styles.badges}>
           <div className={`${styles.badge} ${styles.total}`}>
             <span className={styles.label}>Total</span>
