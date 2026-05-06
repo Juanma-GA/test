@@ -1,16 +1,19 @@
 import { useAPIKey } from '../hooks/useAPIKey';
+import { useBRDPs } from '../hooks/useBRDPs';
 import AIConfigSection from '../components/AIConfigSection';
+import DataManagementSection from '../components/DataManagementSection';
 import AboutSection from '../components/AboutSection';
 import styles from './SettingsPage.module.css';
 
 /**
  * Settings Page component
- * Manages AI configuration and displays app information
+ * Manages AI configuration, data management, and displays app information
  * @returns {JSX.Element} Settings page with configuration sections
  */
 export default function SettingsPage() {
   const { apiKey, modelName, setApiKey, setModelName, saveKey, isConfigured } =
     useAPIKey();
+  const { brdps, setBrdps } = useBRDPs();
 
   /**
    * Handle save button click
@@ -32,6 +35,8 @@ export default function SettingsPage() {
           onSave={handleSave}
           isConfigured={isConfigured}
         />
+
+        <DataManagementSection brdps={brdps} onSetBrdps={setBrdps} />
 
         <AboutSection />
       </div>
