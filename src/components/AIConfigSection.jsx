@@ -2,20 +2,15 @@ import { useState } from 'react';
 import styles from './AIConfigSection.module.css';
 
 /**
- * API connection test result type
- * @typedef {Object} TestResult
- * @property {string} status - 'idle' | 'testing' | 'verified' | 'invalid' | 'error'
- * @property {string} message - Status message to display
- */
-
-/**
  * AI Configuration section component
- * Handles API key input, model selection, and connection testing
+ * Handles provider selection, API key input, model selection, and connection testing
  * @param {Object} props - Component props
  * @param {string} props.apiKey - Current API key
  * @param {string} props.modelName - Current model name
+ * @param {string} props.provider - Selected provider
  * @param {Function} props.onApiKeyChange - Callback when API key changes
  * @param {Function} props.onModelChange - Callback when model changes
+ * @param {Function} props.onProviderChange - Callback when provider changes
  * @param {Function} props.onSave - Callback to save settings
  * @param {boolean} props.isConfigured - Whether API key is configured
  * @returns {JSX.Element} AI configuration section
@@ -23,8 +18,10 @@ import styles from './AIConfigSection.module.css';
 export default function AIConfigSection({
   apiKey,
   modelName,
+  provider,
   onApiKeyChange,
   onModelChange,
+  onProviderChange,
   onSave,
   isConfigured,
 }) {
@@ -120,6 +117,23 @@ export default function AIConfigSection({
         <p className={styles.warningText}>
           Your API key is stored in your browser only. Never share or expose it.
         </p>
+      </div>
+
+      {/* Provider Dropdown */}
+      <div className={styles.formGroup}>
+        <label htmlFor="provider" className={styles.label}>
+          Provider
+        </label>
+        <select
+          id="provider"
+          value={provider}
+          onChange={(e) => onProviderChange(e.target.value)}
+          className={styles.input}
+        >
+          <option value="Anthropic">Anthropic</option>
+          <option value="OpenAI">OpenAI</option>
+          <option value="Custom">Custom</option>
+        </select>
       </div>
 
       {/* API Key Input */}

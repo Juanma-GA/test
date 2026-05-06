@@ -11,15 +11,23 @@ import styles from './SettingsPage.module.css';
  * @returns {JSX.Element} Settings page with configuration sections
  */
 export default function SettingsPage() {
-  const { apiKey, modelName, setApiKey, setModelName, saveKey, isConfigured } =
-    useAPIKey();
+  const {
+    apiKey,
+    modelName,
+    provider,
+    setApiKey,
+    setModelName,
+    setProvider,
+    saveKey,
+    isConfigured,
+  } = useAPIKey();
   const { brdps, setBrdps } = useBRDPs();
 
   /**
    * Handle save button click
    */
   const handleSave = () => {
-    saveKey(apiKey, modelName);
+    saveKey(apiKey, modelName, provider);
   };
 
   return (
@@ -30,8 +38,10 @@ export default function SettingsPage() {
         <AIConfigSection
           apiKey={apiKey}
           modelName={modelName}
+          provider={provider}
           onApiKeyChange={setApiKey}
           onModelChange={setModelName}
+          onProviderChange={setProvider}
           onSave={handleSave}
           isConfigured={isConfigured}
         />
