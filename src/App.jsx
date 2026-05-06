@@ -29,7 +29,7 @@ function App() {
       <div className="flex flex-1">
         <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
         <main className="flex-1 bg-gray-50">
-          {currentPage === 'brdp' && <BRDPPage />}
+          {currentPage === 'brdp' && <BRDPPage chatOpen={chatOpen} onSetChatOpen={setChatOpen} />}
           {currentPage === 'settings' && <SettingsPage />}
         </main>
       </div>

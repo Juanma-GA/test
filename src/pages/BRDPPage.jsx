@@ -15,9 +15,12 @@ import styles from './BRDPPage.module.css';
  * Main page with search, filter, sort, pagination, detail panel, and chat
  * Chain: filter → search → sort → paginate
  * Layout: Flexible based on open panels
+ * @param {Object} props - Component props
+ * @param {boolean} props.chatOpen - Whether chat panel is open
+ * @param {Function} props.onSetChatOpen - Callback to set chat open state
  * @returns {JSX.Element} Page with table, detail panel, and chat
  */
-export default function BRDPPage() {
+export default function BRDPPage({ chatOpen, onSetChatOpen }) {
   const { brdps } = useBRDPs();
   const { apiKey, modelName, provider, isConfigured } = useAPIKey();
   const [search, setSearch] = useState('');
@@ -26,7 +29,6 @@ export default function BRDPPage() {
   const [sortDir, setSortDir] = useState('');
   const [page, setPage] = useState(1);
   const [selectedBrdp, setSelectedBrdp] = useState(null);
-  const [chatOpen, setChatOpen] = useState(false);
 
   // Chat hook with selected BRDP context
   const { messages, sendUserMessage, clearHistory, isLoading, error } = useChat({
@@ -83,14 +85,14 @@ export default function BRDPPage() {
    * Handle opening the chat panel
    */
   const handleOpenChat = () => {
-    setChatOpen(true);
+    onSetChatOpen(true);
   };
 
   /**
    * Handle closing the chat panel
    */
   const handleCloseChat = () => {
-    setChatOpen(false);
+    onSetChatOpen(false);
   };
 
   /**
