@@ -1,3 +1,8 @@
+/**
+ * Settings Page component
+ * Placeholder for application settings
+ * @returns {JSX.Element} Settings page content
+ */
 export default function SettingsPage() {
   return (
     <div className="p-8">

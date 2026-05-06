@@ -5,6 +5,11 @@ import BRDPPage from './pages/BRDPPage';
 import SettingsPage from './pages/SettingsPage';
 import './index.css';
 
+/**
+ * Main App component
+ * Manages page routing between BRDP and Settings pages
+ * @returns {JSX.Element} Application layout with header, sidebar, and main content
+ */
 function App() {
   const [currentPage, setCurrentPage] = useState('brdp');
 

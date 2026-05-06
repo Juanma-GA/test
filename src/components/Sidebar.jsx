@@ -1,9 +1,12 @@
-interface SidebarProps {
-  currentPage: string;
-  onNavigate: (page: string) => void;
-}
-
-export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
+/**
+ * Sidebar component with navigation
+ * Displays navigation buttons for different pages
+ * @param {Object} props - Component props
+ * @param {string} props.currentPage - Currently active page
+ * @param {Function} props.onNavigate - Callback when navigation button is clicked
+ * @returns {JSX.Element} Sidebar element with navigation buttons
+ */
+export default function Sidebar({ currentPage, onNavigate }) {
   return (
     <aside className="bg-gray-900 text-white w-64 min-h-screen shadow-lg">
       <nav className="p-6">
