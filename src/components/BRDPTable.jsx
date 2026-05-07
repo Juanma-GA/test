@@ -146,6 +146,7 @@ export default function BRDPTable({
       <table className={styles.table}>
         <thead>
           <tr>
+            <th className={styles.editHeader}></th>
             <th
               className={getHeaderClass('id')}
               onClick={() => handleSort('id')}
@@ -164,7 +165,6 @@ export default function BRDPTable({
               {sortField === 'validation' && <SortIndicator sortDir={sortDir} />}
             </th>
             <th>Comment</th>
-            <th className={styles.editHeader}></th>
           </tr>
         </thead>
         <tbody>
@@ -174,6 +174,19 @@ export default function BRDPTable({
               className={`${selectedId === brdp.id ? styles.selected : ''} ${styles.row}`}
               onClick={() => onSelect(brdp)}
             >
+              <td className={styles.editCell}>
+                <button
+                  className={styles.editBtn}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(brdp);
+                  }}
+                  aria-label="Edit BRDP"
+                  title="Edit BRDP"
+                >
+                  ✏️
+                </button>
+              </td>
               <td className={styles.id}>{brdp.id}</td>
               <td className={styles.title} title={brdp.title}>
                 {truncate(brdp.title, 40)}
@@ -189,19 +202,6 @@ export default function BRDPTable({
               </td>
               <td className={styles.comment} title={brdp.comment}>
                 {truncate(brdp.comment, 40)}
-              </td>
-              <td className={styles.editCell}>
-                <button
-                  className={styles.editBtn}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit(brdp);
-                  }}
-                  aria-label="Edit BRDP"
-                  title="Edit BRDP"
-                >
-                  ✏️
-                </button>
               </td>
             </tr>
           ))}
