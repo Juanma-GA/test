@@ -32,7 +32,7 @@
 }
 
 .tableWrapper {
-  flex: 1;
+  flex: none;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
