@@ -2,6 +2,49 @@ import { useState, useCallback } from 'react';
 import { sendMessage, buildSystemPrompt } from '../api/llmAPI';
 
 /**
+ * Build a compact summary of the BRDP dataset
+ * @param {Array} brdps - Array of BRDP records
+ * @returns {string} Summary with total, breakdown, and compact JSON index
+ */
+function buildDatasetSummary(brdps) {
+  if (!brdps || brdps.length === 0) {
+    return 'No hay datos BRDP disponibles.';
+  }
+
+  // Calculate total and breakdown by validation status
+  const breakdown = {
+    Validated: 0,
+    Refused: 0,
+    Pending: 0,
+  };
+
+  brdps.forEach((brdp) => {
+    if (breakdown.hasOwnProperty(brdp.validation)) {
+      breakdown[brdp.validation]++;
+    }
+  });
+
+  // Build compact JSON index with only: id, validation, and definition
+  const compactIndex = brdps.map((brdp) => ({
+    id: brdp.id,
+    status: brdp.validation,
+    rule: brdp.definition,
+  }));
+
+  // Format the summary string
+  const breakdownStr = Object.entries(breakdown)
+    .map(([status, count]) => `${status}: ${count}`)
+    .join(', ');
+
+  return `Total de BRDPs: ${brdps.length}
+Desglose: ${breakdownStr}
+
+Índice compacto:
+${JSON.stringify(compactIndex, null, 0)}`;
+}
+
+
+/**
  * Custom hook for managing chat conversation
  * Handles message history and LLM communication
  * @param {Object} options - Hook options
