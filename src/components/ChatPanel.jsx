@@ -95,7 +95,7 @@ export default function ChatPanel({
   onNavigateSettings,
   onClose,
   detailPanelOpen,
-  selectedBrdp,
+  selectedBRDPs = [],
   onDeselectBrdp,
   onOpenGenerateModal,
   width = 340,
@@ -104,7 +104,7 @@ export default function ChatPanel({
   const { brdps, updateBRDP } = useBRDPContext();
   const [input, setInput] = useState('');
   const [isResizing, setIsResizing] = useState(false);
-  const [activeContext, setActiveContext] = useState(selectedBrdp);
+  const [activeContext, setActiveContext] = useState(selectedBRDPs);
   const [appliedSuggestions, setAppliedSuggestions] = useState({});
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
@@ -121,10 +121,10 @@ export default function ChatPanel({
     }
   }, [isLoading, messages.length]);
 
-  // Update active context when selectedBrdp changes
+  // Update active context when selectedBRDPs changes
   useEffect(() => {
-    setActiveContext(selectedBrdp);
-  }, [selectedBrdp]);
+    setActiveContext(selectedBRDPs);
+  }, [selectedBRDPs]);
 
   // Handle resize
   useEffect(() => {
@@ -175,12 +175,13 @@ export default function ChatPanel({
   };
 
   /**
-   * Handle applying a suggestion to the selected BRDP
+   * Handle applying a suggestion to the first selected BRDP
    */
   const handleApplySuggestion = (field, content) => {
-    if (!selectedBrdp) return;
+    if (!activeContext || activeContext.length === 0) return;
 
-    updateBRDP(selectedBrdp.id, { [field]: content });
+    const targetBrdp = activeContext[0];
+    updateBRDP(targetBrdp.id, { [field]: content });
 
     // Mark suggestion as applied
     const suggestionKey = `${field}-${content.substring(0, 20)}`;
@@ -313,13 +314,15 @@ export default function ChatPanel({
       {/* Input Area */}
       {isConfigured && (
         <div className={styles.inputContainer}>
-          {activeContext && (
+          {activeContext && activeContext.length > 0 && (
             <div className={styles.contextPill}>
-              <span className={styles.contextText}>📌 Context: {activeContext.id}</span>
+              <span className={styles.contextText}>
+                📌 Context: {activeContext.length === 1 ? activeContext[0].id : `${activeContext.length} BRDPs selected`}
+              </span>
               <button
                 className={styles.contextClear}
                 onClick={() => {
-                  setActiveContext(null);
+                  setActiveContext([]);
                   onDeselectBrdp?.();
                 }}
                 aria-label="Clear context"

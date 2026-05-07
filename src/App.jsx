@@ -13,6 +13,12 @@ import GenerateModal from './components/GenerateModal';
 import './index.css';
 import './App.css';
 
+// Access BRDPContext inside AppContent
+function useSelectedBRDP() {
+  const { selectedBRDPs } = useBRDPContext();
+  return selectedBRDPs.length > 0 ? selectedBRDPs[0] : null;
+}
+
 /**
  * Main App component
  * Manages page routing between BRDP and Settings pages
@@ -21,13 +27,12 @@ import './App.css';
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('brdp');
   const [chatOpen, setChatOpen] = useState(false);
-  const [selectedBrdp, setSelectedBrdp] = useState(null);
   const [showGenerateModal, setShowGenerateModal] = useState(false);
   const [chatPanelWidth, setChatPanelWidth] = useState(() => {
     const saved = localStorage.getItem('chatPanelWidth');
     return saved ? parseInt(saved) : 340;
   });
-  const { brdps } = useBRDPContext();
+  const { brdps, selectedBRDPs, setSelectedBRDPs } = useBRDPContext();
   const { toasts, showToast } = useToast();
   const { apiKey, modelName, provider, isConfigured } = useAPIKey();
 
@@ -35,7 +40,7 @@ function AppContent() {
     apiKey,
     modelName,
     provider,
-    selectedBrdp,
+    selectedBRDPs,
   });
 
   // Save chat panel width to localStorage
@@ -73,7 +78,7 @@ function AppContent() {
       <div className="workspaceRow">
         <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
         <main className="mainContent">
-          {currentPage === 'brdp' && <BRDPPage selectedBrdp={selectedBrdp} onSelectBrdp={setSelectedBrdp} showToast={showToast} onNavigate={setCurrentPage} />}
+          {currentPage === 'brdp' && <BRDPPage showToast={showToast} onNavigate={setCurrentPage} />}
           {currentPage === 'settings' && <SettingsPage showToast={showToast} />}
         </main>
         {currentPage === 'brdp' && chatOpen && (
@@ -87,9 +92,9 @@ function AppContent() {
             isConfigured={isConfigured}
             onNavigateSettings={handleNavigateSettings}
             onClose={handleCloseChat}
-            detailPanelOpen={!!selectedBrdp}
-            selectedBrdp={selectedBrdp}
-            onDeselectBrdp={() => setSelectedBrdp(null)}
+            detailPanelOpen={selectedBRDPs.length > 0}
+            selectedBRDPs={selectedBRDPs}
+            onDeselectBrdp={() => setSelectedBRDPs([])}
             onOpenGenerateModal={openGenerateModal}
             width={chatPanelWidth}
             onWidthChange={setChatPanelWidth}

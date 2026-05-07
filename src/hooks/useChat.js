@@ -47,17 +47,17 @@ ${JSON.stringify(compactIndex, null, 0)}`;
 /**
  * Build enhanced system prompt with dataset context
  * @param {Array} brdps - All BRDP records from context
- * @param {Object} [selectedBrdp] - Currently selected BRDP
+ * @param {Array} [selectedBRDPs] - Currently selected BRDPs
  * @returns {string} Enhanced system prompt with dataset and optional BRDP context
  */
-function buildEnhancedSystemPrompt(brdps, selectedBrdp) {
+function buildEnhancedSystemPrompt(brdps, selectedBRDPs = []) {
   const basePrompt = `You are an S1000D / DITA and BRDP expert assistant.
 You help users understand business rules, validate decisions,
 and answer questions about S1000D, DITA, and technical publications.`;
 
   const datasetSummary = buildDatasetSummary(brdps);
 
-  if (!selectedBrdp) {
+  if (!selectedBRDPs || selectedBRDPs.length === 0) {
     return `${basePrompt}
 
 BRDP Dataset Context:
@@ -66,16 +66,16 @@ ${datasetSummary}
 Use the complete dataset above to answer questions about business rules, validate proposals, and provide insights across all BRDP records.`;
   }
 
-  // If a specific BRDP is selected, include its full details
+  // If BRDPs are selected, include their full details
   return `${basePrompt}
 
 BRDP Dataset Context:
 ${datasetSummary}
 
 Current BRDP Focus (selected for detailed analysis):
-${JSON.stringify(selectedBrdp, null, 2)}
+${JSON.stringify(selectedBRDPs, null, 2)}
 
-Provide answers focusing on the selected BRDP while leveraging the complete dataset for comparison and validation.
+Provide answers focusing on the selected BRDP${selectedBRDPs.length > 1 ? 's' : ''} while leveraging the complete dataset for comparison and validation.
 
 SUGGESTION FORMAT INSTRUCTIONS:
 If the user asks you to improve, rewrite, or suggest a new version of the Proposal or Comment field, respond with your explanation followed by a special block in this exact format:
@@ -101,7 +101,7 @@ Always include the suggestion block at the end of your response when rewriting a
  * @param {Object} options.apiKey - API key from useAPIKey
  * @param {string} options.modelName - Model name from useAPIKey
  * @param {string} options.provider - Provider from useAPIKey
- * @param {Object} [options.selectedBrdp] - Currently selected BRDP
+ * @param {Array} [options.selectedBRDPs] - Currently selected BRDPs
  * @returns {Object} Chat management object
  * @property {Array} messages - Conversation history
  * @property {Function} sendUserMessage - Send a message and get response
@@ -109,7 +109,7 @@ Always include the suggestion block at the end of your response when rewriting a
  * @property {boolean} isLoading - Whether waiting for response
  * @property {string|null} error - Error message if any
  */
-export function useChat({ apiKey, modelName, provider, selectedBrdp }) {
+export function useChat({ apiKey, modelName, provider, selectedBRDPs = [] }) {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -136,7 +136,7 @@ export function useChat({ apiKey, modelName, provider, selectedBrdp }) {
 
       try {
         // Build system prompt with dataset and BRDP context
-        const systemPrompt = buildEnhancedSystemPrompt(brdps, selectedBrdp);
+        const systemPrompt = buildEnhancedSystemPrompt(brdps, selectedBRDPs);
 
         // Initialize assistant message with empty content
         let assistantMessage = { role: 'assistant', content: '' };
@@ -167,7 +167,7 @@ export function useChat({ apiKey, modelName, provider, selectedBrdp }) {
         abortControllerRef.current = null;
       }
     },
-    [messages, apiKey, modelName, provider, selectedBrdp, brdps]
+    [messages, apiKey, modelName, provider, selectedBRDPs, brdps]
   );
 
   /**
