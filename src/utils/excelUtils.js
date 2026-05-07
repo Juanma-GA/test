@@ -1,4 +1,5 @@
 import * as XLSX from 'xlsx';
+import { mockBRDPs } from '../data/mockBRDPs';
 
 const COLUMN_NAMES = [
   'BRDP Identifier',
@@ -17,11 +18,19 @@ const FIELD_MAP = {
 };
 
 /**
- * Generate a blank Excel template with headers
+ * Generate Excel template with headers and mock data
  * @returns {Blob} Excel file blob
  */
 export function generateTemplate() {
-  const worksheet = XLSX.utils.aoa_to_sheet([COLUMN_NAMES]);
+  const data = mockBRDPs.map((brdp) => ({
+    'BRDP Identifier': brdp.id,
+    'BRDP Definition': brdp.definition,
+    'ATX Decision Proposal': brdp.proposal,
+    'Validation Status': brdp.validation,
+    'Comment': brdp.comment,
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(data);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, 'BRDPs');
 
