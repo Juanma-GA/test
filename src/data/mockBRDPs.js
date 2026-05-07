@@ -6,6 +6,7 @@
 /**
  * @typedef {Object} BRDPRecord
  * @property {string} id - BRDP identifier
+ * @property {string} title - BRDP title
  * @property {string} definition - BRDP definition with S1000D terminology
  * @property {string} proposal - ATX decision proposal
  * @property {string} validation - Validation status
@@ -20,6 +21,7 @@
 export const mockBRDPs = [
   {
     id: 'BRDP-S1-00001',
+    title: 'Alphanumeric Character Usage Rules',
     definition: 'Decide whether and when to use the alpha characters \'I\' and \'O\'.',
     proposal: 'The use of alpha characters \'I\' and \'O\' in S1000D data shall be compliant with ATA iSpec 2200, Specification 2000, and the CSDD.',
     validation: 'Refused',
@@ -27,6 +29,7 @@ export const mockBRDPs = [
   },
   {
     id: 'BRDP-S1-00002',
+    title: 'CAGE Code Authorization',
     definition: 'Create a list of permitted CAGE codes and/or names of the enterprises.',
     proposal: 'XXXXX is permitted as CAGE code in this project.',
     validation: 'Validated',
@@ -34,6 +37,7 @@ export const mockBRDPs = [
   },
   {
     id: 'BRDP-S1-00003',
+    title: 'S1000D Version Selection',
     definition: 'Decide which issue or issues of S1000D to be used.',
     proposal: 'S1000D issue 4.2 shall be used.',
     validation: 'Validated',
@@ -41,6 +45,7 @@ export const mockBRDPs = [
   },
   {
     id: 'BRDP-S1-00004',
+    title: 'Information Sets Definition',
     definition: 'Decide which information sets, given in S1000D and/or project specific, to be used.',
     proposal: 'Equipment Information shall be used',
     validation: 'Validated',
@@ -48,6 +53,7 @@ export const mockBRDPs = [
   },
   {
     id: 'BRDP-S1-00005',
+    title: 'Publication Output Strategy',
     definition: 'Decide which publications to be produced.',
     proposal: 'One CMP per LRU (=project) as XML delivery package Installation Publication per customer listing the specifics of the component installation allowed. PDF export optional.',
     validation: 'Validated',
@@ -55,6 +61,7 @@ export const mockBRDPs = [
   },
   {
     id: 'BRDP-S1-00006',
+    title: 'Schema and Information Set Mapping',
     definition: 'Decide which Schemas to be used and in which information set they are to be used.',
     proposal: 'Descriptive, Procedural and IPD schemas shall be used as per Writing Style Guide',
     validation: 'Validated',
@@ -62,6 +69,7 @@ export const mockBRDPs = [
   },
   {
     id: 'BRDP-S1-00007',
+    title: 'Optional Element Usage Guidelines',
     definition: 'Decide whether and how to use each optional element and attribute in its structural context.',
     proposal: 'Refer to Section 2-3 for General Civil Aviation rules for element and attribute usage.',
     validation: 'Validated',
@@ -69,6 +77,7 @@ export const mockBRDPs = [
   },
   {
     id: 'BRDP-S1-00008',
+    title: 'Deliverable Format and Content',
     definition: 'Decide on the possible deliverables, such as: S1000D objects (eg, data modules, publication modules, illustration sheets and multimedia objects, data management lists) using file based transfer. Refer to Chap 7.5.1. Page-oriented publications and/or interactive electronic technical publications',
     proposal: 'As per Spec 1000BR Section 3-2-3, LHT expects and sends a Transfer Package including DDN, PM, Content DM, ACT, CIR Enterprise and ICN when referenced within a DM. PDF export optional.',
     validation: 'Validated',
@@ -76,6 +85,7 @@ export const mockBRDPs = [
   },
   {
     id: 'BRDP-S1-00009',
+    title: 'Data Exchange Frequency',
     definition: 'Decide on the frequency of data exchanges.',
     proposal: 'Exchange on demand.',
     validation: 'Validated',
@@ -83,6 +93,7 @@ export const mockBRDPs = [
   },
   {
     id: 'BRDP-S1-00010',
+    title: 'Zoning and Access Identification',
     definition: 'Decide whether to use a zoning and access identification system.',
     proposal: 'Zoning rules shall not be applied for CMPs',
     validation: 'Validated',

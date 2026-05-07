@@ -3,6 +3,7 @@ import { mockBRDPs } from '../data/mockBRDPs';
 
 const COLUMN_NAMES = [
   'BRDP Identifier',
+  'BRDP Title',
   'BRDP Definition',
   'ATX Decision Proposal',
   'Validation Status',
@@ -11,6 +12,7 @@ const COLUMN_NAMES = [
 
 const FIELD_MAP = {
   'BRDP Identifier': 'id',
+  'BRDP Title': 'title',
   'BRDP Definition': 'definition',
   'ATX Decision Proposal': 'proposal',
   'Validation Status': 'validation',
@@ -24,6 +26,7 @@ const FIELD_MAP = {
 export function generateTemplate() {
   const data = mockBRDPs.map((brdp) => ({
     'BRDP Identifier': brdp.id,
+    'BRDP Title': brdp.title,
     'BRDP Definition': brdp.definition,
     'ATX Decision Proposal': brdp.proposal,
     'Validation Status': brdp.validation,
@@ -37,6 +40,7 @@ export function generateTemplate() {
   // Set column widths
   worksheet['!cols'] = [
     { wch: 20 }, // BRDP Identifier
+    { wch: 30 }, // BRDP Title
     { wch: 40 }, // BRDP Definition
     { wch: 40 }, // ATX Decision Proposal
     { wch: 18 }, // Validation Status
@@ -134,6 +138,7 @@ export function importFromExcel(file) {
 export function exportToExcel(brdps) {
   const data = brdps.map((brdp) => ({
     'BRDP Identifier': brdp.id,
+    'BRDP Title': brdp.title,
     'BRDP Definition': brdp.definition,
     'ATX Decision Proposal': brdp.proposal,
     'Validation Status': brdp.validation,
@@ -147,6 +152,7 @@ export function exportToExcel(brdps) {
   // Set column widths
   worksheet['!cols'] = [
     { wch: 20 },
+    { wch: 30 },
     { wch: 40 },
     { wch: 40 },
     { wch: 18 },
@@ -163,6 +169,7 @@ export function exportToExcel(brdps) {
 export function exportToCSV(brdps) {
   const data = brdps.map((brdp) => ({
     'BRDP Identifier': brdp.id,
+    'BRDP Title': brdp.title,
     'BRDP Definition': brdp.definition,
     'ATX Decision Proposal': brdp.proposal,
     'Validation Status': brdp.validation,

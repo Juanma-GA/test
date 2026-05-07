@@ -153,6 +153,7 @@ export default function BRDPTable({
               BRDP Identifier
               {sortField === 'id' && <SortIndicator sortDir={sortDir} />}
             </th>
+            <th>Title</th>
             <th>Definition</th>
             <th>Proposal</th>
             <th
@@ -174,6 +175,9 @@ export default function BRDPTable({
               onClick={() => onSelect(brdp)}
             >
               <td className={styles.id}>{brdp.id}</td>
+              <td className={styles.title} title={brdp.title}>
+                {truncate(brdp.title, 40)}
+              </td>
               <td className={styles.definition} title={brdp.definition}>
                 {truncate(brdp.definition, 60)}
               </td>

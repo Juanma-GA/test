@@ -87,6 +87,15 @@
   text-overflow: ellipsis;
 }
 
+.title {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #374151;
+  font-weight: 500;
+}
+
 .definition,
 .proposal {
   max-width: 300px;
