@@ -37,7 +37,7 @@ export default function SettingsPage({ showToast }) {
     <div className={styles.container}>
       <h2 className={styles.title}>Settings</h2>
 
-      <div className={styles.sectionsContainer}>
+      <div className={styles.settingsGrid}>
         <AIConfigSection
           apiKey={apiKey}
           modelName={modelName}
