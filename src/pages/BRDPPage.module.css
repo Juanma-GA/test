@@ -1,14 +1,12 @@
 .pageContainer {
-  flex: 1;
-  min-height: 0;
   display: flex;
-  flex-direction: column;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
 }
 
 .container {
   flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: column;
   padding: 2rem;
@@ -34,12 +32,10 @@
 }
 
 .tableWrapper {
-  flex: 1;
-  min-height: 0;
+  height: calc(100vh - 220px);
   overflow-y: auto;
   overflow-x: hidden;
-  display: flex;
-  flex-direction: column;
+  flex: none;
 }
 
 @media (max-width: 768px) {
