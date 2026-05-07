@@ -95,34 +95,74 @@ export default function BRDPPage({ selectedBrdp, onSelectBrdp, showToast, onNavi
 
   return (
     <div className={styles.pageContainer}>
-      <div className={styles.container}>
+      {/* Fixed top section - never scrolls */}
+      <div className={styles.topSection}>
         <h2 className={styles.title}>BRDP Records</h2>
-
         <div className={styles.controls}>
           <SearchBar value={search} onChange={handleSearchChange} />
           <FilterPills activeFilter={filter} onFilterChange={handleFilterChange} />
         </div>
+      </div>
 
-        <div style={{
-          overflowY: 'scroll',
-          height: '100%',
-          WebkitOverflowScrolling: 'touch'
-        }}>
-          <BRDPTable
-            rows={rows}
-            onSelect={handleSelectBrdp}
-            selectedId={selectedBrdp?.id}
-            onSort={handleSort}
-            sortField={sortField}
-            sortDir={sortDir}
-            currentPage={page}
-            totalPages={totalPages || 1}
-            total={total}
-            onPageChange={handlePageChange}
-            noResults={noResults}
-            noBrdps={brdps.length === 0}
-            onGoToSettings={() => onNavigate('settings')}
-          />
+      {/* This div scrolls */}
+      <div className={styles.scrollArea}>
+        <BRDPTable
+          rows={rows}
+          onSelect={handleSelectBrdp}
+          selectedId={selectedBrdp?.id}
+          onSort={handleSort}
+          sortField={sortField}
+          sortDir={sortDir}
+          currentPage={page}
+          totalPages={totalPages || 1}
+          total={total}
+          onPageChange={handlePageChange}
+          noResults={noResults}
+          noBrdps={brdps.length === 0}
+          onGoToSettings={() => onNavigate('settings')}
+        />
+      </div>
+
+      {/* Fixed bottom section - never scrolls */}
+      <div className={styles.bottomSection}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '11px', color: '#9ca3af' }}>
+            {total} {total === 1 ? 'record' : 'records'} | Page {page} of {totalPages || 1}
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              onClick={() => handlePageChange(page - 1)}
+              disabled={page === 1}
+              style={{
+                padding: '5px 12px',
+                borderRadius: '6px',
+                border: '1px solid #dde3ec',
+                background: 'white',
+                color: '#6b7280',
+                fontSize: '12px',
+                cursor: page === 1 ? 'not-allowed' : 'pointer',
+                opacity: page === 1 ? '0.4' : '1'
+              }}
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => handlePageChange(page + 1)}
+              disabled={page === totalPages}
+              style={{
+                padding: '5px 12px',
+                borderRadius: '6px',
+                border: '1px solid #dde3ec',
+                background: 'white',
+                color: '#6b7280',
+                fontSize: '12px',
+                cursor: page === totalPages ? 'not-allowed' : 'pointer',
+                opacity: page === totalPages ? '0.4' : '1'
+              }}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
 
