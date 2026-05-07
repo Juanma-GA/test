@@ -12,7 +12,7 @@
   padding: 2rem;
   max-width: 1400px;
   width: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .title {
@@ -32,10 +32,7 @@
 }
 
 .tableWrapper {
-  height: calc(100vh - 220px);
-  overflow-y: auto;
-  overflow-x: hidden;
-  flex: none;
+  /* Height and overflow handled by inline style in BRDPPage.jsx */
 }
 
 @media (max-width: 768px) {
