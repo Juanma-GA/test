@@ -26,6 +26,7 @@ export default function BRDPPage({ showToast, onNavigate }) {
   const [sortDir, setSortDir] = useState('');
   const [page, setPage] = useState(1);
   const [detailBrdp, setDetailBrdp] = useState(null);
+  const [isDirty, setIsDirty] = useState(false);
 
   // Reset to page 1 when search or filter changes
   const handleSearchChange = (newSearch) => {
@@ -69,6 +70,7 @@ export default function BRDPPage({ showToast, onNavigate }) {
    */
   const handleClosePanel = () => {
     setDetailBrdp(null);
+    setIsDirty(false);
   };
 
   /**
@@ -148,6 +150,8 @@ export default function BRDPPage({ showToast, onNavigate }) {
             noResults={noResults}
             noBrdps={brdps.length === 0}
             onGoToSettings={() => onNavigate('settings')}
+            editingBrdpId={detailBrdp?.id}
+            isDirtyEditing={isDirty}
           />
         </div>
       </div>
@@ -159,6 +163,7 @@ export default function BRDPPage({ showToast, onNavigate }) {
           onClose={handleClosePanel}
           showToast={showToast}
           onUpdate={handleBrdpUpdate}
+          onDirtyChange={setIsDirty}
         />
       )}
     </div>

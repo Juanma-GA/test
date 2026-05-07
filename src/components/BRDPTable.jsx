@@ -78,6 +78,8 @@ export default function BRDPTable({
   noResults,
   noBrdps,
   onGoToSettings,
+  editingBrdpId,
+  isDirtyEditing,
 }) {
   const [lastSelectedId, setLastSelectedId] = useState(null);
   /**
@@ -201,17 +203,22 @@ export default function BRDPTable({
               onClick={(e) => handleRowClick(brdp, e)}
             >
               <td className={styles.editCell}>
-                <button
-                  className={styles.editBtn}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit(brdp);
-                  }}
-                  aria-label="Edit BRDP"
-                  title="Edit BRDP"
-                >
-                  ✏️
-                </button>
+                <div className={styles.editBtnContainer}>
+                  <button
+                    className={styles.editBtn}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit(brdp);
+                    }}
+                    aria-label="Edit BRDP"
+                    title="Edit BRDP"
+                  >
+                    ✏️
+                  </button>
+                  {editingBrdpId === brdp.id && isDirtyEditing && (
+                    <div className={styles.dirtyIndicator} title="Unsaved changes" />
+                  )}
+                </div>
               </td>
               <td className={styles.id}>{brdp.id}</td>
               <td className={styles.title} title={brdp.title}>

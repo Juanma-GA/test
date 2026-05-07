@@ -73,13 +73,14 @@ function ValidationBadge({ status }) {
  * @param {Function} props.onUpdate - Callback when BRDP is updated
  * @returns {JSX.Element} Detail panel with full record information
  */
-export default function DetailPanel({ brdp, onClose, showToast, onUpdate }) {
+export default function DetailPanel({ brdp, onClose, showToast, onUpdate, onDirtyChange }) {
   const { updateBRDP, brdps } = useBRDPContext();
   const { getNote, saveNote } = useLocalNotes();
   const [notes, setNotes] = useState('');
   const [notesDirty, setNotesDirty] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
   const [editData, setEditData] = useState({
     proposal: brdp.proposal,
     validation: brdp.validation,
@@ -92,12 +93,20 @@ export default function DetailPanel({ brdp, onClose, showToast, onUpdate }) {
     setNotes(savedNotes);
     setNotesDirty(false);
     setIsEditing(false);
+    setIsDirty(false);
     setEditData({
       proposal: brdp.proposal,
       validation: brdp.validation,
       comment: brdp.comment,
     });
   }, [brdp.id, brdp.proposal, brdp.validation, brdp.comment, getNote]);
+
+  // Notify parent when isDirty changes
+  useEffect(() => {
+    if (onDirtyChange) {
+      onDirtyChange(isDirty);
+    }
+  }, [isDirty, onDirtyChange]);
 
   // Handle escape key to close panel
   useEffect(() => {
@@ -138,6 +147,9 @@ export default function DetailPanel({ brdp, onClose, showToast, onUpdate }) {
       ...prev,
       [field]: value,
     }));
+    if (value !== brdp[field]) {
+      setIsDirty(true);
+    }
   };
 
   /**
@@ -146,6 +158,7 @@ export default function DetailPanel({ brdp, onClose, showToast, onUpdate }) {
   const handleSaveChanges = () => {
     updateBRDP(brdp.id, editData);
     setIsEditing(false);
+    setIsDirty(false);
     if (onUpdate) {
       const fieldsToTrack = ['proposal', 'comment', 'validation'];
       const history = [...(brdp.history || [])];
@@ -179,6 +192,22 @@ export default function DetailPanel({ brdp, onClose, showToast, onUpdate }) {
       comment: brdp.comment,
     });
     setIsEditing(false);
+    setIsDirty(false);
+  };
+
+  /**
+   * Handle close panel with unsaved changes check
+   */
+  const handleCloseWithCheck = () => {
+    if (isDirty && isEditing) {
+      if (window.confirm('You have unsaved changes. Are you sure you want to close?\n\nClick "OK" to discard changes or "Cancel" to keep editing.')) {
+        setIsDirty(false);
+        setIsEditing(false);
+        onClose();
+      }
+    } else {
+      onClose();
+    }
   };
 
   return (
@@ -206,7 +235,7 @@ export default function DetailPanel({ brdp, onClose, showToast, onUpdate }) {
             )}
             <button
               className={styles.closeBtn}
-              onClick={onClose}
+              onClick={handleCloseWithCheck}
               aria-label="Close panel"
               title="Close"
             >
@@ -344,6 +373,9 @@ export default function DetailPanel({ brdp, onClose, showToast, onUpdate }) {
         {/* Footer */}
         {isEditing && (
           <div className={styles.footer}>
+            {isDirty && (
+              <p className={styles.unsavedWarning}>⚠️ Unsaved changes</p>
+            )}
             <div className={styles.editActions}>
               <button
                 className={styles.saveBtn}
