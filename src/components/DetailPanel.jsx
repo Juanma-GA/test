@@ -4,6 +4,27 @@ import { useLocalNotes } from '../hooks/useLocalNotes';
 import styles from './DetailPanel.module.css';
 
 /**
+ * Format ISO date string to DD/MM/YYYY HH:mm
+ */
+function formatDate(isoString) {
+  const date = new Date(isoString);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
+}
+
+/**
+ * Truncate text to 60 characters
+ */
+function truncate(text, maxLength = 60) {
+  if (!text) return '';
+  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+}
+
+/**
  * Lock icon component for read-only fields
  * @returns {JSX.Element} Lock icon with tooltip
  */
@@ -51,6 +72,7 @@ export default function DetailPanel({ brdp, onClose, showToast, onUpdate }) {
   const [notes, setNotes] = useState('');
   const [notesDirty, setNotesDirty] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const [editData, setEditData] = useState({
     proposal: brdp.proposal,
     validation: brdp.validation,
@@ -252,6 +274,45 @@ export default function DetailPanel({ brdp, onClose, showToast, onUpdate }) {
               className={styles.textarea}
             />
             {notesDirty && <p className={styles.savingIndicator}>Saving...</p>}
+          </div>
+
+          {/* Change History Section */}
+          <div className={styles.historySection}>
+            <button
+              className={styles.historyToggle}
+              onClick={() => setShowHistory(!showHistory)}
+            >
+              {showHistory ? '▼' : '▶'} Change History
+            </button>
+            {showHistory && (
+              <div className={styles.historyContent}>
+                {!brdp.history || brdp.history.length === 0 ? (
+                  <p className={styles.noHistory}>No changes recorded.</p>
+                ) : (
+                  <div className={styles.historyList}>
+                    {[...brdp.history].reverse().map((entry, idx) => (
+                      <div key={idx} className={styles.historyEntry}>
+                        <div className={styles.historyDate}>
+                          {formatDate(entry.date)}
+                        </div>
+                        <div className={styles.historyField}>
+                          <strong>{entry.field}</strong>
+                        </div>
+                        <div className={styles.historyChange}>
+                          <span className={styles.oldValue}>
+                            {truncate(entry.oldValue)}
+                          </span>
+                          <span className={styles.arrow}>→</span>
+                          <span className={styles.newValue}>
+                            {truncate(entry.newValue)}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 

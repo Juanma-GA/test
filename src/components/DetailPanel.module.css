@@ -318,6 +318,119 @@
   color: #4b5563;
 }
 
+.historySection {
+  padding: 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.historyToggle {
+  width: 100%;
+  padding: 12px 20px;
+  background: white;
+  border: none;
+  text-align: left;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.historyToggle:hover {
+  background-color: #f9fafb;
+}
+
+.historyContent {
+  padding: 12px 20px;
+  background-color: #fafbfc;
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.historyEntry {
+  padding: 10px;
+  background: white;
+  border: 1px solid #e8edf5;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.historyDate {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.historyField {
+  font-size: 11px;
+  color: #374151;
+}
+
+.historyField strong {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.historyChange {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: #6b7280;
+}
+
+.oldValue {
+  background-color: #fee2e2;
+  color: #991b1b;
+  padding: 2px 6px;
+  border-radius: 3px;
+  word-break: break-word;
+}
+
+.arrow {
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.newValue {
+  background-color: #dcfce7;
+  color: #166534;
+  padding: 2px 6px;
+  border-radius: 3px;
+  word-break: break-word;
+}
+
+.noHistory {
+  padding: 16px 12px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+.footer {
+  padding: 12px 20px;
+  border-top: 1px solid #f1f5f9;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
 /* Responsive design */
 @media (max-width: 900px) {
   .panel {

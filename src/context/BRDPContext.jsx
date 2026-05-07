@@ -26,9 +26,26 @@ export function BRDPProvider({ children }) {
   }, []);
 
   const updateBRDP = useCallback((id, changes) => {
-    const updated = brdps.map(b =>
-      b.id === id ? { ...b, ...changes } : b
-    );
+    const updated = brdps.map(b => {
+      if (b.id !== id) return b;
+
+      // Build history entry for each changed field
+      const history = b.history || [];
+      const fieldsToTrack = ['proposal', 'comment', 'validation'];
+
+      Object.keys(changes).forEach(field => {
+        if (fieldsToTrack.includes(field) && changes[field] !== b[field]) {
+          history.push({
+            date: new Date().toISOString(),
+            field,
+            oldValue: b[field] || '',
+            newValue: changes[field] || '',
+          });
+        }
+      });
+
+      return { ...b, ...changes, history };
+    });
     setBrdps(updated);
   }, [brdps, setBrdps]);
 
