@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { useBRDPContext } from '../context/BRDPContext';
-import GenerateModal from './GenerateModal';
 import styles from './ChatPanel.module.css';
 
 /**
@@ -31,6 +30,7 @@ function TypingIndicator() {
  * @param {Function} props.onNavigateSettings - Navigate to settings
  * @param {Function} props.onClose - Callback to close panel
  * @param {boolean} props.detailPanelOpen - Whether detail panel is open
+ * @param {Function} props.onOpenGenerateModal - Callback to open generate modal
  * @returns {JSX.Element} Chat panel
  */
 export default function ChatPanel({
@@ -43,10 +43,10 @@ export default function ChatPanel({
   onNavigateSettings,
   onClose,
   detailPanelOpen,
+  onOpenGenerateModal,
 }) {
   const { brdps } = useBRDPContext();
   const [input, setInput] = useState('');
-  const [showGenerateModal, setShowGenerateModal] = useState(false);
   const messagesEndRef = useRef(null);
 
   // Auto-scroll to bottom when messages change
@@ -95,20 +95,12 @@ export default function ChatPanel({
         <button
           className={styles.generateBtn}
           disabled={!isConfigured || brdps.length === 0}
-          onClick={() => setShowGenerateModal(true)}
+          onClick={onOpenGenerateModal}
           title={!isConfigured || brdps.length === 0 ? 'Configure your API key and load BRDPs first' : ''}
         >
           Generate Output
         </button>
       </div>
-
-      {/* Generate Modal */}
-      {showGenerateModal && (
-        <GenerateModal
-          brdps={brdps}
-          onClose={() => setShowGenerateModal(false)}
-        />
-      )}
 
       {/* Messages Area */}
       <div className={styles.messagesContainer}>
