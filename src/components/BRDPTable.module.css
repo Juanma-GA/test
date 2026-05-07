@@ -136,6 +136,14 @@
   position: relative;
 }
 
+.editHeader {
+  padding: 1rem !important;
+  width: 40px;
+  min-width: 40px;
+  background-color: #f8fafc !important;
+  border-bottom: 2px solid #e8edf5 !important;
+}
+
 .editCell {
   padding: 6px 4px !important;
   text-align: center;

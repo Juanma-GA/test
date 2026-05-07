@@ -25,6 +25,7 @@ export default function BRDPPage({ selectedBrdp, onSelectBrdp, showToast, onNavi
   const [sortField, setSortField] = useState('');
   const [sortDir, setSortDir] = useState('');
   const [page, setPage] = useState(1);
+  const [detailBrdp, setDetailBrdp] = useState(null);
 
   // Reset to page 1 when search or filter changes
   const handleSearchChange = (newSearch) => {
@@ -56,7 +57,7 @@ export default function BRDPPage({ selectedBrdp, onSelectBrdp, showToast, onNavi
   };
 
   /**
-   * Handle single-click: highlight row and silently load BRDP context
+   * Handle single-click: load BRDP context for chat (do NOT open detail panel)
    */
   const handleSelectBrdp = (brdp) => {
     onSelectBrdp(brdp);
@@ -66,14 +67,14 @@ export default function BRDPPage({ selectedBrdp, onSelectBrdp, showToast, onNavi
    * Handle edit button click: open detail/edit panel
    */
   const handleEditBrdp = (brdp) => {
-    onSelectBrdp(brdp);
+    setDetailBrdp(brdp);
   };
 
   /**
    * Handle closing the detail panel
    */
   const handleClosePanel = () => {
-    onSelectBrdp(null);
+    setDetailBrdp(null);
   };
 
   /**
@@ -126,9 +127,9 @@ export default function BRDPPage({ selectedBrdp, onSelectBrdp, showToast, onNavi
       </div>
 
       {/* Detail Panel */}
-      {selectedBrdp && (
+      {detailBrdp && (
         <DetailPanel
-          brdp={selectedBrdp}
+          brdp={detailBrdp}
           onClose={handleClosePanel}
           showToast={showToast}
           onUpdate={handleBrdpUpdate}

@@ -163,6 +163,7 @@ export default function BRDPTable({
               {sortField === 'validation' && <SortIndicator sortDir={sortDir} />}
             </th>
             <th>Comment</th>
+            <th className={styles.editHeader}></th>
           </tr>
         </thead>
         <tbody>
