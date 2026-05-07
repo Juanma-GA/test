@@ -79,7 +79,6 @@ function TypingIndicator() {
  * @param {Function} props.onNavigateSettings - Navigate to settings
  * @param {Function} props.onClose - Callback to close panel
  * @param {boolean} props.detailPanelOpen - Whether detail panel is open
- * @param {Function} props.onOpenGenerateModal - Callback to open generate modal
  * @param {number} props.width - Panel width in pixels
  * @param {Function} props.onWidthChange - Callback to update width
  * @returns {JSX.Element} Chat panel
@@ -97,7 +96,6 @@ export default function ChatPanel({
   detailPanelOpen,
   selectedBRDPs = [],
   onDeselectBrdp,
-  onOpenGenerateModal,
   width = 340,
   onWidthChange,
 }) {
@@ -217,17 +215,6 @@ export default function ChatPanel({
       </div>
 
       {/* Generate Button */}
-      <div className={styles.actionButtons}>
-        <button
-          className={styles.generateBtn}
-          disabled={!isConfigured || brdps.length === 0}
-          onClick={onOpenGenerateModal}
-          title={!isConfigured || brdps.length === 0 ? 'Configure your API key and load BRDPs first' : ''}
-        >
-          Generate Output
-        </button>
-      </div>
-
       {/* Messages Area */}
       <div className={styles.messagesContainer}>
         {!isConfigured ? (
