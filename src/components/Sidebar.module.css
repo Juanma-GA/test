@@ -45,8 +45,10 @@
 }
 
 .navItem.active {
-  background: var(--blue-light);
-  border-left: 2px solid var(--blue);
+  background: var(--blue-light) !important;
+  border-left: 2px solid #2563eb !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .navItem.active .navIcon {

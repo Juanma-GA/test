@@ -43,12 +43,13 @@
 }
 
 .title > span > strong {
+  display: block;
   font-family: 'Syne', sans-serif;
   font-size: 15px;
   font-weight: 700;
   color: var(--text);
-  line-height: 1.5;
-  padding-bottom: 4px;
+  line-height: 1.6;
+  padding-bottom: 6px;
   overflow: visible;
 }
 
