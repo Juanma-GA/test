@@ -57,11 +57,19 @@ export default function ChatPanel({
   const [input, setInput] = useState('');
   const [isResizing, setIsResizing] = useState(false);
   const messagesEndRef = useRef(null);
+  const textareaRef = useRef(null);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Focus input after response arrives
+  useEffect(() => {
+    if (!isLoading && messages.length > 0) {
+      textareaRef.current?.focus();
+    }
+  }, [isLoading, messages.length]);
 
   // Handle resize
   useEffect(() => {
@@ -203,6 +211,7 @@ export default function ChatPanel({
       {isConfigured && (
         <div className={styles.inputContainer}>
           <textarea
+            ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}

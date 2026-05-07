@@ -16,9 +16,10 @@ import styles from './BRDPPage.module.css';
  * @param {Function} props.onSelectBrdp - Callback to select/deselect BRDP
  * @param {Function} props.showToast - Callback to show toast notifications
  * @param {Function} props.onNavigate - Callback to navigate to different page
+ * @param {Function} props.onAskAIAboutBRDP - Callback to ask AI about a BRDP
  * @returns {JSX.Element} Page with table and detail panel
  */
-export default function BRDPPage({ selectedBrdp, onSelectBrdp, showToast, onNavigate }) {
+export default function BRDPPage({ selectedBrdp, onSelectBrdp, showToast, onNavigate, onAskAIAboutBRDP }) {
   const { brdps } = useBRDPContext();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('All');
@@ -122,7 +123,7 @@ export default function BRDPPage({ selectedBrdp, onSelectBrdp, showToast, onNavi
         <DetailPanel
           brdp={selectedBrdp}
           onClose={handleClosePanel}
-          onOpenChat={() => {}}
+          onOpenChat={() => onAskAIAboutBRDP(selectedBrdp)}
           showToast={showToast}
           onUpdate={handleBrdpUpdate}
         />
