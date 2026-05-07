@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useBRDPContext } from '../context/BRDPContext';
 import { useTableLogic } from '../hooks/useTableLogic';
 import SearchBar from '../components/SearchBar';
@@ -25,6 +25,11 @@ export default function BRDPPage({ selectedBrdp, onSelectBrdp, showToast, onNavi
   const [sortField, setSortField] = useState('');
   const [sortDir, setSortDir] = useState('');
   const [page, setPage] = useState(1);
+
+  // Reset to page 1 when brdps array changes (new import)
+  useEffect(() => {
+    setPage(1);
+  }, [brdps]);
 
   // Reset to page 1 when search or filter changes
   const handleSearchChange = (newSearch) => {

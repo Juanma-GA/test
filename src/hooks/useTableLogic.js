@@ -99,7 +99,7 @@ export function useTableLogic({ brdps, search, filter, sortField, sortDir, page 
     result = applySort(result, sortField, sortDir);
     const rows = applyPagination(result, page);
 
-    const totalPages = Math.ceil(total / ROWS_PER_PAGE);
+    const totalPages = Math.max(1, Math.ceil(total / ROWS_PER_PAGE));
 
     return { rows, totalPages, total };
   }, [brdps, search, filter, sortField, sortDir, page]);
