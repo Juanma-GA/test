@@ -202,6 +202,7 @@
   border-top-right-radius: 3px;
   padding: 8px 11px;
   max-width: 86%;
+  border-top: 2px solid #1d4ed8;
 }
 
 .message.assistant {
@@ -216,6 +217,7 @@
   border-top-left-radius: 3px;
   padding: 8px 11px;
   max-width: 86%;
+  border-top: 2px solid #d1d5db;
 }
 
 .errorMessage {
@@ -357,6 +359,36 @@
   overflow-wrap: break-word;
   word-break: break-word;
   max-width: 100%;
+  font-size: 13px;
+}
+
+.markdownContent h1,
+.markdownContent h2,
+.markdownContent h3,
+.markdownContent h4,
+.markdownContent h5,
+.markdownContent h6 {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0.25rem 0;
+  padding: 0;
+}
+
+.markdownContent p {
+  margin: 0.25rem 0;
+  padding: 0;
+}
+
+.markdownContent ul,
+.markdownContent ol {
+  margin: 0.25rem 0;
+  padding-left: 1.25rem;
+}
+
+.markdownContent li {
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
 }
 
 .markdownContent table {
@@ -372,7 +404,7 @@
   padding: 0.5rem;
   border: 1px solid #e8edf5;
   text-align: left;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .markdownContent table th {
@@ -386,11 +418,13 @@
   padding: 0.5rem;
   border-radius: 4px;
   font-size: 11px;
+  margin: 0.25rem 0;
 }
 
 .markdownContent code {
   overflow-wrap: break-word;
   word-break: break-word;
+  font-size: 12px;
 }
 
 /* Responsive */
