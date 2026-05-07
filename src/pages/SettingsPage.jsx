@@ -9,9 +9,11 @@ import styles from './SettingsPage.module.css';
 /**
  * Settings Page component
  * Manages AI configuration, data management, and displays app information
+ * @param {Object} props - Component props
+ * @param {Function} props.showToast - Callback to show toast notifications
  * @returns {JSX.Element} Settings page with configuration sections
  */
-export default function SettingsPage() {
+export default function SettingsPage({ showToast }) {
   const {
     apiKey,
     modelName,
@@ -49,7 +51,7 @@ export default function SettingsPage() {
 
         <ProjectConfigSection />
 
-        <DataManagementSection brdps={brdps} onSetBrdps={setBrdps} />
+        <DataManagementSection brdps={brdps} onSetBrdps={setBrdps} showToast={showToast} />
 
         <AboutSection />
       </div>

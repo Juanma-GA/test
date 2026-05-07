@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { mockBRDPs } from '../data/mockBRDPs';
 import { generateTemplate, importFromExcel, exportToExcel, exportToCSV } from '../utils/excelUtils';
 import styles from './DataManagementSection.module.css';
 
@@ -8,12 +9,14 @@ import styles from './DataManagementSection.module.css';
  * @param {Object} props - Component props
  * @param {Array} props.brdps - Current BRDP records
  * @param {Function} props.onSetBrdps - Callback to update BRDPs
+ * @param {Function} props.showToast - Callback to show toast notifications
  * @returns {JSX.Element} Data management section
  */
-export default function DataManagementSection({ brdps, onSetBrdps }) {
+export default function DataManagementSection({ brdps, onSetBrdps, showToast }) {
   const [importedRows, setImportedRows] = useState([]);
   const [importErrors, setImportErrors] = useState([]);
   const [importMode, setImportMode] = useState(null);
+  const [showResetDialog, setShowResetDialog] = useState(false);
   const fileInputRef = useRef(null);
 
   /**
@@ -71,6 +74,9 @@ export default function DataManagementSection({ brdps, onSetBrdps }) {
     onSetBrdps(importedRows);
     setImportedRows([]);
     setImportMode(null);
+    if (showToast) {
+      showToast(`${importedRows.length} BRDPs imported successfully`, 'success');
+    }
   };
 
   /**
@@ -82,6 +88,9 @@ export default function DataManagementSection({ brdps, onSetBrdps }) {
     onSetBrdps([...brdps, ...newRows]);
     setImportedRows([]);
     setImportMode(null);
+    if (showToast) {
+      showToast(`${newRows.length} new BRDPs imported successfully`, 'success');
+    }
   };
 
   /**
@@ -98,6 +107,9 @@ export default function DataManagementSection({ brdps, onSetBrdps }) {
    */
   const handleExportExcel = () => {
     exportToExcel(brdps);
+    if (showToast) {
+      showToast('File downloaded successfully', 'success');
+    }
   };
 
   /**
@@ -105,6 +117,20 @@ export default function DataManagementSection({ brdps, onSetBrdps }) {
    */
   const handleExportCSV = () => {
     exportToCSV(brdps);
+    if (showToast) {
+      showToast('File downloaded successfully', 'success');
+    }
+  };
+
+  /**
+   * Handle reset to demo data
+   */
+  const handleResetConfirm = () => {
+    onSetBrdps(mockBRDPs);
+    setShowResetDialog(false);
+    if (showToast) {
+      showToast('Reset to demo data successfully', 'success');
+    }
   };
 
   return (
@@ -212,6 +238,37 @@ export default function DataManagementSection({ brdps, onSetBrdps }) {
           {brdps.length} BRDP record{brdps.length !== 1 ? 's' : ''} available for export
         </p>
       </div>
+
+      {/* Subsection D: Reset to demo data */}
+      <div className={styles.subsection}>
+        <h4 className={styles.subtitle}>Reset data</h4>
+        <button onClick={() => setShowResetDialog(true)} className={styles.resetButton}>
+          Reset to demo data
+        </button>
+        <p className={styles.helpText}>
+          Replace all current BRDPs with the original demo data
+        </p>
+      </div>
+
+      {/* Reset confirmation dialog */}
+      {showResetDialog && (
+        <div className={styles.dialogOverlay} onClick={() => setShowResetDialog(false)}>
+          <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.dialogTitle}>Reset to demo data</h3>
+            <p className={styles.dialogMessage}>
+              This will replace all current BRDPs with demo data. Are you sure?
+            </p>
+            <div className={styles.dialogActions}>
+              <button onClick={handleResetConfirm} className={styles.primaryButton}>
+                Reset
+              </button>
+              <button onClick={() => setShowResetDialog(false)} className={styles.cancelButton}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
