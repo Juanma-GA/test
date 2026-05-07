@@ -151,13 +151,16 @@ export default function DataManagementSection({ brdps, onSetBrdps, showToast }) 
 
         {importMode === null && (
           <>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".xlsx,.xls"
-              onChange={handleFileSelect}
-              className={styles.fileInput}
-            />
+            <label className={styles.fileInputLabel}>
+              Choose Excel file
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={handleFileSelect}
+                className={styles.fileInputHidden}
+              />
+            </label>
             <p className={styles.helpText}>
               Select an Excel file with columns: BRDP Identifier, BRDP Definition,
               ATX Decision Proposal, Validation Status, Comment

@@ -53,6 +53,28 @@
   font-size: 11px;
 }
 
+.fileInputLabel {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 7px;
+  border: 1px solid #dde3ec;
+  background: white;
+  font-size: 12px;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.fileInputLabel:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.fileInputHidden {
+  display: none;
+}
+
 .errorContainer {
   margin-top: 1rem;
   padding: 1rem;
