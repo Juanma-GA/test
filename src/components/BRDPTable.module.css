@@ -16,14 +16,14 @@
 
 .table thead {
   background-color: #f8fafc !important;
-  border-bottom: 1.5px solid #e8edf5 !important;
+  border-bottom: 2px solid #e8edf5 !important;
   position: sticky;
   top: 0;
 }
 
 .table thead tr {
   background-color: #f8fafc !important;
-  border-bottom: 1.5px solid #e8edf5 !important;
+  border-bottom: 2px solid #e8edf5 !important;
 }
 
 .table thead th {
