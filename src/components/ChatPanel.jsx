@@ -96,6 +96,7 @@ export default function ChatPanel({
   onClose,
   detailPanelOpen,
   selectedBrdp,
+  onDeselectBrdp,
   onOpenGenerateModal,
   width = 340,
   onWidthChange,
@@ -317,7 +318,10 @@ export default function ChatPanel({
               <span className={styles.contextText}>📌 Context: {activeContext.id}</span>
               <button
                 className={styles.contextClear}
-                onClick={() => setActiveContext(null)}
+                onClick={() => {
+                  setActiveContext(null);
+                  onDeselectBrdp?.();
+                }}
                 aria-label="Clear context"
                 title="Clear context"
               >

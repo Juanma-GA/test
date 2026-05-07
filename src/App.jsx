@@ -89,6 +89,7 @@ function AppContent() {
             onClose={handleCloseChat}
             detailPanelOpen={!!selectedBrdp}
             selectedBrdp={selectedBrdp}
+            onDeselectBrdp={() => setSelectedBrdp(null)}
             onOpenGenerateModal={openGenerateModal}
             width={chatPanelWidth}
             onWidthChange={setChatPanelWidth}
