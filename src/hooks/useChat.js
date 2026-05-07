@@ -1,5 +1,6 @@
-import { useState, useCallback } from 'react';
-import { sendMessage, buildSystemPrompt } from '../api/llmAPI';
+import { useState, useCallback, useContext } from 'react';
+import { sendMessage } from '../api/llmAPI';
+import { BRDPContext } from '../context/BRDPContext';
 
 /**
  * Build a compact summary of the BRDP dataset
@@ -43,6 +44,40 @@ Desglose: ${breakdownStr}
 ${JSON.stringify(compactIndex, null, 0)}`;
 }
 
+/**
+ * Build enhanced system prompt with dataset context
+ * @param {Array} brdps - All BRDP records from context
+ * @param {Object} [selectedBrdp] - Currently selected BRDP
+ * @returns {string} Enhanced system prompt with dataset and optional BRDP context
+ */
+function buildEnhancedSystemPrompt(brdps, selectedBrdp) {
+  const basePrompt = `You are an S1000D / DITA and BRDP expert assistant.
+You help users understand business rules, validate decisions,
+and answer questions about S1000D, DITA, and technical publications.`;
+
+  const datasetSummary = buildDatasetSummary(brdps);
+
+  if (!selectedBrdp) {
+    return `${basePrompt}
+
+BRDP Dataset Context:
+${datasetSummary}
+
+Use the complete dataset above to answer questions about business rules, validate proposals, and provide insights across all BRDP records.`;
+  }
+
+  // If a specific BRDP is selected, include its full details
+  return `${basePrompt}
+
+BRDP Dataset Context:
+${datasetSummary}
+
+Current BRDP Focus (selected for detailed analysis):
+${JSON.stringify(selectedBrdp, null, 2)}
+
+Provide answers focusing on the selected BRDP while leveraging the complete dataset for comparison and validation.`;
+}
+
 
 /**
  * Custom hook for managing chat conversation
@@ -63,6 +98,7 @@ export function useChat({ apiKey, modelName, provider, selectedBrdp }) {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { brdps } = useContext(BRDPContext);
 
   /**
    * Send a user message and get AI response
@@ -80,8 +116,8 @@ export function useChat({ apiKey, modelName, provider, selectedBrdp }) {
       setError(null);
 
       try {
-        // Build system prompt with BRDP context if available
-        const systemPrompt = buildSystemPrompt(selectedBrdp);
+        // Build system prompt with dataset and BRDP context
+        const systemPrompt = buildEnhancedSystemPrompt(brdps, selectedBrdp);
 
         // Send to LLM
         const response = await sendMessage(
@@ -100,7 +136,7 @@ export function useChat({ apiKey, modelName, provider, selectedBrdp }) {
         setIsLoading(false);
       }
     },
-    [messages, apiKey, modelName, provider, selectedBrdp]
+    [messages, apiKey, modelName, provider, selectedBrdp, brdps]
   );
 
   /**
