@@ -7,9 +7,10 @@ import styles from './Header.module.css';
  * @param {Object} props - Component props
  * @param {Function} props.onChatClick - Callback when chat button is clicked
  * @param {boolean} props.chatOpen - Whether chat panel is currently open
+ * @param {Function} props.onOpenGenerateModal - Callback to open generate modal
  * @returns {JSX.Element} Header element with title, stat badges, and chat button
  */
-export default function Header({ onChatClick, chatOpen }) {
+export default function Header({ onChatClick, chatOpen, onOpenGenerateModal }) {
   const { stats } = useBRDPContext();
 
   return (
@@ -46,6 +47,7 @@ export default function Header({ onChatClick, chatOpen }) {
             ✨ AI Assistant
           </button>
           <button
+            onClick={onOpenGenerateModal}
             className={styles.generateBtn}
             title="Generate Output"
             aria-label="Generate Output"
