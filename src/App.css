@@ -1,6 +1,5 @@
 .appContainer {
-  flex: 1;
-  min-height: 0;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -17,9 +16,8 @@
 .mainContent {
   flex: 1;
   min-height: 0;
-  min-width: 0;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   background: var(--bg, #f4f6f9);
 }
