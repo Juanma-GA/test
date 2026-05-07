@@ -18,17 +18,8 @@ export default function Header({ onChatClick, chatOpen }) {
         <h1 className={styles.title}>
           <span>
             <strong>BRDP Manager</strong>
-            <em>v1.0</em>
           </span>
         </h1>
-        <button
-          onClick={onChatClick}
-          className={`${styles.chatButton} ${chatOpen ? styles.chatActive : ''}`}
-          title={chatOpen ? "Close AI Assistant" : "Open AI Assistant"}
-          aria-label="Open AI Assistant"
-        >
-          💬 Chat
-        </button>
         <div className={styles.badges}>
           <div className={`${styles.badge} ${styles.total}`}>
             <span className={styles.value}>{stats.total}</span>
@@ -46,6 +37,14 @@ export default function Header({ onChatClick, chatOpen }) {
             <span className={styles.value}>{stats.pending}</span>
             <span className={styles.label}>Pending</span>
           </div>
+          <button
+            onClick={onChatClick}
+            className={`${styles.chatButton} ${chatOpen ? styles.chatActive : ''}`}
+            title={chatOpen ? "Close AI Assistant" : "Open AI Assistant"}
+            aria-label="Open AI Assistant"
+          >
+            ✨ AI Assistant
+          </button>
         </div>
       </div>
     </header>

@@ -27,6 +27,12 @@
   font-weight: 600;
 }
 
+.allActive {
+  background-color: var(--blue);
+  border-color: var(--blue);
+  color: white;
+}
+
 .validatedActive {
   background-color: #22c55e;
 }

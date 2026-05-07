@@ -21,6 +21,7 @@ export default function FilterPills({ activeFilter, onFilterChange }) {
 
     if (activeFilter === option) {
       classes += ` ${styles.active}`;
+      if (option === 'All') classes += ` ${styles.allActive}`;
       if (option === 'Validated') classes += ` ${styles.validatedActive}`;
       if (option === 'Refused') classes += ` ${styles.refusedActive}`;
       if (option === 'Pending') classes += ` ${styles.pendingActive}`;
