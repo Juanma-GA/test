@@ -18,9 +18,11 @@ import styles from './BRDPPage.module.css';
  * @param {Object} props - Component props
  * @param {boolean} props.chatOpen - Whether chat panel is open
  * @param {Function} props.onSetChatOpen - Callback to set chat open state
+ * @param {Function} props.showToast - Callback to show toast notifications
+ * @param {Function} props.onNavigate - Callback to navigate to different page
  * @returns {JSX.Element} Page with table, detail panel, and chat
  */
-export default function BRDPPage({ chatOpen, onSetChatOpen }) {
+export default function BRDPPage({ chatOpen, onSetChatOpen, showToast, onNavigate }) {
   const { brdps } = useBRDPs();
   const { apiKey, modelName, provider, isConfigured } = useAPIKey();
   const [search, setSearch] = useState('');
@@ -149,6 +151,8 @@ export default function BRDPPage({ chatOpen, onSetChatOpen }) {
             total={total}
             onPageChange={handlePageChange}
             noResults={noResults}
+            noBrdps={brdps.length === 0}
+            onGoToSettings={() => onNavigate('settings')}
           />
         </div>
       </div>

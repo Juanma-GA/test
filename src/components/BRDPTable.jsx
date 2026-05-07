@@ -57,6 +57,8 @@ function SortIndicator({ sortDir }) {
  * @param {number} props.total - Total records matching filter/search
  * @param {Function} props.onPageChange - Callback to change page
  * @param {boolean} props.noResults - Whether there are no results to display
+ * @param {boolean} [props.noBrdps] - Whether there are no BRDPs at all (vs no search results)
+ * @param {Function} [props.onGoToSettings] - Callback to navigate to settings
  * @returns {JSX.Element} Table displaying BRDP records with pagination
  */
 export default function BRDPTable({
@@ -71,6 +73,8 @@ export default function BRDPTable({
   total,
   onPageChange,
   noResults,
+  noBrdps,
+  onGoToSettings,
 }) {
   /**
    * Get sort direction for a column
@@ -108,11 +112,27 @@ export default function BRDPTable({
     return cls;
   };
 
+  if (noBrdps) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.emptyState}>
+          <p className={styles.emptyMessage}>📋 No BRDPs loaded</p>
+          <p className={styles.emptyHint}>Import an Excel file in Settings to get started</p>
+          {onGoToSettings && (
+            <button onClick={onGoToSettings} className={styles.settingsBtn}>
+              Go to Settings
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   if (noResults) {
     return (
       <div className={styles.container}>
         <div className={styles.emptyState}>
-          <p className={styles.emptyMessage}>No results found</p>
+          <p className={styles.emptyMessage}>🔍 No BRDPs found</p>
           <p className={styles.emptyHint}>Try adjusting your search or filters</p>
         </div>
       </div>

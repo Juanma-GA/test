@@ -139,7 +139,23 @@
 .emptyHint {
   font-size: 0.875rem;
   color: #9ca3af;
-  margin: 0;
+  margin: 0 0 1rem 0;
+}
+
+.settingsBtn {
+  padding: 0.625rem 1.5rem;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.settingsBtn:hover {
+  background-color: #1d4ed8;
 }
 
 .footer {

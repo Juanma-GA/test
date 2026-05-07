@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { useToast } from './hooks/useToast';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
+import ToastContainer from './components/ToastContainer';
 import BRDPPage from './pages/BRDPPage';
 import SettingsPage from './pages/SettingsPage';
 import './index.css';
@@ -13,6 +15,7 @@ import './index.css';
 function App() {
   const [currentPage, setCurrentPage] = useState('brdp');
   const [chatOpen, setChatOpen] = useState(false);
+  const { toasts, showToast } = useToast();
 
   /**
    * Handle opening chat from header
@@ -29,10 +32,11 @@ function App() {
       <div className="flex flex-1">
         <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
         <main className="flex-1 bg-gray-50">
-          {currentPage === 'brdp' && <BRDPPage chatOpen={chatOpen} onSetChatOpen={setChatOpen} />}
-          {currentPage === 'settings' && <SettingsPage />}
+          {currentPage === 'brdp' && <BRDPPage chatOpen={chatOpen} onSetChatOpen={setChatOpen} showToast={showToast} onNavigate={setCurrentPage} />}
+          {currentPage === 'settings' && <SettingsPage showToast={showToast} />}
         </main>
       </div>
+      <ToastContainer toasts={toasts} />
     </div>
   );
 }

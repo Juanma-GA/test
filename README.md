@@ -1,73 +1,102 @@
-# React + TypeScript + Vite
+# BRDP Manager
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A comprehensive business rules document (BRDP) management system for S1000D and DITA documentation projects. Manage BRDP records, validate technical decisions, and interact with AI assistants for expert guidance.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **BRDP Records Management** — Import, search, filter, sort, and export BRDP records
+- **AI Assistant Chat** — Get expert guidance on S1000D, DITA, and technical documentation
+- **Multi-Provider LLM Support** — Configure Anthropic Claude, OpenAI, or custom API endpoints
+- **Project Configuration** — Manage S1000D project metadata and identifiers
+- **Excel Import/Export** — Bulk import and export BRDP records
+- **Notes System** — Attach persistent notes to BRDP records
+- **Local Data Persistence** — All data saved locally in localStorage
 
-## React Compiler
+## Quick Start
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Run with Docker
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+docker-compose up --build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open http://localhost:8080 in your browser.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Run Locally
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
+
+Open http://localhost:5173 in your browser.
+
+## Configuration
+
+### AI Configuration
+
+1. Go to **Settings** → **AI Configuration**
+2. Select your provider (Anthropic Claude, OpenAI, or Custom)
+3. Enter your API key and model name
+4. Click "Test Connection" to verify
+
+### Project Configuration
+
+1. Go to **Settings** → **Project Configuration**
+2. Enter your S1000D project details:
+   - Project Name
+   - Model Ident Code (CAGE code)
+   - System Diff Code (default: A)
+   - Issue Number (default: 001)
+   - Language and Country ISO codes
+   - Security Classification
+   - Enterprise Code
+3. Click "Save Configuration"
+
+## Usage
+
+### Managing BRDPs
+
+1. **Import**: Go to Settings → Data Management to import an Excel file
+2. **Search**: Use the search bar to find specific BRDPs
+3. **Filter**: Filter by validation status (All, Validated, Refused, Pending)
+4. **Sort**: Click column headers to sort
+5. **View Details**: Click a row to see full details and add notes
+6. **Export**: Export to Excel or CSV format
+
+### Using the AI Assistant
+
+1. Click the 💬 button in the header or "Ask AI about this BRDP" in the detail panel
+2. Ask questions about your BRDP records, S1000D, DITA, or technical documentation
+3. Use "Generate Output" to configure BREX or Schematron output (coming soon)
+
+## Build & Deploy
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+Output is in the `dist/` directory.
+
+### Docker Production Build
+
+The included `Dockerfile` uses a two-stage build:
+1. **Build Stage**: Compiles the React app with Vite
+2. **Serve Stage**: Uses lightweight nginx to serve the built app
+
+```bash
+docker-compose up --build -d
+```
+
+## Environment
+
+- **Node.js**: 20+ (for development and Docker)
+- **Browser**: Modern browser with ES2020+ support
+- **Storage**: localStorage for data persistence
+- **API**: Optional Anthropic, OpenAI, or custom LLM endpoints
+
+## License
+
+Proprietary - All rights reserved
