@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from './hooks/useToast';
 import { useAPIKey } from './hooks/useAPIKey';
 import { useChat } from './hooks/useChat';
@@ -23,6 +23,10 @@ function AppContent() {
   const [chatOpen, setChatOpen] = useState(false);
   const [selectedBrdp, setSelectedBrdp] = useState(null);
   const [showGenerateModal, setShowGenerateModal] = useState(false);
+  const [chatPanelWidth, setChatPanelWidth] = useState(() => {
+    const saved = localStorage.getItem('chatPanelWidth');
+    return saved ? parseInt(saved) : 340;
+  });
   const { brdps } = useBRDPContext();
   const { toasts, showToast } = useToast();
   const { apiKey, modelName, provider, isConfigured } = useAPIKey();
@@ -33,6 +37,11 @@ function AppContent() {
     provider,
     selectedBrdp,
   });
+
+  // Save chat panel width to localStorage
+  useEffect(() => {
+    localStorage.setItem('chatPanelWidth', chatPanelWidth.toString());
+  }, [chatPanelWidth]);
 
   /**
    * Handle opening generate modal
@@ -79,6 +88,8 @@ function AppContent() {
             onClose={handleCloseChat}
             detailPanelOpen={!!selectedBrdp}
             onOpenGenerateModal={openGenerateModal}
+            width={chatPanelWidth}
+            onWidthChange={setChatPanelWidth}
           />
         )}
       </div>

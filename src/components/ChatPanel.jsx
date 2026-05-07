@@ -32,6 +32,8 @@ function TypingIndicator() {
  * @param {Function} props.onClose - Callback to close panel
  * @param {boolean} props.detailPanelOpen - Whether detail panel is open
  * @param {Function} props.onOpenGenerateModal - Callback to open generate modal
+ * @param {number} props.width - Panel width in pixels
+ * @param {Function} props.onWidthChange - Callback to update width
  * @returns {JSX.Element} Chat panel
  */
 export default function ChatPanel({
@@ -45,15 +47,45 @@ export default function ChatPanel({
   onClose,
   detailPanelOpen,
   onOpenGenerateModal,
+  width = 340,
+  onWidthChange,
 }) {
   const { brdps } = useBRDPContext();
   const [input, setInput] = useState('');
+  const [isResizing, setIsResizing] = useState(false);
   const messagesEndRef = useRef(null);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Handle resize
+  useEffect(() => {
+    if (!isResizing) return;
+
+    const handleMouseMove = (e) => {
+      const newWidth = window.innerWidth - e.clientX;
+      const MIN_WIDTH = 280;
+      const MAX_WIDTH = 600;
+
+      if (newWidth >= MIN_WIDTH && newWidth <= MAX_WIDTH) {
+        onWidthChange?.(newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing, onWidthChange]);
 
   /**
    * Handle send button click
@@ -77,7 +109,17 @@ export default function ChatPanel({
   };
 
   return (
-    <div className={`${styles.panel} ${detailPanelOpen ? styles.withDetail : ''}`}>
+    <div
+      className={`${styles.panel} ${detailPanelOpen ? styles.withDetail : ''}`}
+      style={{ width: `${width}px` }}
+    >
+      {/* Resize Handle */}
+      <div
+        className={styles.resizeHandle}
+        onMouseDown={() => setIsResizing(true)}
+        title="Drag to resize panel"
+      />
+
       {/* Header */}
       <div className={styles.header}>
         <h3 className={styles.title}>Ask AI</h3>

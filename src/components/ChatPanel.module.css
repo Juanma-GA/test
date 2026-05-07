@@ -8,13 +8,29 @@
   flex-shrink: 0;
   min-height: 0;
   animation: slideInChat 0.3s ease-out;
-  flex-shrink: 0;
-  height: 100%;
+  position: relative;
+  transition: width 0.05s ease-out;
 }
 
 .panel.withDetail {
   width: 25%;
   min-width: 250px;
+}
+
+.resizeHandle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background: transparent;
+  cursor: col-resize;
+  transition: background-color 0.2s;
+  z-index: 10;
+}
+
+.resizeHandle:hover {
+  background: #2563eb;
 }
 
 @keyframes slideInChat {
