@@ -5,6 +5,52 @@ import TypingDots from './TypingDots';
 import styles from './ChatPanel.module.css';
 
 /**
+ * Parse message content for [SUGGESTION:field]...[/SUGGESTION] blocks
+ * @param {string} content - Message content
+ * @returns {Array} Array of {type, content, field} objects
+ */
+function parseSuggestions(content) {
+  const parts = [];
+  const suggestionRegex = /\[SUGGESTION:(proposal|comment)\]([\s\S]*?)\[\/SUGGESTION\]/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = suggestionRegex.exec(content)) !== null) {
+    // Add text before suggestion as markdown
+    if (match.index > lastIndex) {
+      parts.push({
+        type: 'markdown',
+        content: content.substring(lastIndex, match.index),
+      });
+    }
+
+    // Add suggestion block
+    parts.push({
+      type: 'suggestion',
+      field: match[1],
+      content: match[2].trim(),
+    });
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Add remaining text after last suggestion
+  if (lastIndex < content.length) {
+    parts.push({
+      type: 'markdown',
+      content: content.substring(lastIndex),
+    });
+  }
+
+  // If no suggestions found, return entire content as markdown
+  if (parts.length === 0) {
+    return [{ type: 'markdown', content }];
+  }
+
+  return parts;
+}
+
+/**
  * Typing indicator component
  * Shows animated dots while waiting for response
  * @returns {JSX.Element} Typing indicator
@@ -195,7 +241,25 @@ export default function ChatPanel({
                 >
                   {message.role === 'assistant' ? (
                     <div className={styles.markdownContent}>
-                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                      {parseSuggestions(message.content).map((part, partIdx) => (
+                        part.type === 'markdown' ? (
+                          <div key={partIdx}>
+                            <ReactMarkdown>{part.content}</ReactMarkdown>
+                          </div>
+                        ) : (
+                          <div key={partIdx} className={styles.suggestionBox}>
+                            <div className={styles.suggestionLabel}>
+                              {part.field === 'proposal' ? 'Suggested Proposal:' : 'Suggested Comment:'}
+                            </div>
+                            <div className={styles.suggestionText}>
+                              {part.content}
+                            </div>
+                            <button className={styles.applySuggestionBtn}>
+                              Apply
+                            </button>
+                          </div>
+                        )
+                      ))}
                       {isStreamingLastMessage && <TypingDots />}
                     </div>
                   ) : (
