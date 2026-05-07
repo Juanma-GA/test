@@ -84,6 +84,13 @@ export default function BRDPPage({ chatOpen, onSetChatOpen, showToast, onNavigat
   };
 
   /**
+   * Handle BRDP updated in DetailPanel
+   */
+  const handleBrdpUpdate = (updatedBrdp) => {
+    setSelectedBrdp(updatedBrdp);
+  };
+
+  /**
    * Handle opening the chat panel
    */
   const handleOpenChat = () => {
@@ -163,6 +170,8 @@ export default function BRDPPage({ chatOpen, onSetChatOpen, showToast, onNavigat
           brdp={selectedBrdp}
           onClose={handleClosePanel}
           onOpenChat={handleOpenChat}
+          showToast={showToast}
+          onUpdate={handleBrdpUpdate}
         />
       )}
 

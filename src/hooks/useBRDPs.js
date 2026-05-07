@@ -46,6 +46,18 @@ export function useBRDPs() {
   }, []);
 
   /**
+   * Update a single BRDP record
+   * @param {string} id - BRDP ID to update
+   * @param {Object} changes - Object with fields to update
+   */
+  const updateBRDP = useCallback((id, changes) => {
+    const updatedBrdps = brdps.map(brdp =>
+      brdp.id === id ? { ...brdp, ...changes } : brdp
+    );
+    setBrdps(updatedBrdps);
+  }, [brdps, setBrdps]);
+
+  /**
    * Reset BRDPs to mock data and clear localStorage
    */
   const resetToMock = useCallback(() => {
@@ -69,5 +81,6 @@ export function useBRDPs() {
     setBrdps,
     stats,
     resetToMock,
+    updateBRDP,
   };
 }

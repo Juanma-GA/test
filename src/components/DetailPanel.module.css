@@ -75,6 +75,36 @@
   color: #1f2937;
 }
 
+.headerButtons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.editBtn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.editBtn:hover {
+  color: #2563eb;
+}
+
+.lockIcon {
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+  cursor: help;
+}
+
 .content {
   flex: 1;
   overflow-y: auto;
@@ -210,6 +240,83 @@
   opacity: 0.5;
   background-color: #f3f4f6;
   cursor: not-allowed;
+}
+
+.editTextarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #2563eb;
+  border-radius: 0.375rem;
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: #1f2937;
+  resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.editTextarea:focus {
+  outline: none;
+  border-color: #1d4ed8;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.editSelect {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #2563eb;
+  border-radius: 0.375rem;
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: #1f2937;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.editSelect:focus {
+  outline: none;
+  border-color: #1d4ed8;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.editActions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.saveBtn,
+.cancelBtn {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.saveBtn {
+  background-color: #22c55e;
+  color: white;
+  border-color: #22c55e;
+}
+
+.saveBtn:hover {
+  background-color: #16a34a;
+  border-color: #16a34a;
+}
+
+.cancelBtn {
+  background-color: #e5e7eb;
+  color: #6b7280;
+  border-color: #d1d5db;
+}
+
+.cancelBtn:hover {
+  background-color: #d1d5db;
+  border-color: #9ca3af;
+  color: #4b5563;
 }
 
 /* Responsive design */
