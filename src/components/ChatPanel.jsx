@@ -203,7 +203,7 @@ export default function ChatPanel({
 
       {/* Header */}
       <div className={styles.header}>
-        <h3 className={styles.title}>Ask AI</h3>
+        <h3 className={styles.title}>BRDP Assistant</h3>
         <button
           onClick={onClose}
           className={styles.closeBtn}

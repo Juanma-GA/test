@@ -31,6 +31,26 @@
   flex-shrink: 0;
 }
 
+.statNumber {
+  font-weight: 600;
+}
+
+.totalNumber {
+  color: #6b7280;
+}
+
+.validatedNumber {
+  color: #10b981;
+}
+
+.refusedNumber {
+  color: #ef4444;
+}
+
+.pendingNumber {
+  color: #f59e0b;
+}
+
 .controls {
   display: flex;
   flex-direction: column;

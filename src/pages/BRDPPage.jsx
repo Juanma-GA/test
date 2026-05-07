@@ -129,7 +129,10 @@ export default function BRDPPage({ showToast, onNavigate }) {
       <div className={styles.container}>
         <h2 className={styles.title}>BRDP Records</h2>
         <p className={styles.stats}>
-          {stats.total} total · {stats.validated} validated · {stats.refused} refused · {stats.pending} pending
+          <span className={styles.statNumber + ' ' + styles.totalNumber}>{stats.total}</span> total ·{' '}
+          <span className={styles.statNumber + ' ' + styles.validatedNumber}>{stats.validated}</span> validated ·{' '}
+          <span className={styles.statNumber + ' ' + styles.refusedNumber}>{stats.refused}</span> refused ·{' '}
+          <span className={styles.statNumber + ' ' + styles.pendingNumber}>{stats.pending}</span> pending
         </p>
 
         <div className={styles.controls}>
