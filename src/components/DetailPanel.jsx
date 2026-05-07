@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useBRDPs } from '../hooks/useBRDPs';
+import { useBRDPContext } from '../context/BRDPContext';
 import { useLocalNotes } from '../hooks/useLocalNotes';
 import styles from './DetailPanel.module.css';
 
@@ -47,7 +47,7 @@ function ValidationBadge({ status }) {
  * @returns {JSX.Element} Detail panel with full record information
  */
 export default function DetailPanel({ brdp, onClose, onOpenChat, showToast, onUpdate }) {
-  const { updateBRDP } = useBRDPs();
+  const { updateBRDP } = useBRDPContext();
   const { getNote, saveNote } = useLocalNotes();
   const [notes, setNotes] = useState('');
   const [notesDirty, setNotesDirty] = useState(false);

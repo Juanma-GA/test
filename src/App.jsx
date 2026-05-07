@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useToast } from './hooks/useToast';
+import { BRDPProvider } from './context/BRDPContext';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import ToastContainer from './components/ToastContainer';
@@ -27,17 +28,19 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header onChatClick={handleHeaderChatClick} chatOpen={chatOpen && currentPage === 'brdp'} />
-      <div className="flex flex-1">
-        <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
-        <main className="flex-1 bg-gray-50">
-          {currentPage === 'brdp' && <BRDPPage chatOpen={chatOpen} onSetChatOpen={setChatOpen} showToast={showToast} onNavigate={setCurrentPage} />}
-          {currentPage === 'settings' && <SettingsPage showToast={showToast} />}
-        </main>
+    <BRDPProvider>
+      <div className="flex flex-col min-h-screen">
+        <Header onChatClick={handleHeaderChatClick} chatOpen={chatOpen && currentPage === 'brdp'} />
+        <div className="flex flex-1">
+          <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
+          <main className="flex-1 bg-gray-50">
+            {currentPage === 'brdp' && <BRDPPage chatOpen={chatOpen} onSetChatOpen={setChatOpen} showToast={showToast} onNavigate={setCurrentPage} />}
+            {currentPage === 'settings' && <SettingsPage showToast={showToast} />}
+          </main>
+        </div>
+        <ToastContainer toasts={toasts} />
       </div>
-      <ToastContainer toasts={toasts} />
-    </div>
+    </BRDPProvider>
   );
 }
 

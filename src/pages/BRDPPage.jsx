@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useBRDPs } from '../hooks/useBRDPs';
+import { useBRDPContext } from '../context/BRDPContext';
 import { useTableLogic } from '../hooks/useTableLogic';
 import { useAPIKey } from '../hooks/useAPIKey';
 import { useChat } from '../hooks/useChat';
@@ -23,7 +23,7 @@ import styles from './BRDPPage.module.css';
  * @returns {JSX.Element} Page with table, detail panel, and chat
  */
 export default function BRDPPage({ chatOpen, onSetChatOpen, showToast, onNavigate }) {
-  const { brdps } = useBRDPs();
+  const { brdps } = useBRDPContext();
   const { apiKey, modelName, provider, isConfigured } = useAPIKey();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('All');

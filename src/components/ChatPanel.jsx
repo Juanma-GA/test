@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useBRDPs } from '../hooks/useBRDPs';
+import { useBRDPContext } from '../context/BRDPContext';
 import GenerateModal from './GenerateModal';
 import styles from './ChatPanel.module.css';
 
@@ -44,7 +44,7 @@ export default function ChatPanel({
   onClose,
   detailPanelOpen,
 }) {
-  const { brdps } = useBRDPs();
+  const { brdps } = useBRDPContext();
   const [input, setInput] = useState('');
   const [showGenerateModal, setShowGenerateModal] = useState(false);
   const messagesEndRef = useRef(null);

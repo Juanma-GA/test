@@ -1,5 +1,5 @@
 import { useAPIKey } from '../hooks/useAPIKey';
-import { useBRDPs } from '../hooks/useBRDPs';
+import { useBRDPContext } from '../context/BRDPContext';
 import AIConfigSection from '../components/AIConfigSection';
 import ProjectConfigSection from '../components/ProjectConfigSection';
 import DataManagementSection from '../components/DataManagementSection';
@@ -24,7 +24,7 @@ export default function SettingsPage({ showToast }) {
     saveKey,
     isConfigured,
   } = useAPIKey();
-  const { brdps, setBrdps } = useBRDPs();
+  const { brdps, setBrdps } = useBRDPContext();
 
   /**
    * Handle save button click

@@ -1,4 +1,4 @@
-import { useBRDPs } from '../hooks/useBRDPs';
+import { useBRDPContext } from '../context/BRDPContext';
 import styles from './Header.module.css';
 
 /**
@@ -10,7 +10,7 @@ import styles from './Header.module.css';
  * @returns {JSX.Element} Header element with title, stat badges, and chat button
  */
 export default function Header({ onChatClick, chatOpen }) {
-  const { stats } = useBRDPs();
+  const { stats } = useBRDPContext();
 
   return (
     <header className={styles.header}>
