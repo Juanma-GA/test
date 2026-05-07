@@ -17,7 +17,9 @@ export default function Header({ onChatClick, chatOpen }) {
       <div className={styles.container}>
         <h1 className={styles.title}>
           <span>
-            <strong>BRDP Manager</strong>
+            <span style={{ display: 'block', lineHeight: '1.8', paddingBottom: '4px', overflow: 'visible' }}>
+              BRDP Manager
+            </span>
           </span>
         </h1>
         <div className={styles.badges}>
