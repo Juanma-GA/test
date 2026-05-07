@@ -1,8 +1,4 @@
 .panel {
-  position: fixed;
-  right: 0;
-  top: 56px;
-  bottom: 0;
   width: 340px;
   background: white;
   border-left: 1px solid #e8edf5;
@@ -10,6 +6,8 @@
   flex-direction: column;
   z-index: 30;
   animation: slideInChat 0.3s ease-out;
+  flex-shrink: 0;
+  height: 100%;
 }
 
 .panel.withDetail {

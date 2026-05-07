@@ -1,5 +1,6 @@
 .pageContainer {
   display: flex;
+  flex-direction: row;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -11,8 +12,9 @@
 }
 
 .layoutDefault .container {
-  width: 100%;
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* Layout: container + chat only */
@@ -21,8 +23,9 @@
 }
 
 .layoutChatOnly .container {
-  width: 65%;
-  flex: 0 0 65%;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* Layout: container + detail + chat */
@@ -31,8 +34,9 @@
 }
 
 .layoutThreePanel .container {
-  width: 50%;
-  flex: 0 0 50%;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* Responsive - chat panel goes full width on mobile */

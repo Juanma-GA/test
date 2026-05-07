@@ -29,11 +29,11 @@ function App() {
 
   return (
     <BRDPProvider>
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col h-screen overflow-hidden">
         <Header onChatClick={handleHeaderChatClick} chatOpen={chatOpen && currentPage === 'brdp'} />
-        <div className="flex flex-1">
+        <div className="flex flex-1 overflow-hidden">
           <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
-          <main className="flex-1 bg-gray-50">
+          <main className="flex-1 overflow-hidden bg-gray-50">
             {currentPage === 'brdp' && <BRDPPage chatOpen={chatOpen} onSetChatOpen={setChatOpen} showToast={showToast} onNavigate={setCurrentPage} />}
             {currentPage === 'settings' && <SettingsPage showToast={showToast} />}
           </main>
