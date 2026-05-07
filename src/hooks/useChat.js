@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { sendMessage } from '../api/llmAPI';
+import { useState, useCallback, useRef } from 'react';
+import { sendMessage, sendMessageStream } from '../api/llmAPI';
 import { useBRDPContext } from '../context/BRDPContext';
 
 /**
@@ -99,9 +99,10 @@ export function useChat({ apiKey, modelName, provider, selectedBrdp }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const { brdps } = useBRDPContext();
+  const abortControllerRef = useRef(null);
 
   /**
-   * Send a user message and get AI response
+   * Send a user message and get AI response with streaming
    * @param {string} content - User message content
    */
   const sendUserMessage = useCallback(
@@ -115,29 +116,54 @@ export function useChat({ apiKey, modelName, provider, selectedBrdp }) {
       setIsLoading(true);
       setError(null);
 
+      // Create abort controller for this request
+      abortControllerRef.current = new AbortController();
+
       try {
         // Build system prompt with dataset and BRDP context
         const systemPrompt = buildEnhancedSystemPrompt(brdps, selectedBrdp);
 
-        // Send to LLM
-        const response = await sendMessage(
+        // Initialize assistant message with empty content
+        let assistantMessage = { role: 'assistant', content: '' };
+        setMessages([...updatedMessages, assistantMessage]);
+
+        // Stream the response
+        const completeContent = await sendMessageStream(
           updatedMessages,
           apiKey,
           modelName,
           provider,
-          systemPrompt
+          systemPrompt,
+          (chunk) => {
+            // Update assistant message with partial content
+            assistantMessage.content += chunk;
+            setMessages([...updatedMessages, { ...assistantMessage }]);
+          },
+          abortControllerRef.current
         );
 
-        // Add assistant response to history
-        setMessages([...updatedMessages, response]);
+        // Final update with complete content
+        assistantMessage.content = completeContent;
+        setMessages([...updatedMessages, { ...assistantMessage }]);
       } catch (err) {
         setError(err.message);
       } finally {
         setIsLoading(false);
+        abortControllerRef.current = null;
       }
     },
     [messages, apiKey, modelName, provider, selectedBrdp, brdps]
   );
+
+  /**
+   * Stop the current streaming request
+   */
+  const stopStreaming = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      setIsLoading(false);
+    }
+  }, []);
 
   /**
    * Clear conversation history
@@ -151,6 +177,7 @@ export function useChat({ apiKey, modelName, provider, selectedBrdp }) {
     messages,
     sendUserMessage,
     clearHistory,
+    stopStreaming,
     isLoading,
     error,
   };

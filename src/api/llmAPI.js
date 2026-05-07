@@ -156,6 +156,121 @@ export async function sendMessage(
 }
 
 /**
+ * Stream a message from the configured LLM provider
+ * @param {Array} messages - Message history
+ * @param {string} apiKey - API key
+ * @param {string} modelName - Model name
+ * @param {string} provider - LLM provider
+ * @param {string} [systemPrompt=""] - System prompt
+ * @param {Function} onChunk - Callback for each token received
+ * @param {AbortController} abortController - Controller to cancel request
+ * @returns {Promise<string>} Complete response text
+ * @throws {Error} If the request fails
+ */
+export async function sendMessageStream(
+  messages,
+  apiKey,
+  modelName,
+  provider,
+  systemPrompt = "",
+  onChunk,
+  abortController
+) {
+  if (!apiKey || !modelName || !provider) {
+    throw new Error('Missing API configuration. Please configure in Settings.');
+  }
+
+  let endpoint = 'https://api.anthropic.com/v1/messages';
+
+  if (provider === 'OpenAI') {
+    endpoint = 'https://api.openai.com/v1/chat/completions';
+  }
+
+  if (provider === 'Custom') {
+    endpoint = 'https://api.example.com/v1/messages';
+  }
+
+  const headers = buildHeaders(provider, apiKey);
+  const body = buildRequestBody(provider, modelName, messages, systemPrompt);
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ ...body, stream: true }),
+      signal: abortController?.signal,
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('Invalid API key. Please check your Settings.');
+      }
+      throw new Error('Connection error. Please try again.');
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let fullContent = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value);
+      const lines = chunk.split('\n');
+
+      for (const line of lines) {
+        if (!line.trim()) continue;
+
+        // Parse streaming response based on provider
+        if (provider === 'Anthropic') {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              if (data.type === 'content_block_delta' && data.delta?.type === 'text_delta') {
+                const text = data.delta.text;
+                fullContent += text;
+                onChunk?.(text);
+              }
+            } catch (e) {
+              // Skip parsing errors
+            }
+          }
+        } else {
+          // OpenAI and Custom providers
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') continue;
+
+            try {
+              const parsed = JSON.parse(data);
+              const content = parsed.choices?.[0]?.delta?.content;
+              if (content) {
+                fullContent += content;
+                onChunk?.(content);
+              }
+            } catch (e) {
+              // Skip parsing errors
+            }
+          }
+        }
+      }
+    }
+
+    return fullContent;
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      throw new Error('Request cancelled by user.');
+    }
+    if (error.message.includes('Invalid API key') ||
+        error.message.includes('Connection error')) {
+      throw error;
+    }
+    throw new Error('Connection error. Please try again.');
+  }
+}
+
+/**
  * Export system prompt builder for external use
  */
 export { buildSystemPrompt };

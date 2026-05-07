@@ -25,6 +25,7 @@ function TypingIndicator() {
  * @param {Array} props.messages - Message history
  * @param {Function} props.onSendMessage - Callback to send message
  * @param {Function} props.onClearHistory - Callback to clear history
+ * @param {Function} props.onStopStreaming - Callback to stop streaming
  * @param {boolean} props.isLoading - Whether waiting for response
  * @param {string} props.error - Error message if any
  * @param {boolean} props.isConfigured - Whether API is configured
@@ -40,6 +41,7 @@ export default function ChatPanel({
   messages,
   onSendMessage,
   onClearHistory,
+  onStopStreaming,
   isLoading,
   error,
   isConfigured,
@@ -167,25 +169,25 @@ export default function ChatPanel({
           </div>
         ) : (
           <>
-            {messages.map((message, idx) => (
-              <div
-                key={idx}
-                className={`${styles.message} ${styles[message.role]}`}
-              >
-                {message.role === 'assistant' ? (
-                  <div className={styles.markdownContent}>
-                    <ReactMarkdown>{message.content}</ReactMarkdown>
-                  </div>
-                ) : (
-                  message.content
-                )}
-              </div>
-            ))}
-            {isLoading && (
-              <div className={`${styles.message} ${styles.assistant}`}>
-                <TypingIndicator />
-              </div>
-            )}
+            {messages.map((message, idx) => {
+              const isLastMessage = idx === messages.length - 1;
+              const isStreamingLastMessage = isLastMessage && isLoading && message.role === 'assistant';
+              return (
+                <div
+                  key={idx}
+                  className={`${styles.message} ${styles[message.role]}`}
+                >
+                  {message.role === 'assistant' ? (
+                    <div className={styles.markdownContent}>
+                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                      {isStreamingLastMessage && <span className={styles.blinkingCursor}>|</span>}
+                    </div>
+                  ) : (
+                    message.content
+                  )}
+                </div>
+              );
+            })}
           </>
         )}
         {error && (
@@ -209,13 +211,24 @@ export default function ChatPanel({
             rows="3"
           />
           <div className={styles.inputActions}>
-            <button
-              onClick={handleSend}
-              disabled={isLoading || !input.trim()}
-              className={styles.sendBtn}
-            >
-              Send
-            </button>
+            {isLoading ? (
+              <button
+                onClick={onStopStreaming}
+                className={styles.sendBtn}
+                style={{ background: '#ef4444' }}
+                title="Stop streaming"
+              >
+                Stop
+              </button>
+            ) : (
+              <button
+                onClick={handleSend}
+                disabled={!input.trim()}
+                className={styles.sendBtn}
+              >
+                Send
+              </button>
+            )}
             <button
               onClick={onClearHistory}
               disabled={isLoading || messages.length === 0}

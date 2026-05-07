@@ -31,7 +31,7 @@ function AppContent() {
   const { toasts, showToast } = useToast();
   const { apiKey, modelName, provider, isConfigured } = useAPIKey();
 
-  const { messages, sendUserMessage, clearHistory, isLoading, error } = useChat({
+  const { messages, sendUserMessage, clearHistory, stopStreaming, isLoading, error } = useChat({
     apiKey,
     modelName,
     provider,
@@ -81,6 +81,7 @@ function AppContent() {
             messages={messages}
             onSendMessage={sendUserMessage}
             onClearHistory={clearHistory}
+            onStopStreaming={stopStreaming}
             isLoading={isLoading}
             error={error}
             isConfigured={isConfigured}
