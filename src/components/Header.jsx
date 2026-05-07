@@ -1,3 +1,4 @@
+import { FileText } from 'lucide-react';
 import { useBRDPContext } from '../context/BRDPContext';
 import styles from './Header.module.css';
 
@@ -49,10 +50,10 @@ export default function Header({ onChatClick, chatOpen, onOpenGenerateModal }) {
           <button
             onClick={onOpenGenerateModal}
             className={styles.generateBtn}
-            title="Generate Output"
-            aria-label="Generate Output"
+            title="Generate BREX / Schematron"
+            aria-label="Generate BREX / Schematron"
           >
-            Generate
+            <FileText size={16} /> Generate BREX / Schematron
           </button>
         </div>
       </div>
