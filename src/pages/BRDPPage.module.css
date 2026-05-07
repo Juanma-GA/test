@@ -36,6 +36,8 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
 }
 
 @media (max-width: 768px) {
