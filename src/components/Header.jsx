@@ -30,10 +30,10 @@ export default function Header({ onChatClick, chatOpen, onOpenGenerateModal }) {
           <button
             onClick={onChatClick}
             className={`${styles.chatButton} ${chatOpen ? styles.chatActive : ''}`}
-            title={chatOpen ? "Close AI Assistant" : "Open AI Assistant"}
-            aria-label="Open AI Assistant"
+            title={chatOpen ? "Close BRDP Assistant" : "Open BRDP Assistant"}
+            aria-label="Open BRDP Assistant"
           >
-            ✨ AI Assistant
+            ✨ BRDP Assistant
           </button>
         </div>
       </div>
