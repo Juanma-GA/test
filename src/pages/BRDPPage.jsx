@@ -16,10 +16,9 @@ import styles from './BRDPPage.module.css';
  * @param {Function} props.onSelectBrdp - Callback to select/deselect BRDP
  * @param {Function} props.showToast - Callback to show toast notifications
  * @param {Function} props.onNavigate - Callback to navigate to different page
- * @param {Function} props.onAskAIAboutBRDP - Callback to ask AI about a BRDP
  * @returns {JSX.Element} Page with table and detail panel
  */
-export default function BRDPPage({ selectedBrdp, onSelectBrdp, showToast, onNavigate, onAskAIAboutBRDP }) {
+export default function BRDPPage({ selectedBrdp, onSelectBrdp, showToast, onNavigate }) {
   const { brdps } = useBRDPContext();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('All');
@@ -57,16 +56,16 @@ export default function BRDPPage({ selectedBrdp, onSelectBrdp, showToast, onNavi
   };
 
   /**
-   * Handle single-click: highlight row and load in chat context
+   * Handle single-click: highlight row and silently load BRDP context
    */
   const handleSelectBrdp = (brdp) => {
-    onAskAIAboutBRDP(brdp);
+    onSelectBrdp(brdp);
   };
 
   /**
-   * Handle double-click: open detail/edit panel
+   * Handle edit button click: open detail/edit panel
    */
-  const handleDoubleClickBrdp = (brdp) => {
+  const handleEditBrdp = (brdp) => {
     onSelectBrdp(brdp);
   };
 
@@ -110,7 +109,7 @@ export default function BRDPPage({ selectedBrdp, onSelectBrdp, showToast, onNavi
           <BRDPTable
             rows={rows}
             onSelect={handleSelectBrdp}
-            onDoubleClick={handleDoubleClickBrdp}
+            onEdit={handleEditBrdp}
             selectedId={selectedBrdp?.id}
             onSort={handleSort}
             sortField={sortField}

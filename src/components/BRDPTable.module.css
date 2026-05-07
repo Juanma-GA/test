@@ -132,6 +132,39 @@
   color: #9ca3af;
 }
 
+.row {
+  position: relative;
+}
+
+.editCell {
+  padding: 6px 4px !important;
+  text-align: center;
+  width: 40px;
+  min-width: 40px;
+}
+
+.editBtn {
+  opacity: 0;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.row:hover .editBtn {
+  opacity: 1;
+}
+
+.editBtn:hover {
+  background-color: #e5e7eb;
+}
+
 .emptyState {
   padding: 3rem 1rem;
   text-align: center;

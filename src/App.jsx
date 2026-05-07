@@ -67,22 +67,13 @@ function AppContent() {
     handleCloseChat();
   };
 
-  /**
-   * Handle asking AI about a specific BRDP
-   */
-  const handleAskAIAboutBRDP = (brdp) => {
-    setChatOpen(true);
-    const message = `Tell me about BRDP ${brdp.id}: ${brdp.definition}. Proposal: ${brdp.proposal}. Status: ${brdp.validation}.`;
-    sendUserMessage(message);
-  };
-
   return (
     <div className="appContainer">
       <Header onChatClick={handleHeaderChatClick} chatOpen={chatOpen && currentPage === 'brdp'} onOpenGenerateModal={openGenerateModal} />
       <div className="workspaceRow">
         <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
         <main className="mainContent">
-          {currentPage === 'brdp' && <BRDPPage selectedBrdp={selectedBrdp} onSelectBrdp={setSelectedBrdp} showToast={showToast} onNavigate={setCurrentPage} onAskAIAboutBRDP={handleAskAIAboutBRDP} />}
+          {currentPage === 'brdp' && <BRDPPage selectedBrdp={selectedBrdp} onSelectBrdp={setSelectedBrdp} showToast={showToast} onNavigate={setCurrentPage} />}
           {currentPage === 'settings' && <SettingsPage showToast={showToast} />}
         </main>
         {currentPage === 'brdp' && chatOpen && (
@@ -97,6 +88,7 @@ function AppContent() {
             onNavigateSettings={handleNavigateSettings}
             onClose={handleCloseChat}
             detailPanelOpen={!!selectedBrdp}
+            selectedBrdp={selectedBrdp}
             onOpenGenerateModal={openGenerateModal}
             width={chatPanelWidth}
             onWidthChange={setChatPanelWidth}

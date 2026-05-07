@@ -49,6 +49,7 @@ export default function ChatPanel({
   onNavigateSettings,
   onClose,
   detailPanelOpen,
+  selectedBrdp,
   onOpenGenerateModal,
   width = 340,
   onWidthChange,
@@ -56,6 +57,7 @@ export default function ChatPanel({
   const { brdps } = useBRDPContext();
   const [input, setInput] = useState('');
   const [isResizing, setIsResizing] = useState(false);
+  const [activeContext, setActiveContext] = useState(selectedBrdp);
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
 
@@ -70,6 +72,11 @@ export default function ChatPanel({
       textareaRef.current?.focus();
     }
   }, [isLoading, messages.length]);
+
+  // Update active context when selectedBrdp changes
+  useEffect(() => {
+    setActiveContext(selectedBrdp);
+  }, [selectedBrdp]);
 
   // Handle resize
   useEffect(() => {
@@ -210,6 +217,19 @@ export default function ChatPanel({
       {/* Input Area */}
       {isConfigured && (
         <div className={styles.inputContainer}>
+          {activeContext && (
+            <div className={styles.contextPill}>
+              <span className={styles.contextText}>📌 Context: {activeContext.id}</span>
+              <button
+                className={styles.contextClear}
+                onClick={() => setActiveContext(null)}
+                aria-label="Clear context"
+                title="Clear context"
+              >
+                ✕
+              </button>
+            </div>
+          )}
           <textarea
             ref={textareaRef}
             value={input}

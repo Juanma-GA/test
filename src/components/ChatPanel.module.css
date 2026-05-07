@@ -293,6 +293,45 @@
   gap: 8px;
 }
 
+.contextPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #dbeafe;
+  border: 1px solid #93c5fd;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: #0c4a6e;
+  font-weight: 500;
+  align-self: flex-start;
+}
+
+.contextText {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.contextClear {
+  background: none;
+  border: none;
+  color: #0c4a6e;
+  cursor: pointer;
+  padding: 0;
+  font-size: 12px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.2s;
+  opacity: 0.7;
+}
+
+.contextClear:hover {
+  opacity: 1;
+}
+
 .textarea {
   width: 100%;
   background: #f4f6f9;

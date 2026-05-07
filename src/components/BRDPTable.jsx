@@ -47,8 +47,8 @@ function SortIndicator({ sortDir }) {
  * Displays BRDP records with sorting and pagination
  * @param {Object} props - Component props
  * @param {Array} props.rows - Array of BRDP records to display (already paginated)
- * @param {Function} props.onSelect - Callback when row is single-clicked (highlight + chat context)
- * @param {Function} props.onDoubleClick - Callback when row is double-clicked (open detail panel)
+ * @param {Function} props.onSelect - Callback when row is clicked (highlight + load context)
+ * @param {Function} props.onEdit - Callback when edit button is clicked (open detail panel)
  * @param {string} [props.selectedId] - ID of currently selected row
  * @param {Function} props.onSort - Callback when column header is clicked
  * @param {string} props.sortField - Current sort field
@@ -65,7 +65,7 @@ function SortIndicator({ sortDir }) {
 export default function BRDPTable({
   rows,
   onSelect,
-  onDoubleClick,
+  onEdit,
   selectedId,
   onSort,
   sortField,
@@ -169,9 +169,8 @@ export default function BRDPTable({
           {rows.map((brdp) => (
             <tr
               key={brdp.id}
-              className={selectedId === brdp.id ? styles.selected : ''}
+              className={`${selectedId === brdp.id ? styles.selected : ''} ${styles.row}`}
               onClick={() => onSelect(brdp)}
-              onDoubleClick={() => onDoubleClick(brdp)}
             >
               <td className={styles.id}>{brdp.id}</td>
               <td className={styles.definition} title={brdp.definition}>
@@ -185,6 +184,19 @@ export default function BRDPTable({
               </td>
               <td className={styles.comment} title={brdp.comment}>
                 {truncate(brdp.comment, 40)}
+              </td>
+              <td className={styles.editCell}>
+                <button
+                  className={styles.editBtn}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(brdp);
+                  }}
+                  aria-label="Edit BRDP"
+                  title="Edit BRDP"
+                >
+                  ✏️
+                </button>
               </td>
             </tr>
           ))}
