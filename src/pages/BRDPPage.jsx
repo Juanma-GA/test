@@ -103,13 +103,11 @@ export default function BRDPPage({ selectedBrdp, onSelectBrdp, showToast, onNavi
           <FilterPills activeFilter={filter} onFilterChange={handleFilterChange} />
         </div>
 
-        <div
-          className={styles.tableWrapper}
-          style={{
-            height: 'calc(100vh - 240px)',
-            overflowY: 'auto'
-          }}
-        >
+        <div style={{
+          overflowY: 'scroll',
+          height: '100%',
+          WebkitOverflowScrolling: 'touch'
+        }}>
           <BRDPTable
             rows={rows}
             onSelect={handleSelectBrdp}
