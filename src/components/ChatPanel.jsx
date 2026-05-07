@@ -100,10 +100,11 @@ export default function ChatPanel({
   width = 340,
   onWidthChange,
 }) {
-  const { brdps } = useBRDPContext();
+  const { brdps, updateBRDP } = useBRDPContext();
   const [input, setInput] = useState('');
   const [isResizing, setIsResizing] = useState(false);
   const [activeContext, setActiveContext] = useState(selectedBrdp);
+  const [appliedSuggestions, setAppliedSuggestions] = useState({});
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
 
@@ -170,6 +171,22 @@ export default function ChatPanel({
       e.preventDefault();
       handleSend();
     }
+  };
+
+  /**
+   * Handle applying a suggestion to the selected BRDP
+   */
+  const handleApplySuggestion = (field, content) => {
+    if (!selectedBrdp) return;
+
+    updateBRDP(selectedBrdp.id, { [field]: content });
+
+    // Mark suggestion as applied
+    const suggestionKey = `${field}-${content.substring(0, 20)}`;
+    setAppliedSuggestions(prev => ({
+      ...prev,
+      [suggestionKey]: true,
+    }));
   };
 
   return (
@@ -254,9 +271,23 @@ export default function ChatPanel({
                             <div className={styles.suggestionText}>
                               {part.content}
                             </div>
-                            <button className={styles.applySuggestionBtn}>
-                              Apply
-                            </button>
+                            {(() => {
+                              const suggestionKey = `${part.field}-${part.content.substring(0, 20)}`;
+                              const isApplied = appliedSuggestions[suggestionKey];
+                              return isApplied ? (
+                                <div className={styles.appliedIndicator}>
+                                  ✓ Applied
+                                </div>
+                              ) : (
+                                <button
+                                  className={styles.applySuggestionBtn}
+                                  onClick={() => handleApplySuggestion(part.field, part.content)}
+                                  disabled={!selectedBrdp}
+                                >
+                                  Apply
+                                </button>
+                              );
+                            })()}
                           </div>
                         )
                       ))}
