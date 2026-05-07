@@ -46,7 +46,7 @@
 
 .navItem.active {
   background: var(--blue-light);
-  border-left-color: var(--blue);
+  border-left: 2px solid var(--blue);
 }
 
 .navItem.active .navIcon {
