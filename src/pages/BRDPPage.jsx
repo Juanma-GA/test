@@ -75,6 +75,8 @@ export default function BRDPPage({ showToast, onNavigate }) {
    * Handle BRDP updated in DetailPanel
    */
   const handleBrdpUpdate = (updatedBrdp) => {
+    // Update the detail panel to show the new values
+    setDetailBrdp(updatedBrdp);
     // Update the selected BRDP in the context if it's currently selected
     if (selectedBRDPs.some(b => b.id === updatedBrdp.id)) {
       const updated = selectedBRDPs.map(b =>
@@ -151,7 +153,7 @@ export default function BRDPPage({ showToast, onNavigate }) {
       </div>
 
       {/* Detail Panel */}
-      {detailBrdp && selectedBRDPs.length > 0 && (
+      {detailBrdp && (
         <DetailPanel
           brdp={detailBrdp}
           onClose={handleClosePanel}

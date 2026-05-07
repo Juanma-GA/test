@@ -74,7 +74,7 @@ function ValidationBadge({ status }) {
  * @returns {JSX.Element} Detail panel with full record information
  */
 export default function DetailPanel({ brdp, onClose, showToast, onUpdate }) {
-  const { updateBRDP } = useBRDPContext();
+  const { updateBRDP, brdps } = useBRDPContext();
   const { getNote, saveNote } = useLocalNotes();
   const [notes, setNotes] = useState('');
   const [notesDirty, setNotesDirty] = useState(false);
@@ -147,7 +147,22 @@ export default function DetailPanel({ brdp, onClose, showToast, onUpdate }) {
     updateBRDP(brdp.id, editData);
     setIsEditing(false);
     if (onUpdate) {
-      onUpdate({ ...brdp, ...editData });
+      const fieldsToTrack = ['proposal', 'comment', 'validation'];
+      const history = [...(brdp.history || [])];
+
+      fieldsToTrack.forEach(field => {
+        if (editData[field] !== brdp[field]) {
+          history.push({
+            date: new Date().toISOString(),
+            field,
+            oldValue: brdp[field] || '',
+            newValue: editData[field] || '',
+          });
+        }
+      });
+
+      const updatedBrdp = { ...brdp, ...editData, history };
+      onUpdate(updatedBrdp);
     }
     if (showToast) {
       showToast('BRDP updated', 'success');
