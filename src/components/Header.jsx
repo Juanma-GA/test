@@ -1,19 +1,15 @@
 import { FileText } from 'lucide-react';
-import { useBRDPContext } from '../context/BRDPContext';
 import styles from './Header.module.css';
 
 /**
- * Header component with application title and statistics badges
- * Displays real-time counts of BRDP records by validation status
+ * Header component with application title and action buttons
  * @param {Object} props - Component props
  * @param {Function} props.onChatClick - Callback when chat button is clicked
  * @param {boolean} props.chatOpen - Whether chat panel is currently open
  * @param {Function} props.onOpenGenerateModal - Callback to open generate modal
- * @returns {JSX.Element} Header element with title, stat badges, and chat button
+ * @returns {JSX.Element} Header element with title and action buttons
  */
 export default function Header({ onChatClick, chatOpen, onOpenGenerateModal }) {
-  const { stats } = useBRDPContext();
-
   return (
     <header className={styles.header}>
       <div className={styles.container}>
@@ -22,23 +18,7 @@ export default function Header({ onChatClick, chatOpen, onOpenGenerateModal }) {
             <strong>BRDP Manager</strong>
           </span>
         </h1>
-        <div className={styles.badges}>
-          <div className={`${styles.badge} ${styles.total}`}>
-            <span className={styles.value}>{stats.total}</span>
-            <span className={styles.label}>Total</span>
-          </div>
-          <div className={`${styles.badge} ${styles.validated}`}>
-            <span className={styles.value}>{stats.validated}</span>
-            <span className={styles.label}>Validated</span>
-          </div>
-          <div className={`${styles.badge} ${styles.refused}`}>
-            <span className={styles.value}>{stats.refused}</span>
-            <span className={styles.label}>Refused</span>
-          </div>
-          <div className={`${styles.badge} ${styles.pending}`}>
-            <span className={styles.value}>{stats.pending}</span>
-            <span className={styles.label}>Pending</span>
-          </div>
+        <div className={styles.buttons}>
           <button
             onClick={onChatClick}
             className={`${styles.chatButton} ${chatOpen ? styles.chatActive : ''}`}

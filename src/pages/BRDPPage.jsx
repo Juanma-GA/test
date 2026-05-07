@@ -19,7 +19,7 @@ import styles from './BRDPPage.module.css';
  * @returns {JSX.Element} Page with table and detail panel
  */
 export default function BRDPPage({ showToast, onNavigate }) {
-  const { brdps, selectedBRDPs, setSelectedBRDPs } = useBRDPContext();
+  const { brdps, selectedBRDPs, setSelectedBRDPs, stats } = useBRDPContext();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('All');
   const [sortField, setSortField] = useState('');
@@ -128,6 +128,9 @@ export default function BRDPPage({ showToast, onNavigate }) {
     <div className={styles.pageContainer}>
       <div className={styles.container}>
         <h2 className={styles.title}>BRDP Records</h2>
+        <p className={styles.stats}>
+          {stats.total} total · {stats.validated} validated · {stats.refused} refused · {stats.pending} pending
+        </p>
 
         <div className={styles.controls}>
           <SearchBar value={search} onChange={handleSearchChange} />

@@ -19,7 +19,15 @@
   font-size: 1.875rem;
   font-weight: 700;
   color: #1f2937;
+  margin: 0 0 0.5rem 0;
+  flex-shrink: 0;
+}
+
+.stats {
+  font-size: 0.875rem;
+  color: #9ca3af;
   margin: 0 0 1.5rem 0;
+  font-weight: 400;
   flex-shrink: 0;
 }
 
