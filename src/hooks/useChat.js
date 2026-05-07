@@ -25,12 +25,11 @@ function buildDatasetSummary(brdps) {
     }
   });
 
-  // Build compact JSON index with only: id, title, status, and definition
+  // Build compact JSON index with only: id, title, and status
   const compactIndex = brdps.map((brdp) => ({
     id: brdp.id,
     title: brdp.title,
     status: brdp.validation,
-    rule: brdp.definition,
   }));
 
   // Format the summary string
