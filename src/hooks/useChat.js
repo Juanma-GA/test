@@ -1,6 +1,6 @@
-import { useState, useCallback, useContext } from 'react';
+import { useState, useCallback } from 'react';
 import { sendMessage } from '../api/llmAPI';
-import { BRDPContext } from '../context/BRDPContext';
+import { useBRDPContext } from '../context/BRDPContext';
 
 /**
  * Build a compact summary of the BRDP dataset
@@ -98,7 +98,7 @@ export function useChat({ apiKey, modelName, provider, selectedBrdp }) {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { brdps } = useContext(BRDPContext);
+  const { brdps } = useBRDPContext();
 
   /**
    * Send a user message and get AI response
