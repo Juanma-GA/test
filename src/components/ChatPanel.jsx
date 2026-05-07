@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useBRDPContext } from '../context/BRDPContext';
+import TypingDots from './TypingDots';
 import styles from './ChatPanel.module.css';
 
 /**
@@ -180,7 +181,7 @@ export default function ChatPanel({
                   {message.role === 'assistant' ? (
                     <div className={styles.markdownContent}>
                       <ReactMarkdown>{message.content}</ReactMarkdown>
-                      {isStreamingLastMessage && <span className={styles.blinkingCursor}>|</span>}
+                      {isStreamingLastMessage && <TypingDots />}
                     </div>
                   ) : (
                     message.content
