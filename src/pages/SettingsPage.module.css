@@ -5,16 +5,16 @@
 }
 
 .title {
-  font-size: 28px;
+  font-size: 20px;
   font-weight: 700;
   color: #111827;
-  margin: 0 0 24px 0;
+  margin: 0 0 16px 0;
 }
 
 .sectionsContainer {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0;
 }
 
 .section {
@@ -22,6 +22,7 @@
   border-radius: 10px;
   border: 1px solid #e8edf5;
   padding: 16px;
+  margin-bottom: 12px;
 }
 
 .sectionTitle {

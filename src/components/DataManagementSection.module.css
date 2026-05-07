@@ -2,14 +2,14 @@
   background: white;
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
+  padding: 16px;
 }
 
 .title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0 0 1.5rem 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 12px 0;
 }
 
 .subsection {
