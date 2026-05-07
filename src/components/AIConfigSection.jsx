@@ -130,10 +130,11 @@ export default function AIConfigSection({
           onChange={(e) => onProviderChange(e.target.value)}
           className={styles.input}
         >
-          <option value="Anthropic">Anthropic</option>
-          <option value="OpenAI">OpenAI</option>
+          <option value="Anthropic">Anthropic API</option>
+          <option value="OpenAI">OpenAI API</option>
           <option value="Custom">Custom</option>
         </select>
+        <p className={styles.providerNote}>Compatible with OpenAI-compatible endpoints</p>
       </div>
 
       {/* API Key Input */}

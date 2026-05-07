@@ -1,6 +1,6 @@
 .container {
   padding: 32px;
-  max-width: 680px;
+  max-width: 720px;
   margin: 0 auto;
 }
 
@@ -21,21 +21,21 @@
   background: white;
   border-radius: 10px;
   border: 1px solid #e8edf5;
-  padding: 24px;
+  padding: 16px;
 }
 
 .sectionTitle {
   font-family: 'Syne', sans-serif;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 700;
   color: #111827;
-  margin: 0 0 16px 0;
-  padding-bottom: 12px;
+  margin: 0 0 12px 0;
+  padding-bottom: 8px;
   border-bottom: 1px solid #e8edf5;
 }
 
 .formGroup {
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 .label {
@@ -53,7 +53,7 @@
 .select,
 .textarea {
   width: 100%;
-  padding: 8px 12px;
+  padding: 7px 11px;
   border: 1px solid #dde3ec;
   border-radius: 7px;
   font-size: 13px;
@@ -133,8 +133,8 @@
 .formRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 14px;
+  gap: 12px;
+  margin-bottom: 0;
 }
 
 .formRow .formGroup {
