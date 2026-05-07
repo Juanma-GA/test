@@ -46,7 +46,8 @@
   font-size: 15px;
   font-weight: 700;
   color: var(--text);
-  line-height: 1;
+  line-height: 1.3;
+  padding-bottom: 2px;
 }
 
 /* Stat Badges */
@@ -159,6 +160,30 @@
   background: var(--blue);
   color: white;
   border-color: var(--blue-dark);
+}
+
+/* Generate Button */
+.generateBtn {
+  background: var(--blue);
+  border: 1px solid var(--blue-dark);
+  color: white;
+  font-weight: 600;
+  font-size: 11.5px;
+  padding: 6px 13px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.generateBtn:hover {
+  background: var(--blue-dark);
+  border-color: #1b3fa0;
+}
+
+.generateBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 @media (max-width: 900px) {

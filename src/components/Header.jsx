@@ -45,6 +45,13 @@ export default function Header({ onChatClick, chatOpen }) {
           >
             ✨ AI Assistant
           </button>
+          <button
+            className={styles.generateBtn}
+            title="Generate Output"
+            aria-label="Generate Output"
+          >
+            Generate
+          </button>
         </div>
       </div>
     </header>
