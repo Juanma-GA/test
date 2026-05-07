@@ -131,7 +131,9 @@ export default function ChatPanel({
                 className={`${styles.message} ${styles[message.role]}`}
               >
                 {message.role === 'assistant' ? (
-                  <ReactMarkdown>{message.content}</ReactMarkdown>
+                  <div className={styles.markdownContent}>
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                  </div>
                 ) : (
                   message.content
                 )}

@@ -353,6 +353,46 @@
   cursor: not-allowed;
 }
 
+.markdownContent {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+.markdownContent table {
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.5rem 0;
+}
+
+.markdownContent table th,
+.markdownContent table td {
+  padding: 0.5rem;
+  border: 1px solid #e8edf5;
+  text-align: left;
+  font-size: 11px;
+}
+
+.markdownContent table th {
+  background: #f0f0f0;
+  font-weight: 600;
+}
+
+.markdownContent pre {
+  overflow-x: auto;
+  background: #f5f5f5;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.markdownContent code {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .panel {
