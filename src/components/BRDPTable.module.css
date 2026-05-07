@@ -96,7 +96,15 @@
   font-weight: 500;
 }
 
-.definition,
+.definition {
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #374151;
+  font-weight: 500;
+}
+
 .proposal {
   max-width: 300px;
   white-space: nowrap;
