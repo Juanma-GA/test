@@ -2,9 +2,9 @@
   background: white;
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 100%;
 }
 
 .table {
@@ -57,23 +57,16 @@
 .table tbody tr {
   border-bottom: 1px solid #e5e7eb;
   cursor: pointer;
-  background: white;
-  transition: background 0.1s;
+  transition: background-color 0.2s;
 }
 
 .table tbody tr:hover {
-  background: #f8fafc;
-  cursor: pointer;
+  background-color: #f9fafb;
 }
 
 .table tbody tr.selected {
-  background: #eff6ff;
-  border-left: 2px solid #2563eb;
-}
-
-.table tbody tr.selected td:first-child {
-  color: #1d4ed8;
-  font-weight: 600;
+  background-color: #dbeafe;
+  border-left: 4px solid #2563eb;
 }
 
 .table tbody td {
@@ -88,6 +81,7 @@
   font-weight: 500 !important;
   max-width: 150px;
   white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
 }
 
@@ -95,6 +89,7 @@
 .proposal {
   max-width: 300px;
   white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
   color: #6b7280;
 }
@@ -130,6 +125,7 @@
 .comment {
   max-width: 200px;
   white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
   color: #9ca3af;
 }
@@ -179,14 +175,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-shrink: 0;
 }
 
 .footerInfo {
   flex: 1;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  color: #9ca3af;
 }
 
 .pagination {
@@ -195,24 +187,25 @@
 }
 
 .paginationBtn {
-  padding: 5px 12px;
-  border-radius: 6px;
-  border: 1px solid #dde3ec;
-  background: white;
-  color: #6b7280;
-  font-size: 12px;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: white;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.paginationBtn.active {
-  background: #2563eb;
-  color: white;
+.paginationBtn:hover:not(:disabled) {
   border-color: #2563eb;
+  color: #2563eb;
+  background-color: #eff6ff;
 }
 
 .paginationBtn:disabled {
-  opacity: 0.4;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
