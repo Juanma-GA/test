@@ -7,20 +7,27 @@ import styles from './DetailPanel.module.css';
  * Format ISO date string to DD/MM/YYYY HH:mm
  */
 function formatDate(isoString) {
-  const date = new Date(isoString);
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  return `${day}/${month}/${year} ${hours}:${minutes}`;
+  try {
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) {
+      return 'Invalid date';
+    }
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  } catch {
+    return 'Invalid date';
+  }
 }
 
 /**
  * Truncate text to 60 characters
  */
 function truncate(text, maxLength = 60) {
-  if (!text) return '';
+  if (!text || typeof text !== 'string') return '';
   return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 }
 
@@ -286,29 +293,32 @@ export default function DetailPanel({ brdp, onClose, showToast, onUpdate }) {
             </button>
             {showHistory && (
               <div className={styles.historyContent}>
-                {!brdp.history || brdp.history.length === 0 ? (
+                {!Array.isArray(brdp.history) || brdp.history.length === 0 ? (
                   <p className={styles.noHistory}>No changes recorded.</p>
                 ) : (
                   <div className={styles.historyList}>
-                    {[...brdp.history].reverse().map((entry, idx) => (
-                      <div key={idx} className={styles.historyEntry}>
-                        <div className={styles.historyDate}>
-                          {formatDate(entry.date)}
+                    {[...brdp.history].reverse().map((entry, idx) => {
+                      if (!entry || typeof entry !== 'object') return null;
+                      return (
+                        <div key={idx} className={styles.historyEntry}>
+                          <div className={styles.historyDate}>
+                            {formatDate(entry.date || '')}
+                          </div>
+                          <div className={styles.historyField}>
+                            <strong>{entry.field || 'unknown'}</strong>
+                          </div>
+                          <div className={styles.historyChange}>
+                            <span className={styles.oldValue}>
+                              {truncate(entry.oldValue || '')}
+                            </span>
+                            <span className={styles.arrow}>→</span>
+                            <span className={styles.newValue}>
+                              {truncate(entry.newValue || '')}
+                            </span>
+                          </div>
                         </div>
-                        <div className={styles.historyField}>
-                          <strong>{entry.field}</strong>
-                        </div>
-                        <div className={styles.historyChange}>
-                          <span className={styles.oldValue}>
-                            {truncate(entry.oldValue)}
-                          </span>
-                          <span className={styles.arrow}>→</span>
-                          <span className={styles.newValue}>
-                            {truncate(entry.newValue)}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
