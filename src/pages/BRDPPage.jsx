@@ -56,34 +56,6 @@ export default function BRDPPage({ showToast, onNavigate }) {
     setPage(newPage);
   };
 
-  /**
-   * Handle BRDP selection with support for multi-select
-   */
-  const handleSelectBrdp = useCallback((brdp, options = {}) => {
-    const { mode = 'single' } = options;
-    const brdpId = brdp.id;
-
-    if (mode === 'single') {
-      // Single click: select only this row
-      setSelectedBRDPs([brdp]);
-    } else if (mode === 'toggle') {
-      // Ctrl/Cmd+Click: toggle this row
-      if (selectedBRDPs.some(b => b.id === brdpId)) {
-        setSelectedBRDPs(selectedBRDPs.filter(b => b.id !== brdpId));
-      } else {
-        setSelectedBRDPs([...selectedBRDPs, brdp]);
-      }
-    } else if (mode === 'range' && options.lastSelectedId) {
-      // Shift+Click: select range
-      const lastIdx = rows.findIndex(r => r.id === options.lastSelectedId);
-      const currentIdx = rows.findIndex(r => r.id === brdpId);
-      if (lastIdx !== -1 && currentIdx !== -1) {
-        const [start, end] = lastIdx < currentIdx ? [lastIdx, currentIdx] : [currentIdx, lastIdx];
-        const rangeRows = rows.slice(start, end + 1);
-        setSelectedBRDPs(rangeRows);
-      }
-    }
-  }, [selectedBRDPs, rows, setSelectedBRDPs]);
 
   /**
    * Handle edit button click: open detail/edit panel
@@ -103,7 +75,13 @@ export default function BRDPPage({ showToast, onNavigate }) {
    * Handle BRDP updated in DetailPanel
    */
   const handleBrdpUpdate = (updatedBrdp) => {
-    onSelectBrdp(updatedBrdp);
+    // Update the selected BRDP in the context if it's currently selected
+    if (selectedBRDPs.some(b => b.id === updatedBrdp.id)) {
+      const updated = selectedBRDPs.map(b =>
+        b.id === updatedBrdp.id ? updatedBrdp : b
+      );
+      setSelectedBRDPs(updated);
+    }
   };
 
   // Use table logic with all parameters
@@ -115,6 +93,30 @@ export default function BRDPPage({ showToast, onNavigate }) {
     sortDir,
     page,
   });
+
+  // Update callback dependency after rows is available
+  const handleSelectBrdpWithRows = useCallback((brdp, options = {}) => {
+    const { mode = 'single' } = options;
+    const brdpId = brdp.id;
+
+    if (mode === 'single') {
+      setSelectedBRDPs([brdp]);
+    } else if (mode === 'toggle') {
+      if (selectedBRDPs.some(b => b.id === brdpId)) {
+        setSelectedBRDPs(selectedBRDPs.filter(b => b.id !== brdpId));
+      } else {
+        setSelectedBRDPs([...selectedBRDPs, brdp]);
+      }
+    } else if (mode === 'range' && options.lastSelectedId) {
+      const lastIdx = rows.findIndex(r => r.id === options.lastSelectedId);
+      const currentIdx = rows.findIndex(r => r.id === brdpId);
+      if (lastIdx !== -1 && currentIdx !== -1) {
+        const [start, end] = lastIdx < currentIdx ? [lastIdx, currentIdx] : [currentIdx, lastIdx];
+        const rangeRows = rows.slice(start, end + 1);
+        setSelectedBRDPs(rangeRows);
+      }
+    }
+  }, [selectedBRDPs, rows, setSelectedBRDPs]);
 
   const noResults = total === 0;
 
@@ -131,7 +133,7 @@ export default function BRDPPage({ showToast, onNavigate }) {
         <div className={styles.tableWrapper}>
           <BRDPTable
             rows={rows}
-            onSelect={handleSelectBrdp}
+            onSelect={handleSelectBrdpWithRows}
             onEdit={handleEditBrdp}
             selectedIds={selectedBRDPs.map(b => b.id)}
             onSort={handleSort}
