@@ -20,20 +20,20 @@ export default function Header({ onChatClick, chatOpen, onOpenGenerateModal }) {
         </h1>
         <div className={styles.buttons}>
           <button
-            onClick={onChatClick}
-            className={`${styles.chatButton} ${chatOpen ? styles.chatActive : ''}`}
-            title={chatOpen ? "Close AI Assistant" : "Open AI Assistant"}
-            aria-label="Open AI Assistant"
-          >
-            ✨ AI Assistant
-          </button>
-          <button
             onClick={onOpenGenerateModal}
             className={styles.generateBtn}
             title="Generate BREX / Schematron"
             aria-label="Generate BREX / Schematron"
           >
             <FileText size={16} /> Generate BREX / Schematron
+          </button>
+          <button
+            onClick={onChatClick}
+            className={`${styles.chatButton} ${chatOpen ? styles.chatActive : ''}`}
+            title={chatOpen ? "Close AI Assistant" : "Open AI Assistant"}
+            aria-label="Open AI Assistant"
+          >
+            ✨ AI Assistant
           </button>
         </div>
       </div>
