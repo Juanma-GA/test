@@ -162,8 +162,7 @@ export default function DataManagementSection({ brdps, onSetBrdps, showToast }) 
               />
             </label>
             <p className={styles.helpText}>
-              Select an Excel file with columns: BRDP Identifier, BRDP Definition,
-              ATX Decision Proposal, Validation Status, Comment
+              Select an Excel file created from the template
             </p>
           </>
         )}
@@ -184,32 +183,8 @@ export default function DataManagementSection({ brdps, onSetBrdps, showToast }) 
         {importMode === 'preview' && importedRows.length > 0 && (
           <div className={styles.previewContainer}>
             <p className={styles.previewInfo}>
-              {importedRows.length} rows found (showing first 5)
+              {importedRows.length} rows found
             </p>
-            <div className={styles.previewTable}>
-              <table>
-                <thead>
-                  <tr>
-                    <th>BRDP Identifier</th>
-                    <th>Definition</th>
-                    <th>Proposal</th>
-                    <th>Status</th>
-                    <th>Comment</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {importedRows.slice(0, 5).map((row, idx) => (
-                    <tr key={idx}>
-                      <td>{row.id}</td>
-                      <td className={styles.truncate}>{row.definition}</td>
-                      <td className={styles.truncate}>{row.proposal}</td>
-                      <td>{row.validation}</td>
-                      <td className={styles.truncate}>{row.comment}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
 
             <div className={styles.previewActions}>
               <button onClick={handleReplaceAll} className={styles.primaryButton}>
