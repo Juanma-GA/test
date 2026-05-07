@@ -1,6 +1,7 @@
 import { useAPIKey } from '../hooks/useAPIKey';
 import { useBRDPs } from '../hooks/useBRDPs';
 import AIConfigSection from '../components/AIConfigSection';
+import ProjectConfigSection from '../components/ProjectConfigSection';
 import DataManagementSection from '../components/DataManagementSection';
 import AboutSection from '../components/AboutSection';
 import styles from './SettingsPage.module.css';
@@ -45,6 +46,8 @@ export default function SettingsPage() {
           onSave={handleSave}
           isConfigured={isConfigured}
         />
+
+        <ProjectConfigSection />
 
         <DataManagementSection brdps={brdps} onSetBrdps={setBrdps} />
 
