@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
+import { useBRDPs } from '../hooks/useBRDPs';
+import GenerateModal from './GenerateModal';
 import styles from './ChatPanel.module.css';
 
 /**
@@ -42,7 +44,9 @@ export default function ChatPanel({
   onClose,
   detailPanelOpen,
 }) {
+  const { brdps } = useBRDPs();
   const [input, setInput] = useState('');
+  const [showGenerateModal, setShowGenerateModal] = useState(false);
   const messagesEndRef = useRef(null);
 
   // Auto-scroll to bottom when messages change
@@ -86,15 +90,25 @@ export default function ChatPanel({
         </button>
       </div>
 
-      {/* Action Buttons */}
+      {/* Generate Button */}
       <div className={styles.actionButtons}>
-        <button className={styles.actionBtn} disabled title="Coming soon">
-          Generate BREX
-        </button>
-        <button className={styles.actionBtn} disabled title="Coming soon">
-          Generate Schematron
+        <button
+          className={styles.generateBtn}
+          disabled={!isConfigured || brdps.length === 0}
+          onClick={() => setShowGenerateModal(true)}
+          title={!isConfigured || brdps.length === 0 ? 'Configure your API key and load BRDPs first' : ''}
+        >
+          Generate Output
         </button>
       </div>
+
+      {/* Generate Modal */}
+      {showGenerateModal && (
+        <GenerateModal
+          brdps={brdps}
+          onClose={() => setShowGenerateModal(false)}
+        />
+      )}
 
       {/* Messages Area */}
       <div className={styles.messagesContainer}>
