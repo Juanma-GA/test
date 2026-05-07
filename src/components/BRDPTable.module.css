@@ -2,7 +2,6 @@
   background: white;
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -89,7 +88,6 @@
   font-weight: 500 !important;
   max-width: 150px;
   white-space: nowrap;
-  overflow: hidden;
   text-overflow: ellipsis;
 }
 
@@ -97,7 +95,6 @@
 .proposal {
   max-width: 300px;
   white-space: nowrap;
-  overflow: hidden;
   text-overflow: ellipsis;
   color: #6b7280;
 }
@@ -133,7 +130,6 @@
 .comment {
   max-width: 200px;
   white-space: nowrap;
-  overflow: hidden;
   text-overflow: ellipsis;
   color: #9ca3af;
 }
