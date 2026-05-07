@@ -57,9 +57,16 @@ export default function BRDPPage({ selectedBrdp, onSelectBrdp, showToast, onNavi
   };
 
   /**
-   * Handle opening the detail panel
+   * Handle single-click: highlight row and load in chat context
    */
   const handleSelectBrdp = (brdp) => {
+    onAskAIAboutBRDP(brdp);
+  };
+
+  /**
+   * Handle double-click: open detail/edit panel
+   */
+  const handleDoubleClickBrdp = (brdp) => {
     onSelectBrdp(brdp);
   };
 
@@ -103,6 +110,7 @@ export default function BRDPPage({ selectedBrdp, onSelectBrdp, showToast, onNavi
           <BRDPTable
             rows={rows}
             onSelect={handleSelectBrdp}
+            onDoubleClick={handleDoubleClickBrdp}
             selectedId={selectedBrdp?.id}
             onSort={handleSort}
             sortField={sortField}
@@ -123,7 +131,6 @@ export default function BRDPPage({ selectedBrdp, onSelectBrdp, showToast, onNavi
         <DetailPanel
           brdp={selectedBrdp}
           onClose={handleClosePanel}
-          onOpenChat={() => onAskAIAboutBRDP(selectedBrdp)}
           showToast={showToast}
           onUpdate={handleBrdpUpdate}
         />

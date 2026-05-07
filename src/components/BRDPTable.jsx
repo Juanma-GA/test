@@ -47,7 +47,8 @@ function SortIndicator({ sortDir }) {
  * Displays BRDP records with sorting and pagination
  * @param {Object} props - Component props
  * @param {Array} props.rows - Array of BRDP records to display (already paginated)
- * @param {Function} props.onSelect - Callback when row is clicked
+ * @param {Function} props.onSelect - Callback when row is single-clicked (highlight + chat context)
+ * @param {Function} props.onDoubleClick - Callback when row is double-clicked (open detail panel)
  * @param {string} [props.selectedId] - ID of currently selected row
  * @param {Function} props.onSort - Callback when column header is clicked
  * @param {string} props.sortField - Current sort field
@@ -64,6 +65,7 @@ function SortIndicator({ sortDir }) {
 export default function BRDPTable({
   rows,
   onSelect,
+  onDoubleClick,
   selectedId,
   onSort,
   sortField,
@@ -169,6 +171,7 @@ export default function BRDPTable({
               key={brdp.id}
               className={selectedId === brdp.id ? styles.selected : ''}
               onClick={() => onSelect(brdp)}
+              onDoubleClick={() => onDoubleClick(brdp)}
             >
               <td className={styles.id}>{brdp.id}</td>
               <td className={styles.definition} title={brdp.definition}>

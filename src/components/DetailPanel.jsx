@@ -41,12 +41,11 @@ function ValidationBadge({ status }) {
  * @param {Object} props - Component props
  * @param {Object} props.brdp - BRDP record to display
  * @param {Function} props.onClose - Callback when panel closes
- * @param {Function} props.onOpenChat - Callback to open chat panel
  * @param {Function} props.showToast - Callback to show toast notifications
  * @param {Function} props.onUpdate - Callback when BRDP is updated
  * @returns {JSX.Element} Detail panel with full record information
  */
-export default function DetailPanel({ brdp, onClose, onOpenChat, showToast, onUpdate }) {
+export default function DetailPanel({ brdp, onClose, showToast, onUpdate }) {
   const { updateBRDP } = useBRDPContext();
   const { getNote, saveNote } = useLocalNotes();
   const [notes, setNotes] = useState('');
@@ -257,8 +256,8 @@ export default function DetailPanel({ brdp, onClose, onOpenChat, showToast, onUp
         </div>
 
         {/* Footer */}
-        <div className={styles.footer}>
-          {isEditing ? (
+        {isEditing && (
+          <div className={styles.footer}>
             <div className={styles.editActions}>
               <button
                 className={styles.saveBtn}
@@ -275,16 +274,8 @@ export default function DetailPanel({ brdp, onClose, onOpenChat, showToast, onUp
                 Cancel
               </button>
             </div>
-          ) : (
-            <button
-              className={styles.aiButton}
-              onClick={onOpenChat}
-              title="Ask AI about this BRDP"
-            >
-              Ask AI about this BRDP
-            </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </>
   );
