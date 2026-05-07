@@ -1,5 +1,6 @@
 .appContainer {
-  height: 100vh;
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -7,16 +8,16 @@
 
 .workspaceRow {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: row;
   overflow: hidden;
-  min-height: 0;
 }
 
 .mainContent {
   flex: 1;
-  min-width: 0;
   min-height: 0;
+  min-width: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
