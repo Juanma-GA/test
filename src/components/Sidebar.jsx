@@ -1,3 +1,5 @@
+import styles from './Sidebar.module.css';
+
 /**
  * Sidebar component with navigation
  * Displays navigation buttons for different pages
@@ -8,35 +10,31 @@
  */
 export default function Sidebar({ currentPage, onNavigate }) {
   return (
-    <aside className="bg-gray-900 text-white w-64 min-h-screen shadow-lg">
-      <nav className="p-6">
-        <ul className="space-y-4">
-          <li>
-            <button
-              onClick={() => onNavigate('brdp')}
-              className={`w-full text-left px-4 py-2 rounded-md transition-colors ${
-                currentPage === 'brdp'
-                  ? 'bg-blue-600'
-                  : 'hover:bg-gray-700'
-              }`}
-            >
-              BRDP
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => onNavigate('settings')}
-              className={`w-full text-left px-4 py-2 rounded-md transition-colors ${
-                currentPage === 'settings'
-                  ? 'bg-blue-600'
-                  : 'hover:bg-gray-700'
-              }`}
-            >
-              Settings
-            </button>
-          </li>
-        </ul>
+    <aside className={styles.sidebar}>
+      <div className={styles.sectionLabel}>Navigation</div>
+      <nav className={styles.nav}>
+        <button
+          onClick={() => onNavigate('brdp')}
+          className={`${styles.navItem} ${currentPage === 'brdp' ? styles.active : ''}`}
+        >
+          <span className={styles.navIcon}>📋</span>
+          <span className={styles.navLabel}>BRDP Records</span>
+        </button>
+        <button
+          onClick={() => onNavigate('settings')}
+          className={`${styles.navItem} ${currentPage === 'settings' ? styles.active : ''}`}
+        >
+          <span className={styles.navIcon}>⚙️</span>
+          <span className={styles.navLabel}>Settings</span>
+        </button>
       </nav>
+
+      <div className={styles.footer}>
+        <div>
+          <span className={styles.footerIcon}>ℹ️</span>
+          BRDP Manager v1.0
+        </div>
+      </div>
     </aside>
   );
 }

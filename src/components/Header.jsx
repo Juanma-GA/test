@@ -15,31 +15,36 @@ export default function Header({ onChatClick, chatOpen }) {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        <h1 className={styles.title}>BRDP Manager</h1>
+        <h1 className={styles.title}>
+          <span>
+            <strong>BRDP Manager</strong>
+            <em>v1.0</em>
+          </span>
+        </h1>
         <button
           onClick={onChatClick}
           className={`${styles.chatButton} ${chatOpen ? styles.chatActive : ''}`}
           title={chatOpen ? "Close AI Assistant" : "Open AI Assistant"}
           aria-label="Open AI Assistant"
         >
-          💬
+          💬 Chat
         </button>
         <div className={styles.badges}>
           <div className={`${styles.badge} ${styles.total}`}>
-            <span className={styles.label}>Total</span>
             <span className={styles.value}>{stats.total}</span>
+            <span className={styles.label}>Total</span>
           </div>
           <div className={`${styles.badge} ${styles.validated}`}>
-            <span className={styles.label}>Validated</span>
             <span className={styles.value}>{stats.validated}</span>
+            <span className={styles.label}>Validated</span>
           </div>
           <div className={`${styles.badge} ${styles.refused}`}>
-            <span className={styles.label}>Refused</span>
             <span className={styles.value}>{stats.refused}</span>
+            <span className={styles.label}>Refused</span>
           </div>
           <div className={`${styles.badge} ${styles.pending}`}>
-            <span className={styles.label}>Pending</span>
             <span className={styles.value}>{stats.pending}</span>
+            <span className={styles.label}>Pending</span>
           </div>
         </div>
       </div>
