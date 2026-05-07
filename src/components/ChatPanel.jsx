@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { useBRDPContext } from '../context/BRDPContext';
 import styles from './ChatPanel.module.css';
 
@@ -129,7 +130,11 @@ export default function ChatPanel({
                 key={idx}
                 className={`${styles.message} ${styles[message.role]}`}
               >
-                {message.content}
+                {message.role === 'assistant' ? (
+                  <ReactMarkdown>{message.content}</ReactMarkdown>
+                ) : (
+                  message.content
+                )}
               </div>
             ))}
             {isLoading && (
