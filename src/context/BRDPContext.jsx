@@ -18,6 +18,8 @@ export function BRDPProvider({ children }) {
     return mockBRDPs;
   });
 
+  const [selectedBRDPs, setSelectedBRDPs] = useState([]);
+
   const setBrdps = useCallback((newBrdps) => {
     setBrdpsState(newBrdps);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newBrdps));
@@ -48,6 +50,16 @@ export function BRDPProvider({ children }) {
     updateBRDP,
     resetToMock,
     stats,
+    selectedBRDPs,
+    setSelectedBRDPs,
+    // Backward compatibility: selectedBRDP is first item in selectedBRDPs array
+    get selectedBRDP() {
+      return selectedBRDPs.length > 0 ? selectedBRDPs[0] : null;
+    },
+    // Backward compatibility: setSelectedBRDP sets array with single item or empty
+    setSelectedBRDP: (brdp) => {
+      setSelectedBRDPs(brdp ? [brdp] : []);
+    },
   };
 
   return (

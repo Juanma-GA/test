@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styles from './BRDPTable.module.css';
 
 /**
@@ -66,7 +67,7 @@ export default function BRDPTable({
   rows,
   onSelect,
   onEdit,
-  selectedId,
+  selectedIds = [],
   onSort,
   sortField,
   sortDir,
@@ -78,6 +79,7 @@ export default function BRDPTable({
   noBrdps,
   onGoToSettings,
 }) {
+  const [lastSelectedId, setLastSelectedId] = useState(null);
   /**
    * Get sort direction for a column
    * Cycles: none → asc → desc → none
@@ -112,6 +114,30 @@ export default function BRDPTable({
       cls += ` ${styles.sorted}`;
     }
     return cls;
+  };
+
+  /**
+   * Handle row click with support for multi-selection
+   * Single click: select only this row
+   * Ctrl/Cmd+Click: toggle this row in/out of selection
+   * Shift+Click: select range from last clicked to this row
+   */
+  const handleRowClick = (brdp, e) => {
+    e.stopPropagation();
+
+    if (e.ctrlKey || e.metaKey) {
+      // Ctrl/Cmd+Click: toggle selection
+      onSelect(brdp, { mode: 'toggle' });
+      setLastSelectedId(brdp.id);
+    } else if (e.shiftKey) {
+      // Shift+Click: range selection
+      onSelect(brdp, { mode: 'range', lastSelectedId });
+      setLastSelectedId(brdp.id);
+    } else {
+      // Single click: select only this row
+      onSelect(brdp, { mode: 'single' });
+      setLastSelectedId(brdp.id);
+    }
   };
 
   if (noBrdps) {
@@ -171,8 +197,8 @@ export default function BRDPTable({
           {rows.map((brdp) => (
             <tr
               key={brdp.id}
-              className={`${selectedId === brdp.id ? styles.selected : ''} ${styles.row}`}
-              onClick={() => onSelect(brdp)}
+              className={`${selectedIds.includes(brdp.id) ? styles.selected : ''} ${styles.row}`}
+              onClick={(e) => handleRowClick(brdp, e)}
             >
               <td className={styles.editCell}>
                 <button
