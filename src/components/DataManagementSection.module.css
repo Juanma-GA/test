@@ -13,8 +13,8 @@
 }
 
 .subsection {
-  margin-bottom: 2rem;
-  padding-bottom: 2rem;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
   border-bottom: 1px solid #e5e7eb;
 }
 
@@ -25,10 +25,10 @@
 }
 
 .subtitle {
-  font-size: 1rem;
+  font-size: 12px;
   font-weight: 600;
   color: #374151;
-  margin: 0 0 1rem 0;
+  margin: 0 0 6px 0;
 }
 
 .fileInput {
@@ -50,7 +50,7 @@
 .helpText {
   margin: 0;
   color: #9ca3af;
-  font-size: 0.875rem;
+  font-size: 11px;
 }
 
 .errorContainer {
@@ -137,10 +137,10 @@
 .primaryButton,
 .secondaryButton,
 .cancelButton {
-  padding: 0.75rem 1.5rem;
+  padding: 6px 14px;
   border-radius: 0.375rem;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
   border: 1px solid transparent;
@@ -188,13 +188,13 @@
 }
 
 .resetButton {
-  padding: 0.75rem 1.5rem;
+  padding: 6px 14px;
   background-color: #ef4444;
   color: white;
   border: none;
   border-radius: 0.375rem;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 12px;
   cursor: pointer;
   transition: background-color 0.2s;
 }
