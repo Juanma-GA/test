@@ -57,16 +57,23 @@
 .table tbody tr {
   border-bottom: 1px solid #e5e7eb;
   cursor: pointer;
-  transition: background-color 0.2s;
+  background: white;
+  transition: background 0.1s;
 }
 
 .table tbody tr:hover {
-  background-color: #f9fafb;
+  background: #f8fafc;
+  cursor: pointer;
 }
 
 .table tbody tr.selected {
-  background-color: #dbeafe;
-  border-left: 4px solid #2563eb;
+  background: #eff6ff;
+  border-left: 2px solid #2563eb;
+}
+
+.table tbody tr.selected td:first-child {
+  color: #1d4ed8;
+  font-weight: 600;
 }
 
 .table tbody td {
@@ -179,6 +186,9 @@
 
 .footerInfo {
   flex: 1;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: #9ca3af;
 }
 
 .pagination {
@@ -187,25 +197,24 @@
 }
 
 .paginationBtn {
-  padding: 0.5rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  background-color: white;
-  color: #374151;
-  font-size: 0.875rem;
-  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid #dde3ec;
+  background: white;
+  color: #6b7280;
+  font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.paginationBtn:hover:not(:disabled) {
+.paginationBtn.active {
+  background: #2563eb;
+  color: white;
   border-color: #2563eb;
-  color: #2563eb;
-  background-color: #eff6ff;
 }
 
 .paginationBtn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
