@@ -75,7 +75,22 @@ ${datasetSummary}
 Current BRDP Focus (selected for detailed analysis):
 ${JSON.stringify(selectedBrdp, null, 2)}
 
-Provide answers focusing on the selected BRDP while leveraging the complete dataset for comparison and validation.`;
+Provide answers focusing on the selected BRDP while leveraging the complete dataset for comparison and validation.
+
+SUGGESTION FORMAT INSTRUCTIONS:
+If the user asks you to improve, rewrite, or suggest a new version of the Proposal or Comment field, respond with your explanation followed by a special block in this exact format:
+
+For proposal field:
+[SUGGESTION:proposal]
+Your suggested text here
+[/SUGGESTION]
+
+For comment field:
+[SUGGESTION:comment]
+Your suggested text here
+[/SUGGESTION]
+
+Always include the suggestion block at the end of your response when rewriting a field.`;
 }
 
 
