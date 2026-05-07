@@ -47,7 +47,7 @@
 
 .title > span > strong {
   display: block;
-  font-family: 'Syne', sans-serif;
+  font-family: 'IBM Plex Sans', sans-serif;
   font-size: 15px;
   font-weight: 700;
   color: var(--text);
