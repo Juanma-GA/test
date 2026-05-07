@@ -89,7 +89,7 @@ Comment: ${selectedBrdp.comment}`;
  * @param {string} apiKey - API key
  * @param {string} modelName - Model name
  * @param {string} provider - LLM provider
- * @param {string} systemPrompt - System prompt
+ * @param {string} [systemPrompt=""] - System prompt (optional, defaults to empty string)
  * @returns {Promise<Object>} Response from LLM
  * @throws {Error} If the request fails
  */
@@ -98,7 +98,7 @@ export async function sendMessage(
   apiKey,
   modelName,
   provider,
-  systemPrompt
+  systemPrompt = ""
 ) {
   if (!apiKey || !modelName || !provider) {
     throw new Error('Missing API configuration. Please configure in Settings.');
