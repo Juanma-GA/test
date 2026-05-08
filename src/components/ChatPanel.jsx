@@ -176,7 +176,11 @@ export default function ChatPanel({
    * Handle applying a suggestion to the first selected BRDP
    */
   const handleApplySuggestion = (field, content) => {
-    if (!activeContext || activeContext.length === 0) return;
+    if (!activeContext || activeContext.length === 0) {
+      // Show warning message to user
+      alert('Please select a BRDP first to apply this suggestion');
+      return;
+    }
 
     const targetBrdp = activeContext[0];
     updateBRDP(targetBrdp.id, { [field]: content });
