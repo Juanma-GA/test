@@ -6,7 +6,7 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport, sourc
   const [file, setFile] = useState(null);
   const [dragging, setDragging] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [streamedChars, setStreamedChars] = useState(0);
+  const [progress, setProgress] = useState({ current: 0, total: 0, foundCount: 0 });
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [mergeMode, setMergeMode] = useState('add');
@@ -57,7 +57,7 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport, sourc
     setLoading(true);
     setError(null);
     setResult(null);
-    setStreamedChars(0);
+    setProgress({ current: 0, total: 0, foundCount: 0 });
     abortRef.current = new AbortController();
 
     try {
@@ -66,7 +66,7 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport, sourc
         modelName,
         provider,
         sourceType,
-        onChunk: (chunk) => setStreamedChars(prev => prev + chunk.length),
+        onProgress: (current, total, foundCount) => setProgress({ current, total, foundCount }),
         abortController: abortRef.current,
       });
       setResult(res);
@@ -152,7 +152,20 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport, sourc
           ) : (
             <div className={styles.loadingRow}>
               <span className={styles.spinner} />
-              <span>Extracting… {streamedChars} characters received</span>
+              <div className={styles.progressInfo}>
+                <span>Processing section {progress.current} of {progress.total}</span>
+                <div className={styles.progressBar}>
+                  <div
+                    className={styles.progressFill}
+                    style={{
+                      width: progress.total > 0 ? `${(progress.current / progress.total) * 100}%` : '0%'
+                    }}
+                  />
+                </div>
+                <span className={styles.progressCount}>
+                  {progress.foundCount} BRDP{progress.foundCount !== 1 ? 's' : ''} found
+                </span>
+              </div>
               <button className={styles.cancelBtn} onClick={handleCancel}>Cancel</button>
             </div>
           )}

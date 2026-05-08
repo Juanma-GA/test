@@ -4,7 +4,7 @@
  * Supports DOCX and PDF input via text extraction in the browser
  */
 
-import { sendMessageStream } from "./llmAPI.js";
+import { sendMessage } from "./llmAPI.js";
 
 // ─────────────────────────────────────────────
 // Text extraction
@@ -58,6 +58,80 @@ export async function extractTextFromFile(file) {
 }
 
 // ─────────────────────────────────────────────
+// Chunking strategy
+// ─────────────────────────────────────────────
+
+const CHUNK_SIZE = 3000;
+const OVERLAP = 400;
+
+function splitIntoChunks(text) {
+  const chunks = [];
+  let start = 0;
+
+  while (start < text.length) {
+    let end = Math.min(start + CHUNK_SIZE, text.length);
+
+    if (end < text.length) {
+      const lastNewline = text.lastIndexOf('\n', end);
+      if (lastNewline > start + CHUNK_SIZE * 0.5) {
+        end = lastNewline;
+      }
+    }
+
+    const chunk = text.slice(start, end).trim();
+    if (chunk.length > 0) {
+      chunks.push(chunk);
+    }
+
+    start = end - OVERLAP;
+    if (start < 0) start = 0;
+  }
+
+  return chunks;
+}
+
+function deduplicateBRDPs(allBRDPs) {
+  if (allBRDPs.length === 0) return [];
+
+  const unique = [allBRDPs[0]];
+
+  for (let i = 1; i < allBRDPs.length; i++) {
+    const current = allBRDPs[i];
+    const isDuplicate = unique.some(u => {
+      const proposalSimilarity = calculateSimilarity(u.proposal, current.proposal);
+      return proposalSimilarity > 0.8;
+    });
+
+    if (!isDuplicate) {
+      unique.push(current);
+    }
+  }
+
+  return unique;
+}
+
+function calculateSimilarity(str1, str2) {
+  const s1 = str1.toLowerCase().trim();
+  const s2 = str2.toLowerCase().trim();
+
+  if (s1 === s2) return 1;
+
+  const longer = s1.length > s2.length ? s1 : s2;
+  const shorter = s1.length > s2.length ? s2 : s1;
+
+  if (longer.includes(shorter)) {
+    return shorter.length / longer.length;
+  }
+
+  let matches = 0;
+  for (let i = 0; i < shorter.length; i++) {
+    if (longer.includes(shorter[i])) matches++;
+  }
+
+  return matches / longer.length;
+}
+
+// ─────────────────────────────────────────────
 // ID generation
 // ─────────────────────────────────────────────
 
@@ -85,8 +159,8 @@ export function generateIds(existingBRDPs, count) {
 // Prompt builder
 // ─────────────────────────────────────────────
 
-function buildExtractionPrompt(documentText, sourceType) {
-  const system = `You are an S1000D BRDP expert. Extract all Business Rules Decision Points from the provided document.
+function buildExtractionPrompt(chunkText, sourceType) {
+  const system = `You are an S1000D BRDP expert. Extract all Business Rules Decision Points from the provided document section.
 
 The document may be in English or Spanish. Extract rules in the original language of the document.
 
@@ -112,9 +186,9 @@ STRICT OUTPUT RULES:
 5. If a paragraph contains multiple rules, create one BRDP per rule
 6. proposal must be the exact original text`;
 
-  const user = `Extract all BRDPs from this ${sourceType} document:
+  const user = `Extract all BRDPs from this ${sourceType} section:
 
-${documentText}`;
+${chunkText}`;
 
   return { system, user };
 }
@@ -160,7 +234,7 @@ function parseJSONResponse(raw) {
  * @param {string}   options.modelName
  * @param {string}   options.provider
  * @param {string}   options.sourceType  — 'Style Guide' | 'BREX Doc'
- * @param {Function} options.onChunk     — streaming callback
+ * @param {Function} options.onProgress  — progress callback: (current, total, foundCount)
  * @param {Object}   options.abortController
  *
  * @returns {Promise<{ brdps: Array, rawCount: number }>}
@@ -171,7 +245,7 @@ export async function extractBRDPs(file, existingBRDPs, options = {}) {
     modelName,
     provider = "Anthropic",
     sourceType = "document",
-    onChunk,
+    onProgress,
     abortController,
   } = options;
 
@@ -189,36 +263,51 @@ export async function extractBRDPs(file, existingBRDPs, options = {}) {
     throw new Error("The document appears to be empty or could not be read.");
   }
 
-  // Step 2 — Build prompt
-  const { system, user } = buildExtractionPrompt(documentText, sourceType);
-  const messages = [{ role: "user", content: user }];
+  // Step 2 — Split into chunks
+  const chunks = splitIntoChunks(documentText);
+  const allExtracted = [];
 
-  // Step 3 — Call LLM
-  let rawResponse;
-  try {
-    rawResponse = await sendMessageStream(
-      messages,
-      apiKey,
-      modelName,
-      provider,
-      system,
-      onChunk,
-      abortController
-    );
-  } catch (err) {
-    throw new Error(`LLM call failed: ${err.message}`);
+  // Step 3 — Process each chunk
+  for (let i = 0; i < chunks.length; i++) {
+    if (abortController?.signal.aborted) {
+      throw new Error("Extraction cancelled by user.");
+    }
+
+    try {
+      const { system, user } = buildExtractionPrompt(chunks[i], sourceType);
+      const messages = [{ role: "user", content: user }];
+
+      const response = await sendMessage(
+        messages,
+        apiKey,
+        modelName,
+        provider,
+        system
+      );
+
+      const extracted = parseJSONResponse(response.content);
+      if (Array.isArray(extracted)) {
+        allExtracted.push(...extracted);
+      }
+    } catch (err) {
+      // Skip this chunk, continue with next one
+    }
+
+    if (onProgress) {
+      onProgress(i + 1, chunks.length, allExtracted.length);
+    }
   }
 
-  // Step 4 — Parse response
-  const extracted = parseJSONResponse(rawResponse);
-
-  if (!Array.isArray(extracted) || extracted.length === 0) {
+  if (allExtracted.length === 0) {
     throw new Error("No BRDPs were found in the document.");
   }
 
+  // Step 4 — Deduplicate overlapping results
+  const deduplicated = deduplicateBRDPs(allExtracted);
+
   // Step 5 — Assign IDs
-  const ids = generateIds(existingBRDPs, extracted.length);
-  const brdps = extracted.map((b, i) => ({
+  const ids = generateIds(existingBRDPs, deduplicated.length);
+  const brdps = deduplicated.map((b, i) => ({
     id: ids[i],
     title: b.title || "",
     definition: b.definition || "",
@@ -228,5 +317,5 @@ export async function extractBRDPs(file, existingBRDPs, options = {}) {
     history: [],
   }));
 
-  return { brdps, rawCount: extracted.length };
+  return { brdps, rawCount: deduplicated.length };
 }
