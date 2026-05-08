@@ -1,76 +1,109 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useProjectConfig } from '../hooks/useProjectConfig';
+import { generateBREX } from '../api/generateBREX';
 import styles from './GenerateModal.module.css';
 
-/**
- * Generate Output modal component
- * Allows users to configure and generate BREX or Schematron output
- * @param {Object} props - Component props
- * @param {Array} props.brdps - BRDP records
- * @param {Function} props.onClose - Callback when modal closes
- * @returns {JSX.Element} Modal for output generation
- */
 export default function GenerateModal({ brdps, onClose }) {
   const { projectConfig } = useProjectConfig();
   const [format, setFormat] = useState('BREX — S1000D 4.2');
   const [onlyValidated, setOnlyValidated] = useState(true);
-  const [includedCount, setIncludedCount] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [streamedChars, setStreamedChars] = useState(0);
+  const [result, setResult] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const abortRef = useRef(null);
 
-  // Update included count when BRDPs or filter changes
+  const validatedCount = brdps.filter(
+    b => b.validation?.toLowerCase().trim() === 'validated'
+  ).length;
+  const allCount = brdps.length;
+  const includedCount = onlyValidated ? validatedCount : allCount;
+  const isConfigComplete = !!projectConfig?.modelIdentCode;
+  const isBREX42 = format === 'BREX — S1000D 4.2';
+
+  const getSettings = () => ({
+    apiKey: localStorage.getItem('llm_api_key') || '',
+    modelName: localStorage.getItem('llm_model_name') || '',
+    provider: localStorage.getItem('llm_provider') || 'Anthropic',
+  });
+
   useEffect(() => {
-    if (onlyValidated) {
-      const count = brdps.filter(b => b.validation === 'Validated').length;
-      setIncludedCount(count);
-    } else {
-      setIncludedCount(brdps.length);
-    }
-  }, [brdps, onlyValidated]);
-
-  /**
-   * Handle overlay click to close modal
-   */
-  const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
-  /**
-   * Handle escape key to close modal
-   */
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    const handleKey = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
   }, [onClose]);
 
+  useEffect(() => { setResult(null); }, [onlyValidated, format]);
+
+  const handleGenerate = useCallback(async () => {
+    const { apiKey, modelName, provider } = getSettings();
+
+    if (!apiKey) {
+      setResult({ xml: null, valid: false, error: 'API key not configured. Go to Settings.', brdpCount: 0 });
+      return;
+    }
+
+    setLoading(true);
+    setResult(null);
+    setStreamedChars(0);
+    abortRef.current = new AbortController();
+
+    try {
+      const res = await generateBREX(brdps, projectConfig, {
+        apiKey,
+        modelName,
+        provider,
+        onlyValidated,
+        onChunk: (chunk) => setStreamedChars(prev => prev + chunk.length),
+        abortController: abortRef.current,
+      });
+      setResult(res);
+    } catch (err) {
+      setResult({ xml: null, valid: false, error: err.message, brdpCount: 0 });
+    } finally {
+      setLoading(false);
+    }
+  }, [brdps, projectConfig, onlyValidated]);
+
+  const handleCancel = () => {
+    abortRef.current?.abort();
+    setLoading(false);
+  };
+
+  const handleCopy = () => {
+    if (!result?.xml) return;
+    navigator.clipboard.writeText(result.xml);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownload = () => {
+    if (!result?.xml) return;
+    const today = new Date().toISOString().slice(0, 10);
+    const filename = `DMC-${projectConfig.modelIdentCode}-00-00-00-00A-022A-A_${today}.xml`;
+    const blob = new Blob([result.xml], { type: 'application/xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
-    <div className={styles.overlay} onClick={handleOverlayClick}>
+    <div className={styles.overlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className={styles.modal}>
-        {/* Header */}
+
         <div className={styles.header}>
-          <h2 className={styles.title}>Generate Output</h2>
-          <button
-            onClick={onClose}
-            className={styles.closeBtn}
-            aria-label="Close modal"
-          >
-            ✕
-          </button>
+          <div>
+            <h2 className={styles.title}>Generate Output</h2>
+            <span className={styles.subtitle}>S1000D Issue 4.2</span>
+          </div>
+          <button className={styles.closeBtn} onClick={onClose} aria-label="Close">✕</button>
         </div>
 
-        {/* Content */}
         <div className={styles.content}>
-          {/* Format Selection */}
+
           <div className={styles.formGroup}>
-            <label htmlFor="format" className={styles.label}>
-              Format & Standard
-            </label>
+            <label htmlFor="format" className={styles.label}>Format & Standard</label>
             <select
               id="format"
               value={format}
@@ -84,13 +117,16 @@ export default function GenerateModal({ brdps, onClose }) {
               <option>BREX — S1000D 6.0</option>
               <option>Schematron 1.0</option>
             </select>
+            {!isBREX42 && (
+              <p className={styles.comingSoon}>
+                ⚠ Only BREX — S1000D 4.2 is implemented. Other formats coming soon.
+              </p>
+            )}
           </div>
 
-          {/* Validated Only Checkbox */}
           <div className={styles.checkboxGroup}>
-            <label htmlFor="onlyValidated" className={styles.checkboxLabel}>
+            <label className={styles.checkboxLabel}>
               <input
-                id="onlyValidated"
                 type="checkbox"
                 checked={onlyValidated}
                 onChange={(e) => setOnlyValidated(e.target.checked)}
@@ -100,35 +136,79 @@ export default function GenerateModal({ brdps, onClose }) {
             </label>
           </div>
 
-          {/* Summary */}
           <div className={styles.summary}>
             <p className={styles.summaryText}>
               {includedCount} {includedCount === 1 ? 'BRDP' : 'BRDPs'} will be included
             </p>
           </div>
 
-          {/* Project Config Summary */}
           <div className={styles.projectSummary}>
+            {!isConfigComplete && (
+              <p className={styles.warningText}>
+                ⚠ Project configuration incomplete. Go to Settings before generating.
+              </p>
+            )}
             <p className={styles.projectText}>
-              Project: <strong>{projectConfig.projectName || 'Not configured'}</strong> |{' '}
-              Model: <strong>{projectConfig.modelIdentCode || 'Not configured'}</strong>
+              Project: <strong>{projectConfig.projectName || '—'}</strong> |{' '}
+              Model: <strong>{projectConfig.modelIdentCode || '—'}</strong>
             </p>
-            <a href="#settings" className={styles.settingsLink}>
-              Edit project config in Settings
-            </a>
           </div>
+
         </div>
 
-        {/* Footer */}
-        <div className={styles.footer}>
-          <button
-            disabled
-            className={styles.generateBtn}
-            title="Coming soon"
-          >
-            Generate
-          </button>
+        <div className={styles.generateSection}>
+          {!loading ? (
+            <button
+              className={styles.generateBtn}
+              onClick={handleGenerate}
+              disabled={!isConfigComplete || !isBREX42}
+              title={!isBREX42 ? 'Only BREX 4.2 is available' : undefined}
+            >
+              {result ? 'Regenerate' : 'Generate'}
+            </button>
+          ) : (
+            <div className={styles.loadingRow}>
+              <span className={styles.spinner} />
+              <span>Generating… {streamedChars} characters received</span>
+              <button className={styles.cancelBtn} onClick={handleCancel}>Cancel</button>
+            </div>
+          )}
         </div>
+
+        {result && (
+          <div className={styles.outputSection}>
+            <div className={styles.outputMeta}>
+              <span className={result.valid ? styles.badgeOk : styles.badgeError}>
+                {result.valid ? '✓ Well-formed XML' : `✗ XML error: ${result.error}`}
+              </span>
+              {result.brdpCount > 0 && (
+                <span className={styles.countInfo}>{result.brdpCount} rules included</span>
+              )}
+            </div>
+            {result.xml ? (
+              <>
+                <pre className={styles.xmlOutput}>{result.xml}</pre>
+                <div className={styles.outputActions}>
+                  <button className={styles.actionBtn} onClick={handleCopy}>
+                    {copied ? 'Copied!' : 'Copy to clipboard'}
+                  </button>
+                  <button className={styles.actionBtn} onClick={handleDownload}>
+                    Download as .xml
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className={styles.errorBox}>{result.error}</div>
+            )}
+            <p className={styles.footerNote}>
+              Validate against the full XSD at{' '}
+              <a href="https://www.freeformatter.com/xml-validator-xsd.html" target="_blank" rel="noreferrer">
+                freeformatter.com
+              </a>
+            </p>
+          </div>
+        )}
+
       </div>
     </div>
   );
