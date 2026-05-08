@@ -11,6 +11,7 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport, sourc
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [mergeMode, setMergeMode] = useState('add');
+  const [extractingMsg, setExtractingMsg] = useState('Reading document...');
   const abortRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -25,6 +26,25 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport, sourc
     document.addEventListener('keydown', handleKey);
     return () => document.removeEventListener('keydown', handleKey);
   }, [onClose]);
+
+  useEffect(() => {
+    if (!extracting) return;
+
+    const messages = [
+      'Reading document...',
+      'Extracting text...',
+      'Preparing text...',
+    ];
+
+    let index = 0;
+
+    const interval = setInterval(() => {
+      index = (index + 1) % messages.length;
+      setExtractingMsg(messages[index]);
+    }, 1500);
+
+    return () => clearInterval(interval);
+  }, [extracting]);
 
   const handleFile = (f) => {
     if (!f) return;
@@ -161,7 +181,7 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport, sourc
               <span className={styles.spinner} />
               {extracting ? (
                 <>
-                  <span>Reading document...</span>
+                  <span>{extractingMsg}</span>
                   <button className={styles.cancelBtn} onClick={handleCancel}>Cancel</button>
                 </>
               ) : (
