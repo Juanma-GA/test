@@ -71,8 +71,12 @@
 .extractBtn:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .loadingRow {
-  display: flex; align-items: center; gap: 0.75rem;
-  font-size: 0.9rem; color: var(--color-text-muted, #6b7280);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--color-text-muted, #6b7280);
+  justify-content: space-between;
 }
 
 .spinner {
