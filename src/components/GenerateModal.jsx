@@ -22,9 +22,9 @@ export default function GenerateModal({ brdps, onClose }) {
   const isBREX42 = format === 'BREX — S1000D 4.2';
 
   const getSettings = () => ({
-    apiKey: localStorage.getItem('llm_api_key') || '',
-    modelName: localStorage.getItem('llm_model_name') || '',
-    provider: localStorage.getItem('llm_provider') || 'Anthropic',
+    apiKey: localStorage.getItem('brdp_api_key') || '',
+    modelName: localStorage.getItem('brdp_model') || '',
+    provider: localStorage.getItem('brdp_provider') || 'Anthropic',
   });
 
   useEffect(() => {
