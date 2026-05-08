@@ -154,18 +154,22 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport, sourc
             >
               {result ? 'Re-extract' : 'Extract BRDPs'}
             </button>
-          ) : (
+          ) : null}
+
+          {loading && (
             <div className={styles.loadingRow}>
               <span className={styles.spinner} />
-              <span>{extracting ? 'Reading document...' : `Processing section ${progress.current} of ${progress.total}`}</span>
-              {!extracting && (
-                <div className={styles.progressBar}>
-                  <div
-                    className={styles.progressFill}
-                    style={{
-                      width: progress.total > 0 ? `${(progress.current / progress.total) * 100}%` : '0%'
-                    }}
-                  />
+              {extracting ? (
+                <span>Reading document...</span>
+              ) : (
+                <div className={styles.progressInfo}>
+                  <span>Processing section {progress.current} of {progress.total}</span>
+                  <div className={styles.progressBar}>
+                    <div
+                      className={styles.progressFill}
+                      style={{ width: progress.total > 0 ? `${(progress.current / progress.total) * 100}%` : '0%' }}
+                    />
+                  </div>
                 </div>
               )}
               <button className={styles.cancelBtn} onClick={handleCancel}>Cancel</button>
