@@ -201,9 +201,8 @@ export default function GenerateModal({ brdps, onClose }) {
               <div className={styles.errorBox}>{result.error}</div>
             )}
             <p className={styles.footerNote}>
-              Validate against the full XSD at{' '}
               <a href="https://www.freeformatter.com/xml-validator-xsd.html" target="_blank" rel="noreferrer">
-                freeformatter.com
+                Validate against the full S1000D 4.2 XSD →
               </a>
             </p>
           </div>

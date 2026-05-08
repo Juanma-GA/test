@@ -320,7 +320,7 @@
   padding: 1rem;
   font-size: 0.78rem;
   font-family: 'Menlo', 'Consolas', monospace;
-  max-height: 400px;
+  max-height: 220px;
   overflow-y: auto;
   white-space: pre;
   overflow-x: auto;
