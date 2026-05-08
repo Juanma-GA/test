@@ -32,7 +32,7 @@ STRICT RULES:
 9. brDecisionRef uses ATTRIBUTE: <brDecisionRef brDecisionIdentNumber="BRDP-001"/> — NOT text content.
 10. allowedObjectFlag: "0"=prohibited, "1"=mandatory (must/shall/required), "2"=optional.
 11. objectUse = one sentence summarising the decision.
-12. Use today's date for issueDate.
+12. Use the todayDate value provided in the user message for issueDate. Format: year="YYYY" month="MM" day="DD".
 13. techName = project name; infoName = "Business Rules Exchange".
 14. qualityAssurance: <qualityAssurance><unverified/></qualityAssurance>
 15. applic: <applic><displayText><simplePara>All</simplePara></displayText></applic>`;
@@ -43,6 +43,8 @@ STRICT RULES:
     )
     .join("\n\n");
 
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
   const user = `Generate a BREX Data Module XML with this project configuration:
 
 modelIdentCode: ${projectConfig.modelIdentCode || "UNKNOWN"}
@@ -54,6 +56,7 @@ countryIsoCode: ${projectConfig.countryIsoCode || "US"}
 securityClassification: ${projectConfig.securityClassification || "01"}
 enterpriseCode: ${projectConfig.enterpriseCode || ""}
 projectName: ${projectConfig.projectName || projectConfig.modelIdentCode || "Project"}
+todayDate: ${todayStr}
 
 Include these ${validatedBRDPs.length} BRDP rule(s):
 
