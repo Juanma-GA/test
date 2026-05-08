@@ -21,19 +21,11 @@ export default function GenerateModal({ brdps, onClose }) {
   const isConfigComplete = !!projectConfig?.modelIdentCode;
   const isBREX42 = format === 'BREX — S1000D 4.2';
 
-  const getSettings = () => {
-    const settings = {
-      apiKey: localStorage.getItem('brdp_api_key') || '',
-      modelName: localStorage.getItem('brdp_model') || '',
-      provider: localStorage.getItem('brdp_provider') || 'Anthropic',
-    };
-    console.log('GenerateModal settings:', {
-      hasApiKey: !!settings.apiKey,
-      modelName: settings.modelName,
-      provider: settings.provider,
-    });
-    return settings;
-  };
+  const getSettings = () => ({
+    apiKey: localStorage.getItem('brdp_api_key') || '',
+    modelName: localStorage.getItem('brdp_model') || '',
+    provider: localStorage.getItem('brdp_provider') || 'Anthropic',
+  });
 
   useEffect(() => {
     const handleKey = (e) => { if (e.key === 'Escape') onClose(); };
