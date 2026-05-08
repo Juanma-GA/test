@@ -36,7 +36,7 @@ function buildHeaders(provider, apiKey) {
 function buildRequestBody(provider, modelName, messages, systemPrompt) {
   const baseBody = {
     model: modelName,
-    max_tokens: 2048,
+    max_tokens: 4000,
   };
 
   if (provider === 'Anthropic') {
