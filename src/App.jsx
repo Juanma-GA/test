@@ -74,7 +74,7 @@ function AppContent() {
 
   return (
     <div className="appContainer">
-      <Header onChatClick={handleHeaderChatClick} chatOpen={chatOpen && currentPage === 'brdp'} onOpenGenerateModal={openGenerateModal} />
+      <Header onChatClick={handleHeaderChatClick} chatOpen={chatOpen && currentPage === 'brdp'} onOpenGenerateModal={openGenerateModal} showToast={showToast} />
       <div className="workspaceRow">
         <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
         <main className="mainContent">

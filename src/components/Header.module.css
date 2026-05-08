@@ -96,6 +96,79 @@
   border-color: var(--blue-dark);
 }
 
+/* Secondary Buttons (Outline Style) */
+.secondaryBtn {
+  background: white;
+  border: 1px solid var(--border2);
+  color: var(--text-mid);
+  font-size: 11.5px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.secondaryBtn:hover:not(:disabled) {
+  border-color: var(--blue);
+  color: var(--blue);
+  background: var(--blue-light);
+}
+
+.secondaryBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Dropdown Container */
+.dropdownContainer {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: white;
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  min-width: 180px;
+}
+
+.dropdownItem {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 11.5px;
+  color: var(--text-mid);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.dropdownItem:first-child {
+  border-radius: 6px 6px 0 0;
+}
+
+.dropdownItem:last-child {
+  border-radius: 0 0 6px 6px;
+}
+
+.dropdownItem:hover {
+  background-color: var(--blue-light);
+  color: var(--blue);
+}
+
 /* Generate Button */
 .generateBtn {
   background: var(--blue);
