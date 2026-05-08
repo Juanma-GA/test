@@ -23,7 +23,7 @@ STRICT RULES:
 2. First character must be: <?xml version="1.0" encoding="UTF-8"?>
 3. Use the exact dmodule opening tag from dmodule_opening_tag in the schema.
 4. infoCode is always 022.
-5. Structure: content > brexDoc > brexDmRules. Do NOT add any element between <content> and <brexDoc>. There is no <brex> wrapper.
+5. Structure: content > brex > brexDoc > brexDmRules. The <brex> wrapper IS required. <brexDoc> must be inside <brex>.
 6. brexDmRef is a SELF-REFERENCE — same dmCode attributes as the document. dmRefIdent must include BOTH dmCode AND issueInfo.
 7. Each BRDP = one structureObjectRule inside contextRules > structureObjectRuleGroup.
 8. Child order in structureObjectRule: brDecisionRef → objectPath → objectUse → objectValue.

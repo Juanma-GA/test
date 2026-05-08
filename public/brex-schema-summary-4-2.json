@@ -95,8 +95,11 @@
       "note": "Use <qualityAssurance><unverified/></qualityAssurance> for new documents"
     },
     "content": {
-      "children_required": ["brexDoc"],
-      "note": "content > brexDoc > brexDmRules — do NOT add any wrapper between content and brexDoc"
+      "children_required": ["brex"],
+      "note": "content > brex > brexDoc > brexDmRules — brex wrapper IS required"
+    },
+    "brex": {
+      "children_required": ["brexDoc"]
     },
     "brexDoc": {
       "children_required": ["brexDmRules"]
