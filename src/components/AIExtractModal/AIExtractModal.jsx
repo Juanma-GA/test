@@ -41,7 +41,7 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport, sourc
     const interval = setInterval(() => {
       index = (index + 1) % messages.length;
       setExtractingMsg(messages[index]);
-    }, 1500);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [extracting]);
