@@ -275,7 +275,7 @@ export default function ChatPanel({
                                 <button
                                   className={styles.applySuggestionBtn}
                                   onClick={() => handleApplySuggestion(part.field, part.content)}
-                                  disabled={!selectedBrdp}
+                                  disabled={!activeContext || activeContext.length === 0}
                                 >
                                   Apply
                                 </button>
