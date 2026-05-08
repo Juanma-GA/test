@@ -162,9 +162,6 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport, sourc
                     }}
                   />
                 </div>
-                <span className={styles.progressCount}>
-                  {progress.foundCount} BRDP{progress.foundCount !== 1 ? 's' : ''} found
-                </span>
               </div>
               <button className={styles.cancelBtn} onClick={handleCancel}>Cancel</button>
             </div>
