@@ -67,8 +67,11 @@ const OVERLAP = 600;
 function splitIntoChunks(text) {
   const chunks = [];
   let start = 0;
+  const maxIterations = Math.ceil(text.length / (CHUNK_SIZE - OVERLAP)) + 10;
+  let iterations = 0;
 
-  while (start < text.length) {
+  while (start < text.length && iterations < maxIterations) {
+    iterations++;
     let end = Math.min(start + CHUNK_SIZE, text.length);
 
     if (end < text.length) {
@@ -79,14 +82,19 @@ function splitIntoChunks(text) {
     }
 
     const chunk = text.slice(start, end).trim();
-    if (chunk.length > 0) {
+    if (chunk.length > 50) {
       chunks.push(chunk);
     }
 
-    start = end - OVERLAP;
-    if (start < 0) start = 0;
+    const nextStart = end - OVERLAP;
+    if (nextStart <= start) {
+      start = end + 1;
+    } else {
+      start = nextStart;
+    }
   }
 
+  console.log('[extract] chunks count:', chunks.length);
   return chunks;
 }
 
@@ -269,8 +277,6 @@ export async function extractBRDPs(file, existingBRDPs, options = {}) {
   // Step 2 — Split into chunks
   const chunks = splitIntoChunks(documentText);
   const allExtracted = [];
-
-  console.log('[extract] chunks count:', chunks.length);
 
   // Step 3 — Process each chunk
   for (let i = 0; i < chunks.length; i++) {
