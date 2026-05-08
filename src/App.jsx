@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useToast } from './hooks/useToast';
 import { useAPIKey } from './hooks/useAPIKey';
 import { useChat } from './hooks/useChat';
+import { useProjectConfig } from './hooks/useProjectConfig';
 import { BRDPProvider, useBRDPContext } from './context/BRDPContext';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
@@ -37,6 +38,7 @@ function AppContent() {
   const { brdps, selectedBRDPs, setSelectedBRDPs } = useBRDPContext();
   const { toasts, showToast } = useToast();
   const { apiKey, modelName, provider, isConfigured } = useAPIKey();
+  const { projectConfig } = useProjectConfig();
 
   const { messages, sendUserMessage, clearHistory, stopStreaming, isLoading, error } = useChat({
     apiKey,
