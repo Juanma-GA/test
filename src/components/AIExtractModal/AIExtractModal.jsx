@@ -69,7 +69,7 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport, sourc
         provider,
         sourceType,
         onProgress: (current, total, foundCount) => {
-          if (extracting) setExtracting(false);
+          setExtracting(false);
           setProgress({ current, total, foundCount });
         },
         abortController: abortRef.current,
