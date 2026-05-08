@@ -61,8 +61,8 @@ export async function extractTextFromFile(file) {
 // Chunking strategy
 // ─────────────────────────────────────────────
 
-const CHUNK_SIZE = 3000;
-const OVERLAP = 400;
+const CHUNK_SIZE = 6000;
+const OVERLAP = 600;
 
 function splitIntoChunks(text) {
   const chunks = [];
@@ -290,7 +290,7 @@ export async function extractBRDPs(file, existingBRDPs, options = {}) {
         allExtracted.push(...extracted);
       }
     } catch (err) {
-      // Skip this chunk, continue with next one
+      console.warn(`Chunk ${i + 1} failed:`, err.message);
     }
 
     if (onProgress) {
