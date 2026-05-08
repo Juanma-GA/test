@@ -38,7 +38,7 @@ function AppContent() {
     const saved = localStorage.getItem('chatPanelWidth');
     return saved ? parseInt(saved) : 340;
   });
-  const { brdps, selectedBRDPs, setSelectedBRDPs } = useBRDPContext();
+  const { brdps, setBrdps, selectedBRDPs, setSelectedBRDPs } = useBRDPContext();
   const { toasts, showToast } = useToast();
   const { apiKey, modelName, provider, isConfigured } = useAPIKey();
   const { projectConfig } = useProjectConfig();
