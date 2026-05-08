@@ -16,7 +16,7 @@ import { sendMessageStream } from "./llmAPI.js";
  * @returns {Promise<string>}
  */
 export async function extractTextFromDOCX(file) {
-  const mammoth = await import("https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js");
+  const mammoth = await import("mammoth");
   const arrayBuffer = await file.arrayBuffer();
   const result = await mammoth.extractRawText({ arrayBuffer });
   return result.value;
