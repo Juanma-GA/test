@@ -263,9 +263,14 @@ export async function extractBRDPs(file, existingBRDPs, options = {}) {
     throw new Error("The document appears to be empty or could not be read.");
   }
 
+  console.log('[extract] documentText length:', documentText?.length);
+  console.log('[extract] first 200 chars:', documentText?.slice(0, 200));
+
   // Step 2 — Split into chunks
   const chunks = splitIntoChunks(documentText);
   const allExtracted = [];
+
+  console.log('[extract] chunks count:', chunks.length);
 
   // Step 3 — Process each chunk
   for (let i = 0; i < chunks.length; i++) {
