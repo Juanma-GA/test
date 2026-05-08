@@ -95,7 +95,7 @@ export default function GenerateModal({ brdps, onClose }) {
         <div className={styles.header}>
           <div>
             <h2 className={styles.title}>Generate Output</h2>
-            <span className={styles.subtitle}>S1000D Issue 4.2</span>
+            <span className={styles.subtitle}>{format}</span>
           </div>
           <button className={styles.closeBtn} onClick={onClose} aria-label="Close">✕</button>
         </div>
@@ -164,7 +164,7 @@ export default function GenerateModal({ brdps, onClose }) {
               disabled={!isConfigComplete || !isBREX42}
               title={!isBREX42 ? 'Only BREX 4.2 is available' : undefined}
             >
-              {result ? 'Regenerate' : 'Generate'}
+              {!isBREX42 ? 'Coming soon' : result ? 'Regenerate' : 'Generate'}
             </button>
           ) : (
             <div className={styles.loadingRow}>
