@@ -10,6 +10,7 @@ import BRDPPage from './pages/BRDPPage';
 import SettingsPage from './pages/SettingsPage';
 import ChatPanel from './components/ChatPanel';
 import GenerateModal from './components/GenerateModal';
+import BREXdocModal from './components/BREXdocModal/BREXdocModal';
 import './index.css';
 import './App.css';
 
@@ -28,6 +29,7 @@ function AppContent() {
   const [currentPage, setCurrentPage] = useState('brdp');
   const [chatOpen, setChatOpen] = useState(false);
   const [showGenerateModal, setShowGenerateModal] = useState(false);
+  const [showBREXdocModal, setShowBREXdocModal] = useState(false);
   const [chatPanelWidth, setChatPanelWidth] = useState(() => {
     const saved = localStorage.getItem('chatPanelWidth');
     return saved ? parseInt(saved) : 340;
@@ -74,7 +76,7 @@ function AppContent() {
 
   return (
     <div className="appContainer">
-      <Header onChatClick={handleHeaderChatClick} chatOpen={chatOpen && currentPage === 'brdp'} onOpenGenerateModal={openGenerateModal} showToast={showToast} />
+      <Header onChatClick={handleHeaderChatClick} chatOpen={chatOpen && currentPage === 'brdp'} onOpenGenerateModal={openGenerateModal} onOpenBREXdocModal={() => setShowBREXdocModal(true)} showToast={showToast} />
       <div className="workspaceRow">
         <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
         <main className="mainContent">
@@ -105,6 +107,13 @@ function AppContent() {
         <GenerateModal
           brdps={brdps}
           onClose={() => setShowGenerateModal(false)}
+        />
+      )}
+      {showBREXdocModal && (
+        <BREXdocModal
+          brdps={brdps}
+          projectConfig={projectConfig}
+          onClose={() => setShowBREXdocModal(false)}
         />
       )}
       <ToastContainer toasts={toasts} />

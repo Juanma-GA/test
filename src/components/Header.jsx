@@ -11,7 +11,7 @@ import styles from './Header.module.css';
  * @param {Function} props.showToast - Callback to show toast notifications
  * @returns {JSX.Element} Header element with title and action buttons
  */
-export default function Header({ onChatClick, chatOpen, onOpenGenerateModal, showToast }) {
+export default function Header({ onChatClick, chatOpen, onOpenGenerateModal, onOpenBREXdocModal, showToast }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -35,9 +35,7 @@ export default function Header({ onChatClick, chatOpen, onOpenGenerateModal, sho
   };
 
   const handleGenerateBREXdoc = () => {
-    if (showToast) {
-      showToast('Coming soon', 'info');
-    }
+    if (onOpenBREXdocModal) onOpenBREXdocModal();
   };
 
   return (
