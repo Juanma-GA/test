@@ -6,6 +6,7 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport, sourc
   const [file, setFile] = useState(null);
   const [dragging, setDragging] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [extracting, setExtracting] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0, foundCount: 0 });
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
@@ -55,12 +56,14 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport, sourc
     }
 
     setLoading(true);
+    setExtracting(true);
     setError(null);
     setResult(null);
     setProgress({ current: 0, total: 0, foundCount: 0 });
     abortRef.current = new AbortController();
 
     try {
+      setExtracting(false);
       const res = await extractBRDPs(file, existingBRDPs, {
         apiKey,
         modelName,
@@ -152,17 +155,21 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport, sourc
           ) : (
             <div className={styles.loadingRow}>
               <span className={styles.spinner} />
-              <div className={styles.progressInfo}>
-                <span>Processing section {progress.current} of {progress.total}</span>
-                <div className={styles.progressBar}>
-                  <div
-                    className={styles.progressFill}
-                    style={{
-                      width: progress.total > 0 ? `${(progress.current / progress.total) * 100}%` : '0%'
-                    }}
-                  />
+              {extracting ? (
+                <span>Reading document...</span>
+              ) : (
+                <div className={styles.progressInfo}>
+                  <span>Processing section {progress.current} of {progress.total}</span>
+                  <div className={styles.progressBar}>
+                    <div
+                      className={styles.progressFill}
+                      style={{
+                        width: progress.total > 0 ? `${(progress.current / progress.total) * 100}%` : '0%'
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
               <button className={styles.cancelBtn} onClick={handleCancel}>Cancel</button>
             </div>
           )}
