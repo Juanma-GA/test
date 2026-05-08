@@ -142,7 +142,7 @@ function calculateSimilarity(str1, str2) {
  * @returns {string[]}
  */
 export function generateIds(existingBRDPs, count) {
-  // Find highest existing numeric suffix
+  if (!count || count <= 0) return [];
   let maxNum = 0;
   existingBRDPs.forEach((b) => {
     const match = b.id?.match(/(\d+)$/);
