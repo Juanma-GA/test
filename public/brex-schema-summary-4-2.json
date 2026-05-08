@@ -95,22 +95,16 @@
       "note": "Use <qualityAssurance><unverified/></qualityAssurance> for new documents"
     },
     "content": {
-      "children_required": ["brex"],
-      "note": "content > brex > brexDoc > brexDmRules — brex wrapper IS required"
+      "children_required": ["brex"]
     },
     "brex": {
-      "children_required": ["brexDoc"]
-    },
-    "brexDoc": {
-      "children_required": ["brexDmRules"]
-    },
-    "brexDmRules": {
-      "children_optional": ["contextRules", "nonContextRules"]
+      "children_optional": ["commonInfo", "contextRules", "nonContextRules"],
+      "note": "brex contains contextRules directly — there is NO brexDoc and NO brexDmRules"
     },
     "contextRules": {
       "attributes_optional": ["rulesContext"],
       "children_optional": ["structureObjectRuleGroup"],
-      "note": "rulesContext should be empty string for rules applying to all DM types"
+      "note": "rulesContext = empty string for rules applying to all DM types"
     },
     "structureObjectRuleGroup": {
       "children_required": ["structureObjectRule"],
