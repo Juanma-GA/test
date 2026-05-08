@@ -12,6 +12,7 @@ import SettingsPage from './pages/SettingsPage';
 import ChatPanel from './components/ChatPanel';
 import GenerateModal from './components/GenerateModal';
 import BREXdocModal from './components/BREXdocModal/BREXdocModal';
+import AIExtractModal from './components/AIExtractModal/AIExtractModal';
 import './index.css';
 import './App.css';
 
@@ -31,6 +32,8 @@ function AppContent() {
   const [chatOpen, setChatOpen] = useState(false);
   const [showGenerateModal, setShowGenerateModal] = useState(false);
   const [showBREXdocModal, setShowBREXdocModal] = useState(false);
+  const [showAIExtractModal, setShowAIExtractModal] = useState(false);
+  const [aiExtractSourceType, setAiExtractSourceType] = useState('Style Guide');
   const [chatPanelWidth, setChatPanelWidth] = useState(() => {
     const saved = localStorage.getItem('chatPanelWidth');
     return saved ? parseInt(saved) : 340;
@@ -59,6 +62,19 @@ function AppContent() {
     setShowGenerateModal(true);
   };
 
+  const openAIExtractModal = (sourceType) => {
+    setAiExtractSourceType(sourceType);
+    setShowAIExtractModal(true);
+  };
+
+  const handleImportBRDPs = (newBrdps, mergeMode) => {
+    if (mergeMode === 'replace') {
+      setBrdps(newBrdps);
+    } else {
+      setBrdps([...brdps, ...newBrdps]);
+    }
+  };
+
   /**
    * Handle opening chat from header
    */
@@ -78,7 +94,7 @@ function AppContent() {
 
   return (
     <div className="appContainer">
-      <Header onChatClick={handleHeaderChatClick} chatOpen={chatOpen && currentPage === 'brdp'} onOpenGenerateModal={openGenerateModal} onOpenBREXdocModal={() => setShowBREXdocModal(true)} showToast={showToast} />
+      <Header onChatClick={handleHeaderChatClick} chatOpen={chatOpen && currentPage === 'brdp'} onOpenGenerateModal={openGenerateModal} onOpenBREXdocModal={() => setShowBREXdocModal(true)} onOpenAIExtractModal={openAIExtractModal} showToast={showToast} />
       <div className="workspaceRow">
         <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
         <main className="mainContent">
@@ -116,6 +132,14 @@ function AppContent() {
           brdps={brdps}
           projectConfig={projectConfig}
           onClose={() => setShowBREXdocModal(false)}
+        />
+      )}
+      {showAIExtractModal && (
+        <AIExtractModal
+          onClose={() => setShowAIExtractModal(false)}
+          existingBRDPs={brdps}
+          onImport={handleImportBRDPs}
+          sourceType={aiExtractSourceType}
         />
       )}
       <ToastContainer toasts={toasts} />

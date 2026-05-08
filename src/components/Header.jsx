@@ -11,7 +11,7 @@ import styles from './Header.module.css';
  * @param {Function} props.showToast - Callback to show toast notifications
  * @returns {JSX.Element} Header element with title and action buttons
  */
-export default function Header({ onChatClick, chatOpen, onOpenGenerateModal, onOpenBREXdocModal, showToast }) {
+export default function Header({ onChatClick, chatOpen, onOpenGenerateModal, onOpenBREXdocModal, onOpenAIExtractModal, showToast }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -29,8 +29,10 @@ export default function Header({ onChatClick, chatOpen, onOpenGenerateModal, onO
 
   const handleAIExtractOption = (option) => {
     setIsDropdownOpen(false);
-    if (showToast) {
-      showToast('Coming soon', 'info');
+    if (onOpenAIExtractModal) {
+      onOpenAIExtractModal(
+        option === 'style-guide' ? 'Style Guide' : 'BREX Doc'
+      );
     }
   };
 
