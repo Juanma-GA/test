@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { FileText, ChevronDown } from 'lucide-react';
+import { FileText, Code2, ChevronDown } from 'lucide-react';
 import styles from './Header.module.css';
 
 /**
@@ -85,7 +85,8 @@ export default function Header({ onChatClick, chatOpen, onOpenGenerateModal, sho
             title="Generate BREXdoc"
             aria-label="Generate BREXdoc"
           >
-            <FileText size={16} /> Generate BREXdoc
+            <FileText size={16} />
+            Generate BREXdoc
           </button>
 
           {/* Generate BREX / Schematron Button */}
@@ -95,7 +96,8 @@ export default function Header({ onChatClick, chatOpen, onOpenGenerateModal, sho
             title="Generate BREX / Schematron"
             aria-label="Generate BREX / Schematron"
           >
-            <FileText size={16} /> Generate BREX / Schematron
+            <Code2 size={16} />
+            Generate BREX / Schematron
           </button>
 
           {/* BRDP Assistant Button */}

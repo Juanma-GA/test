@@ -110,7 +110,7 @@
   font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .secondaryBtn:hover:not(:disabled) {
@@ -181,6 +181,9 @@
   cursor: pointer;
   transition: all 0.2s;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .generateBtn:hover {
