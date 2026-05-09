@@ -94,7 +94,6 @@ function splitIntoChunks(text) {
     }
   }
 
-  console.log('[extract] chunks count:', chunks.length);
   return chunks;
 }
 
@@ -278,9 +277,6 @@ export async function extractBRDPs(file, existingBRDPs, options = {}) {
     throw new Error("The document appears to be empty or could not be read.");
   }
 
-  console.log('[extract] documentText length:', documentText?.length);
-  console.log('[extract] first 200 chars:', documentText?.slice(0, 200));
-
   // Step 2 — Split into chunks
   const chunks = splitIntoChunks(documentText);
   const allExtracted = [];
@@ -308,7 +304,7 @@ export async function extractBRDPs(file, existingBRDPs, options = {}) {
         allExtracted.push(...extracted);
       }
     } catch (err) {
-      console.warn(`Chunk ${i + 1} failed:`, err.message);
+      // Silently skip failed chunks
     }
 
     if (onProgress) {
