@@ -97,6 +97,14 @@ export default function BRDPPage({ showToast, onNavigate }) {
     setDetailBrdp(null);
   };
 
+  /**
+   * Handle deletion of multiple selected BRDPs
+   */
+  const handleDeleteSelected = (ids) => {
+    setBrdps(prev => prev.filter(b => !ids.includes(b.id)));
+    setSelectedBRDPs([]);
+  };
+
   // Use table logic with all parameters
   const { rows, totalPages, total } = useTableLogic({
     brdps,
@@ -167,6 +175,7 @@ export default function BRDPPage({ showToast, onNavigate }) {
             onGoToSettings={() => onNavigate('settings')}
             editingBrdpId={detailBrdp?.id}
             isDirtyEditing={isDirty}
+            onDeleteSelected={handleDeleteSelected}
           />
         </div>
       </div>

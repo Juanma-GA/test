@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Trash2 } from 'lucide-react';
 import styles from './BRDPTable.module.css';
 
 /**
@@ -80,6 +81,7 @@ export default function BRDPTable({
   onGoToSettings,
   editingBrdpId,
   isDirtyEditing,
+  onDeleteSelected,
 }) {
   const [lastSelectedId, setLastSelectedId] = useState(null);
   /**
@@ -171,6 +173,21 @@ export default function BRDPTable({
 
   return (
     <div className={styles.container}>
+      {selectedIds.length > 0 && (
+        <div className={styles.selectionToolbar}>
+          <span>{selectedIds.length} BRDP{selectedIds.length > 1 ? 's' : ''} selected</span>
+          <button
+            className={styles.deleteSelectedBtn}
+            onClick={() => {
+              if (window.confirm(`Delete ${selectedIds.length} BRDP${selectedIds.length > 1 ? 's' : ''}? This cannot be undone.`)) {
+                onDeleteSelected(selectedIds);
+              }
+            }}
+          >
+            <Trash2 size={14} /> Delete selected
+          </button>
+        </div>
+      )}
       <table className={styles.table}>
         <thead>
           <tr>
