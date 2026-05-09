@@ -248,3 +248,12 @@
   color: #92400e;
   font-style: italic;
 }
+
+.tdCheck {
+  width: 36px;
+  text-align: center;
+}
+
+.excludedRow {
+  opacity: 0.4;
+}

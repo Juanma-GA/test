@@ -35,6 +35,7 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
   const [mergeMode, setMergeMode] = useState('add');
   const [extractingMsg, setExtractingMsg] = useState('Reading document...');
   const [sourceType, setSourceType] = useState('Style Guide');
+  const [excludedIds, setExcludedIds] = useState([]);
   const abortRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -68,6 +69,10 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
 
     return () => clearInterval(interval);
   }, [extracting]);
+
+  useEffect(() => {
+    if (result) setExcludedIds([]);
+  }, [result]);
 
   const handleFile = (f) => {
     if (!f) return;
@@ -130,9 +135,17 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
     setLoading(false);
   };
 
+  const toggleExclude = (id) => {
+    setExcludedIds(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
+  };
+
   const handleImport = () => {
     if (!result?.brdps) return;
-    onImport(result.brdps, mergeMode);
+    const toImport = result.brdps.filter(b => !excludedIds.includes(b.id));
+    if (toImport.length === 0) return;
+    onImport(toImport, mergeMode);
     onClose();
   };
 
@@ -261,6 +274,7 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
                 <table className={styles.table}>
                   <thead>
                     <tr>
+                      <th></th>
                       <th>ID</th>
                       <th>Title</th>
                       <th>Proposal</th>
@@ -271,7 +285,14 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
                     {result.brdps.map((b) => {
                       const duplicate = findDuplicate(b, existingBRDPs);
                       return (
-                        <tr key={b.id} className={duplicate ? styles.duplicateRow : ''}>
+                        <tr key={b.id} className={`${duplicate ? styles.duplicateRow : ''} ${excludedIds.includes(b.id) ? styles.excludedRow : ''}`}>
+                          <td className={styles.tdCheck}>
+                            <input
+                              type="checkbox"
+                              checked={!excludedIds.includes(b.id)}
+                              onChange={() => toggleExclude(b.id)}
+                            />
+                          </td>
                           <td className={styles.tdId}>{b.id}</td>
                           <td className={styles.tdTitle}>
                             {b.title}
@@ -320,7 +341,7 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
 
               {/* Import button */}
               <button className={styles.importBtn} onClick={handleImport}>
-                Import {result.rawCount} BRDPs
+                Import {result.brdps.filter(b => !excludedIds.includes(b.id)).length} BRDPs
               </button>
             </div>
           )}
