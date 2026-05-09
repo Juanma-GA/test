@@ -2,6 +2,28 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { extractBRDPs } from '../../api/extractBRDPs';
 import styles from './AIExtractModal.module.css';
 
+function calculateSimilarity(str1, str2) {
+  const s1 = (str1 || '').toLowerCase().trim();
+  const s2 = (str2 || '').toLowerCase().trim();
+  if (!s1 || !s2) return 0;
+  if (s1 === s2) return 1;
+  const longer = s1.length > s2.length ? s1 : s2;
+  const shorter = s1.length > s2.length ? s2 : s1;
+  if (longer.includes(shorter)) return shorter.length / longer.length;
+  let matches = 0;
+  for (let i = 0; i < shorter.length; i++) {
+    if (longer.includes(shorter[i])) matches++;
+  }
+  return matches / longer.length;
+}
+
+function findDuplicate(newBrdp, existingBRDPs) {
+  return existingBRDPs.find(existing =>
+    calculateSimilarity(newBrdp.title, existing.title) > 0.8 ||
+    calculateSimilarity(newBrdp.proposal, existing.proposal) > 0.8
+  );
+}
+
 export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
   const [file, setFile] = useState(null);
   const [dragging, setDragging] = useState(false);
@@ -225,6 +247,15 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
                 <span className={styles.badgeOk}>✓ {result.rawCount} BRDPs extracted</span>
               </div>
 
+              {(() => {
+                const duplicateCount = result.brdps.filter(b => findDuplicate(b, existingBRDPs)).length;
+                return duplicateCount > 0 ? (
+                  <div className={styles.duplicateWarning}>
+                    ⚠️ {duplicateCount} possible duplicate{duplicateCount > 1 ? 's' : ''} detected — review before importing
+                  </div>
+                ) : null;
+              })()}
+
               {/* Preview table */}
               <div className={styles.tableWrapper}>
                 <table className={styles.table}>
@@ -237,14 +268,24 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {result.brdps.map((b) => (
-                      <tr key={b.id}>
-                        <td className={styles.tdId}>{b.id}</td>
-                        <td className={styles.tdTitle}>{b.title}</td>
-                        <td className={styles.tdProposal}>{b.proposal}</td>
-                        <td className={styles.tdComment}>{b.comment}</td>
-                      </tr>
-                    ))}
+                    {result.brdps.map((b) => {
+                      const duplicate = findDuplicate(b, existingBRDPs);
+                      return (
+                        <tr key={b.id} className={duplicate ? styles.duplicateRow : ''}>
+                          <td className={styles.tdId}>{b.id}</td>
+                          <td className={styles.tdTitle}>
+                            {b.title}
+                            {duplicate && (
+                              <span className={styles.duplicateBadge} title={`Similar to ${duplicate.id}`}>
+                                duplicate
+                              </span>
+                            )}
+                          </td>
+                          <td className={styles.tdProposal}>{b.proposal}</td>
+                          <td className={styles.tdComment}>{b.comment}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

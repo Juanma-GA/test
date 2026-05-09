@@ -207,3 +207,32 @@
   color: white;
   border-color: var(--color-primary, #2563eb);
 }
+
+.duplicateWarning {
+  padding: 0.5rem 0.75rem;
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #92400e;
+  margin-bottom: 0.5rem;
+}
+
+.duplicateRow {
+  background: #fffbeb;
+}
+
+.duplicateBadge {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.1rem 0.4rem;
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  color: #92400e;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  vertical-align: middle;
+}
