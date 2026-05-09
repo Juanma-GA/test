@@ -1,5 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
-import { FileText, Code2, ChevronDown } from 'lucide-react';
+import { FileText, Code2 } from 'lucide-react';
 import styles from './Header.module.css';
 
 /**
@@ -12,30 +11,6 @@ import styles from './Header.module.css';
  * @returns {JSX.Element} Header element with title and action buttons
  */
 export default function Header({ onChatClick, chatOpen, onOpenGenerateModal, onOpenBREXdocModal, onOpenAIExtractModal, showToast }) {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  // Handle outside click to close dropdown
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleAIExtractOption = (option) => {
-    setIsDropdownOpen(false);
-    if (onOpenAIExtractModal) {
-      onOpenAIExtractModal(
-        option === 'style-guide' ? 'Style Guide' : 'BREX Doc'
-      );
-    }
-  };
-
   const handleGenerateBREXdoc = () => {
     if (onOpenBREXdocModal) onOpenBREXdocModal();
   };
@@ -49,34 +24,14 @@ export default function Header({ onChatClick, chatOpen, onOpenGenerateModal, onO
           </span>
         </h1>
         <div className={styles.buttons}>
-          {/* AI Extract Dropdown */}
-          <div className={styles.dropdownContainer} ref={dropdownRef}>
-            <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className={styles.secondaryBtn}
-              title="AI Extract options"
-              aria-label="AI Extract options"
-              aria-expanded={isDropdownOpen}
-            >
-              AI Extract <ChevronDown size={16} />
-            </button>
-            {isDropdownOpen && (
-              <div className={styles.dropdownMenu}>
-                <button
-                  onClick={() => handleAIExtractOption('style-guide')}
-                  className={styles.dropdownItem}
-                >
-                  Get BRDPs from Style Guide
-                </button>
-                <button
-                  onClick={() => handleAIExtractOption('brex-doc')}
-                  className={styles.dropdownItem}
-                >
-                  Get BRDPs from BREX Doc
-                </button>
-              </div>
-            )}
-          </div>
+          {/* AI Extract Button */}
+          <button
+            onClick={() => onOpenAIExtractModal()}
+            className={styles.secondaryBtn}
+            title="Extract BRDPs from a document"
+          >
+            AI Extract
+          </button>
 
           {/* Generate BREXdoc Button */}
           <button

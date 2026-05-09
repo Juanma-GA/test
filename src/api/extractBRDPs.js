@@ -168,14 +168,21 @@ export function generateIds(existingBRDPs, count) {
 // ─────────────────────────────────────────────
 
 function buildExtractionPrompt(chunkText, sourceType) {
-  const system = `You are an S1000D BRDP expert. Extract all Business Rules Decision Points from the provided document section.
+  let baseSystem = `You are an S1000D BRDP expert. Extract all Business Rules Decision Points from the provided document section.
 
 The document may be in English or Spanish. Extract rules in the original language of the document.
 
 Identify rules by these patterns:
 - Sentences containing: shall, must, must not, should not, is required, is mandatory
 - Paragraphs prefixed with: "Regla SOPTE:", "Decisión específica", "Regla de edición", or equivalent rule markers in any language
-- Any statement that defines how something must or must not be done
+- Any statement that defines how something must or must not be done`;
+
+  if (sourceType === 'Others') {
+    baseSystem += `
+- The document may be any type of technical or procedural document. Extract any statement that defines a rule, decision, requirement, constraint, or recommendation.`;
+  }
+
+  const system = `${baseSystem}
 
 For each rule generate exactly this JSON object:
 {

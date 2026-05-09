@@ -33,7 +33,6 @@ function AppContent() {
   const [showGenerateModal, setShowGenerateModal] = useState(false);
   const [showBREXdocModal, setShowBREXdocModal] = useState(false);
   const [showAIExtractModal, setShowAIExtractModal] = useState(false);
-  const [aiExtractSourceType, setAiExtractSourceType] = useState('Style Guide');
   const [chatPanelWidth, setChatPanelWidth] = useState(() => {
     const saved = localStorage.getItem('chatPanelWidth');
     return saved ? parseInt(saved) : 340;
@@ -62,8 +61,7 @@ function AppContent() {
     setShowGenerateModal(true);
   };
 
-  const openAIExtractModal = (sourceType) => {
-    setAiExtractSourceType(sourceType);
+  const openAIExtractModal = () => {
     setShowAIExtractModal(true);
   };
 
@@ -139,7 +137,6 @@ function AppContent() {
           onClose={() => setShowAIExtractModal(false)}
           existingBRDPs={brdps}
           onImport={handleImportBRDPs}
-          sourceType={aiExtractSourceType}
         />
       )}
       <ToastContainer toasts={toasts} />

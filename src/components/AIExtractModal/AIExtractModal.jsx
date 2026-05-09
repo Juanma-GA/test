@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { extractBRDPs } from '../../api/extractBRDPs';
 import styles from './AIExtractModal.module.css';
 
-export default function AIExtractModal({ onClose, existingBRDPs, onImport, sourceType = 'Style Guide' }) {
+export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
   const [file, setFile] = useState(null);
   const [dragging, setDragging] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -12,6 +12,7 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport, sourc
   const [error, setError] = useState(null);
   const [mergeMode, setMergeMode] = useState('add');
   const [extractingMsg, setExtractingMsg] = useState('Reading document...');
+  const [sourceType, setSourceType] = useState('Style Guide');
   const abortRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -120,13 +121,29 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport, sourc
         {/* Header */}
         <div className={styles.header}>
           <div>
-            <h2 className={styles.title}>AI Extract — {sourceType}</h2>
+            <h2 className={styles.title}>AI Extract</h2>
             <span className={styles.subtitle}>Extract BRDPs from a document using AI</span>
           </div>
           <button className={styles.closeBtn} onClick={onClose}>✕</button>
         </div>
 
         <div className={styles.content}>
+
+          {/* Source Type Selector */}
+          <div className={styles.sourceTypeSection}>
+            <label className={styles.sourceTypeLabel}>Document type</label>
+            <div className={styles.sourceTypeGroup}>
+              {['Style Guide', 'BREX Doc', 'Others'].map((type) => (
+                <button
+                  key={type}
+                  className={`${styles.sourceTypeBtn} ${sourceType === type ? styles.sourceTypeBtnActive : ''}`}
+                  onClick={() => setSourceType(type)}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {/* Drop zone */}
           <div
