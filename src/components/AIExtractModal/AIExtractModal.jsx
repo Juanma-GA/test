@@ -276,9 +276,10 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
                           <td className={styles.tdTitle}>
                             {b.title}
                             {duplicate && (
-                              <span className={styles.duplicateBadge} title={`Similar to ${duplicate.id}`}>
-                                duplicate
-                              </span>
+                              <div className={styles.duplicateInfo}>
+                                <span className={styles.duplicateBadge}>duplicate</span>
+                                <span className={styles.duplicateOf}>↔ {duplicate.id}: {duplicate.title}</span>
+                              </div>
                             )}
                           </td>
                           <td className={styles.tdProposal}>{b.proposal}</td>

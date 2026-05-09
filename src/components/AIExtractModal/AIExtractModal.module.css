@@ -222,9 +222,15 @@
   background: #fffbeb;
 }
 
+.duplicateInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.25rem;
+}
+
 .duplicateBadge {
   display: inline-block;
-  margin-left: 0.4rem;
   padding: 0.1rem 0.4rem;
   background: #fef3c7;
   border: 1px solid #fcd34d;
@@ -234,5 +240,11 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  vertical-align: middle;
+  width: fit-content;
+}
+
+.duplicateOf {
+  font-size: 0.75rem;
+  color: #92400e;
+  font-style: italic;
 }
