@@ -103,19 +103,24 @@
 }
 
 .deleteBtn {
-  background: transparent;
-  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #e8edf5;
+  background: #f8fafc;
+  color: #6b7280;
   cursor: pointer;
-  font-size: 1rem;
-  padding: 0.25rem 0.4rem;
-  border-radius: 4px;
-  opacity: 0.6;
-  transition: opacity 0.15s, background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
 }
 
 .deleteBtn:hover {
-  opacity: 1;
+  color: #dc2626;
   background: #fee2e2;
+  border-color: #fecaca;
 }
 
 .lockIcon {
