@@ -2,25 +2,33 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { extractBRDPs } from '../../api/extractBRDPs';
 import styles from './AIExtractModal.module.css';
 
-function calculateSimilarity(str1, str2) {
-  const s1 = (str1 || '').toLowerCase().trim();
-  const s2 = (str2 || '').toLowerCase().trim();
-  if (!s1 || !s2) return 0;
-  if (s1 === s2) return 1;
-  const longer = s1.length > s2.length ? s1 : s2;
-  const shorter = s1.length > s2.length ? s2 : s1;
-  if (longer.includes(shorter)) return shorter.length / longer.length;
-  let matches = 0;
-  for (let i = 0; i < shorter.length; i++) {
-    if (longer.includes(shorter[i])) matches++;
-  }
-  return matches / longer.length;
+function getKeywords(text) {
+  const stopwords = new Set([
+    'the','a','an','of','to','and','is','be','shall','must','should',
+    'that','this','in','on','for','with','not','are','or','as','by',
+    'it','its','from','at','use','used','using','all','any','each',
+    'will','may','been','have','has','was','were','their','they'
+  ]);
+  return (text || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '')
+    .split(/\s+/)
+    .filter(w => w.length > 3 && !stopwords.has(w));
+}
+
+function jaccardSimilarity(text1, text2) {
+  const words1 = new Set(getKeywords(text1));
+  const words2 = new Set(getKeywords(text2));
+  if (words1.size === 0 || words2.size === 0) return 0;
+  const intersection = new Set([...words1].filter(w => words2.has(w)));
+  const union = new Set([...words1, ...words2]);
+  return intersection.size / union.size;
 }
 
 function findDuplicate(newBrdp, existingBRDPs) {
   return existingBRDPs.find(existing =>
-    calculateSimilarity(newBrdp.title, existing.title) > 0.8 ||
-    calculateSimilarity(newBrdp.proposal, existing.proposal) > 0.8
+    jaccardSimilarity(newBrdp.title, existing.title) > 0.5 ||
+    jaccardSimilarity(newBrdp.proposal, existing.proposal) > 0.4
   );
 }
 
