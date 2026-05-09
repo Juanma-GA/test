@@ -82,10 +82,12 @@ export default function DetailPanel({ brdp, onClose, showToast, onUpdate, onDirt
   const [isEditing, setIsEditing] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [definitionUnlocked, setDefinitionUnlocked] = useState(false);
   const [editData, setEditData] = useState({
     proposal: brdp.proposal,
     validation: brdp.validation,
     comment: brdp.comment,
+    definition: brdp.definition,
   });
 
   // Load notes on mount or when BRDP changes
@@ -95,12 +97,14 @@ export default function DetailPanel({ brdp, onClose, showToast, onUpdate, onDirt
     setNotesDirty(false);
     setIsEditing(false);
     setIsDirty(false);
+    setDefinitionUnlocked(false);
     setEditData({
       proposal: brdp.proposal,
       validation: brdp.validation,
       comment: brdp.comment,
+      definition: brdp.definition,
     });
-  }, [brdp.id, brdp.proposal, brdp.validation, brdp.comment, getNote]);
+  }, [brdp.id, brdp.proposal, brdp.validation, brdp.comment, brdp.definition, getNote]);
 
   // Notify parent when isDirty changes
   useEffect(() => {
@@ -160,8 +164,9 @@ export default function DetailPanel({ brdp, onClose, showToast, onUpdate, onDirt
     updateBRDP(brdp.id, editData);
     setIsEditing(false);
     setIsDirty(false);
+    setDefinitionUnlocked(false);
     if (onUpdate) {
-      const fieldsToTrack = ['proposal', 'comment', 'validation'];
+      const fieldsToTrack = ['proposal', 'comment', 'validation', 'definition'];
       const history = [...(brdp.history || [])];
 
       fieldsToTrack.forEach(field => {
@@ -191,9 +196,11 @@ export default function DetailPanel({ brdp, onClose, showToast, onUpdate, onDirt
       proposal: brdp.proposal,
       validation: brdp.validation,
       comment: brdp.comment,
+      definition: brdp.definition,
     });
     setIsEditing(false);
     setIsDirty(false);
+    setDefinitionUnlocked(false);
   };
 
   /**
@@ -273,9 +280,28 @@ export default function DetailPanel({ brdp, onClose, showToast, onUpdate, onDirt
             {/* Definition */}
             <div className={styles.field}>
               <label className={styles.label}>
-                Definition <LockIcon />
+                Definition
+                {!definitionUnlocked && (
+                  <span
+                    className={styles.lockIcon}
+                    title="Click to unlock and edit"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => setDefinitionUnlocked(true)}
+                  >
+                    🔒
+                  </span>
+                )}
               </label>
-              <p className={styles.value}>{brdp.definition}</p>
+              {isEditing && definitionUnlocked ? (
+                <textarea
+                  className={styles.editTextarea}
+                  value={editData.definition}
+                  onChange={(e) => handleEditChange('definition', e.target.value)}
+                  rows="3"
+                />
+              ) : (
+                <p className={styles.value}>{isEditing ? editData.definition : brdp.definition}</p>
+              )}
             </div>
 
             {/* Proposal */}
