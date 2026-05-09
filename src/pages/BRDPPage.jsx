@@ -19,7 +19,7 @@ import styles from './BRDPPage.module.css';
  * @returns {JSX.Element} Page with table and detail panel
  */
 export default function BRDPPage({ showToast, onNavigate }) {
-  const { brdps, selectedBRDPs, setSelectedBRDPs, stats } = useBRDPContext();
+  const { brdps, setBrdps, selectedBRDPs, setSelectedBRDPs, stats } = useBRDPContext();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('All');
   const [sortField, setSortField] = useState('');
@@ -86,6 +86,15 @@ export default function BRDPPage({ showToast, onNavigate }) {
       );
       setSelectedBRDPs(updated);
     }
+  };
+
+  /**
+   * Handle BRDP deletion
+   */
+  const handleDeleteBRDP = (id) => {
+    setBrdps(prev => prev.filter(b => b.id !== id));
+    setSelectedBRDPs(selectedBRDPs.filter(b => b.id !== id));
+    setDetailBrdp(null);
   };
 
   // Use table logic with all parameters
@@ -170,6 +179,7 @@ export default function BRDPPage({ showToast, onNavigate }) {
           showToast={showToast}
           onUpdate={handleBrdpUpdate}
           onDirtyChange={setIsDirty}
+          onDelete={handleDeleteBRDP}
         />
       )}
     </div>

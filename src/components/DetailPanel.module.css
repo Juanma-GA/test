@@ -102,6 +102,22 @@
   background: #eff6ff;
 }
 
+.deleteBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.25rem 0.4rem;
+  border-radius: 4px;
+  opacity: 0.6;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.deleteBtn:hover {
+  opacity: 1;
+  background: #fee2e2;
+}
+
 .lockIcon {
   font-size: 0.75rem;
   margin-left: 0.5rem;

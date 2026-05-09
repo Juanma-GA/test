@@ -73,7 +73,7 @@ function ValidationBadge({ status }) {
  * @param {Function} props.onUpdate - Callback when BRDP is updated
  * @returns {JSX.Element} Detail panel with full record information
  */
-export default function DetailPanel({ brdp, onClose, showToast, onUpdate, onDirtyChange }) {
+export default function DetailPanel({ brdp, onClose, showToast, onUpdate, onDirtyChange, onDelete }) {
   const { updateBRDP, brdps } = useBRDPContext();
   const { getNote, saveNote } = useLocalNotes();
   const [notes, setNotes] = useState('');
@@ -231,6 +231,20 @@ export default function DetailPanel({ brdp, onClose, showToast, onUpdate, onDirt
                 title="Edit BRDP"
               >
                 ✏️
+              </button>
+            )}
+            {!isEditing && onDelete && (
+              <button
+                className={styles.deleteBtn}
+                onClick={() => {
+                  if (window.confirm(`Delete ${brdp.id}? This action cannot be undone.`)) {
+                    onDelete(brdp.id);
+                  }
+                }}
+                aria-label="Delete BRDP"
+                title="Delete BRDP"
+              >
+                🗑️
               </button>
             )}
             <button
