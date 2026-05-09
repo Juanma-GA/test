@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Trash2 } from 'lucide-react';
 import { useBRDPContext } from '../context/BRDPContext';
 import { useLocalNotes } from '../hooks/useLocalNotes';
 import styles from './DetailPanel.module.css';
@@ -244,7 +245,7 @@ export default function DetailPanel({ brdp, onClose, showToast, onUpdate, onDirt
                 aria-label="Delete BRDP"
                 title="Delete BRDP"
               >
-                🗑️
+                <Trash2 size={16} />
               </button>
             )}
             <button
