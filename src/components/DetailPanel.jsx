@@ -281,14 +281,14 @@ export default function DetailPanel({ brdp, onClose, showToast, onUpdate, onDirt
             <div className={styles.field}>
               <label className={styles.label}>
                 Definition
-                {!definitionUnlocked && (
+                {(
                   <span
                     className={styles.lockIcon}
-                    title="Click to unlock and edit"
+                    title={definitionUnlocked ? "Click to lock" : "Click to unlock and edit"}
                     style={{ cursor: 'pointer' }}
-                    onClick={() => setDefinitionUnlocked(true)}
+                    onClick={() => setDefinitionUnlocked(prev => !prev)}
                   >
-                    🔒
+                    {definitionUnlocked ? '🔓' : '🔒'}
                   </span>
                 )}
               </label>
