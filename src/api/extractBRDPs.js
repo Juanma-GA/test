@@ -324,7 +324,7 @@ export async function extractBRDPs(file, existingBRDPs, options = {}) {
   const brdps = deduplicated.map((b, i) => ({
     id: ids[i],
     title: b.title || '',
-    definition: b.definition || b.title || '',
+    definition: b.title || '',
     proposal: b.proposal || '',
     validation: 'Pending',
     comment: b.comment || '',
