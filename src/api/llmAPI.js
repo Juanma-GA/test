@@ -31,12 +31,14 @@ function buildHeaders(provider, apiKey) {
  * @param {string} modelName - Model name
  * @param {Array} messages - Message history
  * @param {string} systemPrompt - System prompt
+ * @param {number} temperature - Temperature parameter for sampling
  * @returns {Object} Request body
  */
-function buildRequestBody(provider, modelName, messages, systemPrompt) {
+function buildRequestBody(provider, modelName, messages, systemPrompt, temperature) {
   const baseBody = {
     model: modelName,
     max_tokens: 4000,
+    temperature,
   };
 
   if (provider === 'Anthropic') {
@@ -90,6 +92,7 @@ Comment: ${selectedBrdp.comment}`;
  * @param {string} modelName - Model name
  * @param {string} provider - LLM provider
  * @param {string} [systemPrompt=""] - System prompt (optional, defaults to empty string)
+ * @param {number} [temperature=1] - Temperature parameter for sampling (optional, defaults to 1)
  * @returns {Promise<Object>} Response from LLM
  * @throws {Error} If the request fails
  */
@@ -98,7 +101,8 @@ export async function sendMessage(
   apiKey,
   modelName,
   provider,
-  systemPrompt = ""
+  systemPrompt = "",
+  temperature = 1
 ) {
   if (!apiKey || !modelName || !provider) {
     throw new Error('Missing API configuration. Please configure in Settings.');
@@ -115,7 +119,7 @@ export async function sendMessage(
   }
 
   const headers = buildHeaders(provider, apiKey);
-  const body = buildRequestBody(provider, modelName, messages, systemPrompt);
+  const body = buildRequestBody(provider, modelName, messages, systemPrompt, temperature);
 
   try {
     const response = await fetch(endpoint, {
@@ -164,6 +168,7 @@ export async function sendMessage(
  * @param {string} [systemPrompt=""] - System prompt
  * @param {Function} onChunk - Callback for each token received
  * @param {AbortController} abortController - Controller to cancel request
+ * @param {number} [temperature=1] - Temperature parameter for sampling (optional, defaults to 1)
  * @returns {Promise<string>} Complete response text
  * @throws {Error} If the request fails
  */
@@ -174,7 +179,8 @@ export async function sendMessageStream(
   provider,
   systemPrompt = "",
   onChunk,
-  abortController
+  abortController,
+  temperature = 1
 ) {
   if (!apiKey || !modelName || !provider) {
     throw new Error('Missing API configuration. Please configure in Settings.');
@@ -191,7 +197,7 @@ export async function sendMessageStream(
   }
 
   const headers = buildHeaders(provider, apiKey);
-  const body = buildRequestBody(provider, modelName, messages, systemPrompt);
+  const body = buildRequestBody(provider, modelName, messages, systemPrompt, temperature);
 
   try {
     const response = await fetch(endpoint, {

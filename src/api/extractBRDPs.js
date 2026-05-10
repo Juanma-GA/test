@@ -294,7 +294,8 @@ export async function extractBRDPs(file, existingBRDPs, options = {}) {
         apiKey,
         modelName,
         provider,
-        system
+        system,
+        0.2
       );
 
       const extracted = parseJSONResponse(response.content);
