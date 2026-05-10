@@ -186,9 +186,7 @@ Identify rules by these patterns:
 For each rule generate exactly this JSON object:
 {
   "title": "Short title max 8 words summarising the rule",
-  "definition": "The topic area or section this rule belongs to",
   "proposal": "The exact rule text — do not paraphrase or shorten",
-  "validation": "Pending",
   "comment": "Source: [chapter or section reference if available]"
 }
 
