@@ -103,25 +103,6 @@ export default function AIConfigSection({
         };
 
     try {
-      // Debug: log request details
-      const maskedHeaders = {
-        ...headers,
-        ...(headers['x-api-key'] && {
-          'x-api-key': headers['x-api-key'].substring(0, 8) + '...',
-        }),
-        ...(headers['Authorization'] && {
-          'Authorization': 'Bearer ' + headers['Authorization'].substring(7, 15) + '...',
-        }),
-      };
-
-      console.log('[Test Connection] Request Details:', {
-        endpoint,
-        headers: maskedHeaders,
-        body,
-        provider,
-        modelName,
-      });
-
       const response = await fetch(endpoint, {
         method: 'POST',
         headers,
