@@ -70,6 +70,11 @@ export default function AIConfigSection({
       endpoint = 'https://api.example.com/v1/messages';
     }
 
+    // Override endpoint if custom endpoint is provided
+    if (customEndpoint && customEndpoint.trim()) {
+      endpoint = customEndpoint;
+    }
+
     const headers = provider === 'Anthropic'
       ? {
           'x-api-key': apiKey,
