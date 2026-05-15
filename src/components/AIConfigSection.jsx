@@ -250,12 +250,6 @@ export default function AIConfigSection({
         </div>
       )}
 
-      {/* Status Indicator */}
-      <div className={styles.statusLine}>
-        <span className={styles.statusLabel}>Status:</span>
-        <span className={statusIndicator.className}>{statusIndicator.text}</span>
-      </div>
-
       {/* Action Buttons */}
       <div className={styles.buttonGroup}>
         <button
@@ -272,6 +266,9 @@ export default function AIConfigSection({
         >
           {isTesting ? 'Testing...' : 'Test Connection'}
         </button>
+        <span className={styles.separator}>·</span>
+        <span className={styles.statusLabel}>Status:</span>
+        <span className={statusIndicator.className}>{statusIndicator.text}</span>
       </div>
     </div>
   );
