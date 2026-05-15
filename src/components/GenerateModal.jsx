@@ -25,6 +25,7 @@ export default function GenerateModal({ brdps, onClose }) {
     apiKey: localStorage.getItem('brdp_api_key') || '',
     modelName: localStorage.getItem('brdp_model') || '',
     provider: localStorage.getItem('brdp_provider') || 'Anthropic',
+    customEndpoint: localStorage.getItem('brdp_custom_endpoint') || '',
   });
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export default function GenerateModal({ brdps, onClose }) {
   useEffect(() => { setResult(null); }, [onlyValidated, format]);
 
   const handleGenerate = useCallback(async () => {
-    const { apiKey, modelName, provider } = getSettings();
+    const { apiKey, modelName, provider, customEndpoint } = getSettings();
 
     if (!apiKey) {
       setResult({ xml: null, valid: false, error: 'API key not configured. Go to Settings.', brdpCount: 0 });
@@ -53,6 +54,7 @@ export default function GenerateModal({ brdps, onClose }) {
         apiKey,
         modelName,
         provider,
+        customEndpoint,
         onlyValidated,
         onChunk: (chunk) => setStreamedChars(prev => prev + chunk.length),
         abortController: abortRef.current,

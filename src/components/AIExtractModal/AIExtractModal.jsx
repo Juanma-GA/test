@@ -51,6 +51,7 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
     apiKey: localStorage.getItem('brdp_api_key') || '',
     modelName: localStorage.getItem('brdp_model') || '',
     provider: localStorage.getItem('brdp_provider') || 'Anthropic',
+    customEndpoint: localStorage.getItem('brdp_custom_endpoint') || '',
   });
 
   useEffect(() => {
@@ -101,7 +102,7 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
   }, []);
 
   const handleExtract = async () => {
-    const { apiKey, modelName, provider } = getSettings();
+    const { apiKey, modelName, provider, customEndpoint } = getSettings();
     if (!apiKey) {
       setError('API key not configured. Go to Settings.');
       return;
@@ -123,6 +124,7 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
         apiKey,
         modelName,
         provider,
+        customEndpoint,
         sourceType,
         onProgress: (current, total, foundCount) => {
           setExtracting(false);

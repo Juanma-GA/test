@@ -39,13 +39,14 @@ function AppContent() {
   });
   const { brdps, setBrdps, selectedBRDPs, setSelectedBRDPs } = useBRDPContext();
   const { toasts, showToast } = useToast();
-  const { apiKey, modelName, provider, isConfigured } = useAPIKey();
+  const { apiKey, modelName, provider, customEndpoint, isConfigured } = useAPIKey();
   const { projectConfig } = useProjectConfig();
 
   const { messages, sendUserMessage, clearHistory, stopStreaming, isLoading, error } = useChat({
     apiKey,
     modelName,
     provider,
+    customEndpoint,
     selectedBRDPs,
   });
 

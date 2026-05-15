@@ -92,7 +92,9 @@ Comment: ${selectedBrdp.comment}`;
  * @param {string} modelName - Model name
  * @param {string} provider - LLM provider
  * @param {string} [systemPrompt=""] - System prompt (optional, defaults to empty string)
- * @param {number} [temperature=1] - Temperature parameter for sampling (optional, defaults to 1)
+ * @param {Object} [options={}] - Optional parameters
+ * @param {number} [options.temperature=1] - Temperature parameter for sampling
+ * @param {string} [options.customEndpoint=""] - Custom endpoint override
  * @returns {Promise<Object>} Response from LLM
  * @throws {Error} If the request fails
  */
@@ -102,8 +104,10 @@ export async function sendMessage(
   modelName,
   provider,
   systemPrompt = "",
-  temperature = 1
+  options = {}
 ) {
+  const { temperature = 1, customEndpoint = "" } = options;
+
   if (!apiKey || !modelName || !provider) {
     throw new Error('Missing API configuration. Please configure in Settings.');
   }
@@ -172,7 +176,9 @@ export async function sendMessage(
  * @param {string} [systemPrompt=""] - System prompt
  * @param {Function} onChunk - Callback for each token received
  * @param {AbortController} abortController - Controller to cancel request
- * @param {number} [temperature=1] - Temperature parameter for sampling (optional, defaults to 1)
+ * @param {Object} [options={}] - Optional parameters
+ * @param {number} [options.temperature=1] - Temperature parameter for sampling
+ * @param {string} [options.customEndpoint=""] - Custom endpoint override
  * @returns {Promise<string>} Complete response text
  * @throws {Error} If the request fails
  */
@@ -184,8 +190,10 @@ export async function sendMessageStream(
   systemPrompt = "",
   onChunk,
   abortController,
-  temperature = 1
+  options = {}
 ) {
+  const { temperature = 1, customEndpoint = "" } = options;
+
   if (!apiKey || !modelName || !provider) {
     throw new Error('Missing API configuration. Please configure in Settings.');
   }

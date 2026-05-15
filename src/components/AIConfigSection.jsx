@@ -19,15 +19,30 @@ export default function AIConfigSection({
   apiKey,
   modelName,
   provider,
+  customEndpoint,
   onApiKeyChange,
   onModelChange,
   onProviderChange,
+  onCustomEndpointChange,
   onSave,
   isConfigured,
 }) {
   const [showApiKey, setShowApiKey] = useState(false);
   const [testResult, setTestResult] = useState({ status: 'idle', message: '' });
   const [isTesting, setIsTesting] = useState(false);
+
+  /**
+   * Get the default endpoint for the current provider
+   */
+  const getDefaultEndpoint = () => {
+    const endpoints = {
+      'Anthropic': 'https://api.anthropic.com/v1/messages',
+      'OpenAI': 'https://api.openai.com/v1/chat/completions',
+      'Mistral': 'https://api.mistral.ai/v1/chat/completions',
+      'Custom': 'https://api.example.com/v1/messages',
+    };
+    return endpoints[provider] || '';
+  };
 
   /**
    * Test API key connection
@@ -205,6 +220,22 @@ export default function AIConfigSection({
           placeholder="e.g. claude-haiku-4-5-20251001"
           className={styles.input}
         />
+      </div>
+
+      {/* Custom Endpoint Input */}
+      <div className={styles.formGroup}>
+        <label htmlFor="custom-endpoint" className={styles.label}>
+          Custom Endpoint (optional)
+        </label>
+        <input
+          id="custom-endpoint"
+          type="text"
+          value={customEndpoint}
+          onChange={(e) => onCustomEndpointChange(e.target.value)}
+          placeholder={getDefaultEndpoint()}
+          className={styles.input}
+        />
+        <p className={styles.providerNote}>Leave empty to use default endpoint for {provider}</p>
       </div>
 
       {/* Test Result Message */}

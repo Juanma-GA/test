@@ -109,7 +109,7 @@ Always include the suggestion block at the end of your response when rewriting a
  * @property {boolean} isLoading - Whether waiting for response
  * @property {string|null} error - Error message if any
  */
-export function useChat({ apiKey, modelName, provider, selectedBRDPs = [] }) {
+export function useChat({ apiKey, modelName, provider, customEndpoint = "", selectedBRDPs = [] }) {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -154,7 +154,10 @@ export function useChat({ apiKey, modelName, provider, selectedBRDPs = [] }) {
             assistantMessage.content += chunk;
             setMessages([...updatedMessages, { ...assistantMessage }]);
           },
-          abortControllerRef.current
+          abortControllerRef.current,
+          {
+            customEndpoint,
+          }
         );
 
         // Final update with complete content
@@ -167,7 +170,7 @@ export function useChat({ apiKey, modelName, provider, selectedBRDPs = [] }) {
         abortControllerRef.current = null;
       }
     },
-    [messages, apiKey, modelName, provider, selectedBRDPs, brdps]
+    [messages, apiKey, modelName, provider, customEndpoint, selectedBRDPs, brdps]
   );
 
   /**

@@ -245,6 +245,7 @@ function parseJSONResponse(raw) {
  * @param {string}   options.apiKey
  * @param {string}   options.modelName
  * @param {string}   options.provider
+ * @param {string}   options.customEndpoint
  * @param {string}   options.sourceType  — 'Style Guide' | 'BREX Doc'
  * @param {Function} options.onProgress  — progress callback: (current, total, foundCount)
  * @param {Object}   options.abortController
@@ -256,6 +257,7 @@ export async function extractBRDPs(file, existingBRDPs, options = {}) {
     apiKey,
     modelName,
     provider = "Anthropic",
+    customEndpoint = "",
     sourceType = "document",
     onProgress,
     abortController,
@@ -295,7 +297,10 @@ export async function extractBRDPs(file, existingBRDPs, options = {}) {
         modelName,
         provider,
         system,
-        0.2
+        {
+          temperature: 0.2,
+          customEndpoint,
+        }
       );
 
       const extracted = parseJSONResponse(response.content);

@@ -18,9 +18,11 @@ export default function SettingsPage({ showToast }) {
     apiKey,
     modelName,
     provider,
+    customEndpoint,
     setApiKey,
     setModelName,
     setProvider,
+    setCustomEndpoint,
     saveKey,
     isConfigured,
   } = useAPIKey();
@@ -30,7 +32,7 @@ export default function SettingsPage({ showToast }) {
    * Handle save button click
    */
   const handleSave = () => {
-    saveKey(apiKey, modelName, provider);
+    saveKey(apiKey, modelName, provider, customEndpoint);
   };
 
   return (
@@ -42,9 +44,11 @@ export default function SettingsPage({ showToast }) {
           apiKey={apiKey}
           modelName={modelName}
           provider={provider}
+          customEndpoint={customEndpoint}
           onApiKeyChange={setApiKey}
           onModelChange={setModelName}
           onProviderChange={setProvider}
+          onCustomEndpointChange={setCustomEndpoint}
           onSave={handleSave}
           isConfigured={isConfigured}
         />

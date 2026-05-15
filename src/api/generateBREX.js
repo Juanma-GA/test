@@ -102,6 +102,7 @@ export async function generateBREX(brdps, projectConfig, options = {}) {
     apiKey,
     modelName,
     provider = "Anthropic",
+    customEndpoint = "",
     onlyValidated = true,
     onChunk,
     abortController,
@@ -137,7 +138,10 @@ export async function generateBREX(brdps, projectConfig, options = {}) {
       provider,
       system,
       onChunk,
-      abortController
+      abortController,
+      {
+        customEndpoint,
+      }
     );
   } catch (err) {
     throw new Error(`LLM call failed: ${err.message}`);

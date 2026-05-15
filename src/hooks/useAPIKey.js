@@ -3,6 +3,7 @@ import { useState, useCallback } from 'react';
 const API_KEY_STORAGE = 'brdp_api_key';
 const MODEL_STORAGE = 'brdp_model';
 const PROVIDER_STORAGE = 'brdp_provider';
+const CUSTOM_ENDPOINT_STORAGE = 'brdp_custom_endpoint';
 
 /**
  * Custom hook for managing API key, model, and provider configuration
@@ -43,20 +44,31 @@ export function useAPIKey() {
     }
   });
 
+  const [customEndpoint, setCustomEndpoint] = useState(() => {
+    try {
+      return localStorage.getItem(CUSTOM_ENDPOINT_STORAGE) || '';
+    } catch {
+      return '';
+    }
+  });
+
   /**
    * Save API key, model name, and provider to localStorage
    * @param {string} key - API key to save
    * @param {string} model - Model name to save
    * @param {string} prov - Provider to save
+   * @param {string} endpoint - Custom endpoint to save
    */
-  const saveKey = useCallback((key, model, prov) => {
+  const saveKey = useCallback((key, model, prov, endpoint = '') => {
     try {
       localStorage.setItem(API_KEY_STORAGE, key);
       localStorage.setItem(MODEL_STORAGE, model);
       localStorage.setItem(PROVIDER_STORAGE, prov);
+      localStorage.setItem(CUSTOM_ENDPOINT_STORAGE, endpoint);
       setApiKey(key);
       setModelName(model);
       setProvider(prov);
+      setCustomEndpoint(endpoint);
     } catch {
       console.error('Failed to save API configuration to localStorage');
     }
@@ -70,9 +82,11 @@ export function useAPIKey() {
       localStorage.removeItem(API_KEY_STORAGE);
       localStorage.removeItem(MODEL_STORAGE);
       localStorage.removeItem(PROVIDER_STORAGE);
+      localStorage.removeItem(CUSTOM_ENDPOINT_STORAGE);
       setApiKey('');
       setModelName('');
       setProvider('Anthropic');
+      setCustomEndpoint('');
     } catch {
       console.error('Failed to clear API configuration from localStorage');
     }
@@ -84,9 +98,11 @@ export function useAPIKey() {
     apiKey,
     modelName,
     provider,
+    customEndpoint,
     setApiKey,
     setModelName,
     setProvider,
+    setCustomEndpoint,
     saveKey,
     clearKey,
     isConfigured,
