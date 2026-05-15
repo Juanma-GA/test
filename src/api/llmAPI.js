@@ -114,6 +114,10 @@ export async function sendMessage(
     endpoint = 'https://api.openai.com/v1/chat/completions';
   }
 
+  if (provider === 'Mistral') {
+    endpoint = 'https://api.mistral.ai/v1/chat/completions';
+  }
+
   if (provider === 'Custom') {
     endpoint = 'https://api.example.com/v1/messages';
   }
@@ -190,6 +194,10 @@ export async function sendMessageStream(
 
   if (provider === 'OpenAI') {
     endpoint = 'https://api.openai.com/v1/chat/completions';
+  }
+
+  if (provider === 'Mistral') {
+    endpoint = 'https://api.mistral.ai/v1/chat/completions';
   }
 
   if (provider === 'Custom') {
