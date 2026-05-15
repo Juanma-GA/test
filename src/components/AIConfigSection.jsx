@@ -44,20 +44,49 @@ export default function AIConfigSection({
     setIsTesting(true);
     setTestResult({ status: 'testing', message: 'Testing connection...' });
 
-    try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
+    let endpoint;
+    if (provider === 'Anthropic') {
+      endpoint = 'https://api.anthropic.com/v1/messages';
+    } else if (provider === 'OpenAI') {
+      endpoint = 'https://api.openai.com/v1/chat/completions';
+    } else if (provider === 'Mistral') {
+      endpoint = 'https://api.mistral.ai/v1/chat/completions';
+    } else if (provider === 'Custom') {
+      endpoint = 'https://api.example.com/v1/messages';
+    }
+
+    const headers = provider === 'Anthropic'
+      ? {
           'x-api-key': apiKey,
           'anthropic-version': '2023-06-01',
           'content-type': 'application/json',
           'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
+        }
+      : {
+          'content-type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        };
+
+    const body = provider === 'Anthropic'
+      ? {
           model: modelName,
           max_tokens: 1,
           messages: [{ role: 'user', content: 'hi' }],
-        }),
+        }
+      : {
+          model: modelName,
+          max_tokens: 1,
+          messages: [
+            { role: 'system', content: 'You are a test assistant.' },
+            { role: 'user', content: 'hi' },
+          ],
+        };
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body),
       });
 
       if (response.status === 200) {
@@ -132,6 +161,7 @@ export default function AIConfigSection({
         >
           <option value="Anthropic">Anthropic API</option>
           <option value="OpenAI">OpenAI API</option>
+          <option value="Mistral">Mistral API</option>
           <option value="Custom">Custom</option>
         </select>
         <p className={styles.providerNote}>Compatible with OpenAI-compatible endpoints</p>
