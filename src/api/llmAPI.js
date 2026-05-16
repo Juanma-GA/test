@@ -126,6 +126,12 @@ export async function sendMessage(
     endpoint = 'https://api.example.com/v1/messages';
   }
 
+  console.log('[LLM API] Before proxy check:', {
+    isDev: import.meta.env.DEV,
+    customEndpoint,
+    endpoint,
+  });
+
   // In development, use proxy for custom endpoints to avoid CORS issues
   if (import.meta.env.DEV && customEndpoint && customEndpoint.trim()) {
     endpoint = '/mistral-proxy/chat/completions';
@@ -216,6 +222,12 @@ export async function sendMessageStream(
   if (provider === 'Custom') {
     endpoint = 'https://api.example.com/v1/messages';
   }
+
+  console.log('[LLM API] Before proxy check:', {
+    isDev: import.meta.env.DEV,
+    customEndpoint,
+    endpoint,
+  });
 
   // In development, use proxy for custom endpoints to avoid CORS issues
   if (import.meta.env.DEV && customEndpoint && customEndpoint.trim()) {

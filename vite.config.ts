@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/mistral-proxy': {
-        target: process.env.VITE_CUSTOM_ENDPOINT || 'https://api.example.com/v1/',
+        target: 'https://api.2a91ec1812a1.dc.mistral.ai/v1/',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/mistral-proxy/, ''),
         secure: false,
