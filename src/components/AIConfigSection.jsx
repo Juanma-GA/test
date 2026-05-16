@@ -75,6 +75,11 @@ export default function AIConfigSection({
       endpoint = customEndpoint;
     }
 
+    // In development, use proxy for custom endpoints to avoid CORS issues
+    if (import.meta.env.DEV && customEndpoint && customEndpoint.trim()) {
+      endpoint = '/mistral-proxy/chat/completions';
+    }
+
     const headers = provider === 'Anthropic'
       ? {
           'x-api-key': apiKey,
