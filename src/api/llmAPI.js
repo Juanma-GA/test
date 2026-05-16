@@ -126,6 +126,11 @@ export async function sendMessage(
     endpoint = 'https://api.example.com/v1/messages';
   }
 
+  // In development, use proxy for custom endpoints to avoid CORS issues
+  if (import.meta.env.DEV && customEndpoint && customEndpoint.trim()) {
+    endpoint = '/mistral-proxy/chat/completions';
+  }
+
   const headers = buildHeaders(provider, apiKey);
   const body = buildRequestBody(provider, modelName, messages, systemPrompt, temperature);
 
@@ -210,6 +215,11 @@ export async function sendMessageStream(
 
   if (provider === 'Custom') {
     endpoint = 'https://api.example.com/v1/messages';
+  }
+
+  // In development, use proxy for custom endpoints to avoid CORS issues
+  if (import.meta.env.DEV && customEndpoint && customEndpoint.trim()) {
+    endpoint = '/mistral-proxy/chat/completions';
   }
 
   const headers = buildHeaders(provider, apiKey);
