@@ -16,7 +16,6 @@ export default function DataManagementSection({ brdps, onSetBrdps, showToast }) 
   const [importedRows, setImportedRows] = useState([]);
   const [importErrors, setImportErrors] = useState([]);
   const [importMode, setImportMode] = useState(null);
-  const [showResetDialog, setShowResetDialog] = useState(false);
   const fileInputRef = useRef(null);
 
   /**
@@ -122,17 +121,6 @@ export default function DataManagementSection({ brdps, onSetBrdps, showToast }) 
     }
   };
 
-  /**
-   * Handle reset to demo data
-   */
-  const handleResetConfirm = () => {
-    onSetBrdps(mockBRDPs);
-    setShowResetDialog(false);
-    if (showToast) {
-      showToast('Reset to demo data successfully', 'success');
-    }
-  };
-
   return (
     <div className={styles.section}>
       <h3 className={styles.title}>Data Management</h3>
@@ -217,36 +205,6 @@ export default function DataManagementSection({ brdps, onSetBrdps, showToast }) 
         </p>
       </div>
 
-      {/* Subsection D: Reset to demo data */}
-      <div className={styles.subsection}>
-        <h4 className={styles.subtitle}>Reset data</h4>
-        <button onClick={() => setShowResetDialog(true)} className={styles.resetButton}>
-          Reset to demo data
-        </button>
-        <p className={styles.helpText}>
-          Replace all current BRDPs with the original demo data
-        </p>
-      </div>
-
-      {/* Reset confirmation dialog */}
-      {showResetDialog && (
-        <div className={styles.dialogOverlay} onClick={() => setShowResetDialog(false)}>
-          <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
-            <h3 className={styles.dialogTitle}>Reset to demo data</h3>
-            <p className={styles.dialogMessage}>
-              This will replace all current BRDPs with demo data. Are you sure?
-            </p>
-            <div className={styles.dialogActions}>
-              <button onClick={handleResetConfirm} className={styles.primaryButton}>
-                Reset
-              </button>
-              <button onClick={() => setShowResetDialog(false)} className={styles.cancelButton}>
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
