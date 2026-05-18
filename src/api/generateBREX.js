@@ -11,7 +11,8 @@ async function loadSchemaSummary() {
 }
 
 export function buildBREXPrompt(validatedBRDPs, projectConfig, schemaSummary) {
-  const schemaJSON = JSON.stringify(schemaSummary, null, 2);
+  const { few_shot_examples, ...schemaSummaryWithoutExamples } = schemaSummary;
+  const schemaJSON = JSON.stringify(schemaSummaryWithoutExamples, null, 2);
 
   const fewShotBlock = (schemaSummary.few_shot_examples || []).map((ex, i) => {
     const flag = ex.allowedObjectFlag;
