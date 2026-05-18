@@ -1,5 +1,4 @@
 import { useState, useRef } from 'react';
-import { mockBRDPs } from '../data/mockBRDPs';
 import { generateTemplate, importFromExcel, exportToExcel, exportToCSV } from '../utils/excelUtils';
 import styles from './DataManagementSection.module.css';
 
