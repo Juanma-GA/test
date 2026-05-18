@@ -13,6 +13,31 @@ async function loadSchemaSummary() {
 export function buildBREXPrompt(validatedBRDPs, projectConfig, schemaSummary) {
   const schemaJSON = JSON.stringify(schemaSummary, null, 2);
 
+  const fewShotBlock = (schemaSummary.few_shot_examples || []).map((ex, i) => {
+    const flag = ex.allowedObjectFlag;
+    const labels = [];
+    if (flag === "0") labels.push("prohibited");
+    else if (flag === "1") labels.push("mandatory");
+    else labels.push("no flag");
+    if (ex.objectPath && ex.objectPath.includes("[")) labels.push("complex XPath");
+    if (ex.objectValues && ex.objectValues.length > 1) labels.push("multi value");
+
+    const objectValueLines = (ex.objectValues || [])
+      .map(v => `  <objectValue valueForm="single" valueAllowed="${v}"/>`)
+      .join("\n");
+
+    const flagAttr = flag != null ? ` allowedObjectFlag="${flag}"` : "";
+
+    return `### Example ${i + 1} — ${labels.join(", ")}
+INPUT id: ${ex.id}
+OUTPUT:
+<structureObjectRule id="${ex.id}" brSeverityLevel="brsl01">
+  <brDecisionRef brDecisionIdentNumber="${ex.id}"/>
+  <objectPath${flagAttr}>${ex.objectPath}</objectPath>
+  <objectUse>${ex.objectUse}</objectUse>
+${objectValueLines}</structureObjectRule>`;
+  }).join("\n\n");
+
   const system = `You are an S1000D Issue 4.2 expert. Generate a valid BREX Data Module XML.
 
 Follow this schema structure exactly:
@@ -35,7 +60,12 @@ STRICT RULES:
 12. Use the todayDate value provided in the user message for issueDate. Format: year="YYYY" month="MM" day="DD".
 13. techName = project name; infoName = "Business Rules Exchange".
 14. qualityAssurance: <qualityAssurance><unverified/></qualityAssurance>
-15. applic: <applic><displayText><simplePara>All</simplePara></displayText></applic>`;
+15. applic: <applic><displayText><simplePara>All</simplePara></displayText></applic>
+
+## Few-shot examples: BRDP id → structureObjectRule
+Use these real validated examples as reference for structure, XPath patterns and objectValue formatting.
+
+${fewShotBlock}`;
 
   const brdpLines = validatedBRDPs
     .map((b, i) =>
