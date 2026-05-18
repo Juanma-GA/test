@@ -122,9 +122,13 @@ export async function sendMessage(
   if (provider === 'Custom') {
     endpoint = 'https://api.example.com/v1/messages';
   }
+  if (customEndpoint && customEndpoint.trim()) {
+    const base = customEndpoint.trim().replace(/\/$/, '');
+    endpoint = base.endsWith('/chat/completions') ? base : `${base}/chat/completions`;
+  }
 
-  // In production, route all calls through the local Express proxy
-  // In development, use Vite proxy only for custom endpoints to avoid CORS
+  const realEndpoint = endpoint; // save before proxy override
+
   if (import.meta.env.PROD) {
     endpoint = '/api/proxy';
   } else if (import.meta.env.DEV && customEndpoint && customEndpoint.trim()) {
@@ -132,13 +136,20 @@ export async function sendMessage(
   }
 
   const headers = buildHeaders(provider, apiKey);
-  const body = buildRequestBody(provider, modelName, messages, systemPrompt, temperature);
+  const payload = buildRequestBody(provider, modelName, messages, systemPrompt, temperature);
+
+  // In production, wrap the payload with routing metadata for the Express proxy
+  const isProxy = import.meta.env.PROD;
+  const fetchHeaders = isProxy ? { 'Content-Type': 'application/json' } : headers;
+  const fetchBody = isProxy
+    ? JSON.stringify({ targetEndpoint: realEndpoint, apiKey, provider, payload })
+    : JSON.stringify(payload);
 
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers,
-      body: JSON.stringify(body),
+      headers: fetchHeaders,
+      body: fetchBody,
     });
 
     if (!response.ok) {
@@ -213,9 +224,13 @@ export async function sendMessageStream(
   if (provider === 'Custom') {
     endpoint = 'https://api.example.com/v1/messages';
   }
+  if (customEndpoint && customEndpoint.trim()) {
+    const base = customEndpoint.trim().replace(/\/$/, '');
+    endpoint = base.endsWith('/chat/completions') ? base : `${base}/chat/completions`;
+  }
 
-  // In production, route all calls through the local Express proxy
-  // In development, use Vite proxy only for custom endpoints to avoid CORS
+  const realEndpoint = endpoint; // save before proxy override
+
   if (import.meta.env.PROD) {
     endpoint = '/api/proxy';
   } else if (import.meta.env.DEV && customEndpoint && customEndpoint.trim()) {
@@ -223,13 +238,20 @@ export async function sendMessageStream(
   }
 
   const headers = buildHeaders(provider, apiKey);
-  const body = buildRequestBody(provider, modelName, messages, systemPrompt, temperature);
+  const payload = buildRequestBody(provider, modelName, messages, systemPrompt, temperature);
+
+  // In production, wrap the payload with routing metadata for the Express proxy
+  const isProxy = import.meta.env.PROD;
+  const fetchHeaders = isProxy ? { 'Content-Type': 'application/json' } : headers;
+  const fetchBody = isProxy
+    ? JSON.stringify({ targetEndpoint: realEndpoint, apiKey, provider, payload: { ...payload, stream: true } })
+    : JSON.stringify({ ...payload, stream: true });
 
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers,
-      body: JSON.stringify({ ...body, stream: true }),
+      headers: fetchHeaders,
+      body: fetchBody,
       signal: abortController?.signal,
     });
 
