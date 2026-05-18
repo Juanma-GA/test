@@ -69,49 +69,44 @@ export default function AIConfigSection({
     } else if (provider === 'Custom') {
       endpoint = 'https://api.example.com/v1/messages';
     }
-
-    // Override endpoint if custom endpoint is provided
     if (customEndpoint && customEndpoint.trim()) {
-      endpoint = customEndpoint;
+      const base = customEndpoint.trim().replace(/\/$/, '');
+      endpoint = base.endsWith('/chat/completions') ? base : `${base}/chat/completions`;
     }
 
-    // In development, use proxy for custom endpoints to avoid CORS issues
-    if (import.meta.env.DEV && customEndpoint && customEndpoint.trim()) {
+    const realEndpoint = endpoint; // save before proxy override
+
+    if (import.meta.env.PROD) {
+      endpoint = '/api/proxy';
+    } else if (import.meta.env.DEV && customEndpoint && customEndpoint.trim()) {
       endpoint = '/mistral-proxy/chat/completions';
     }
 
-    const headers = provider === 'Anthropic'
-      ? {
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'content-type': 'application/json',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        }
-      : {
-          'content-type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        };
+    const testPayload = provider === 'Anthropic'
+      ? { model: modelName, max_tokens: 1, messages: [{ role: 'user', content: 'hi' }] }
+      : { model: modelName, max_tokens: 1, messages: [{ role: 'system', content: 'You are a test assistant.' }, { role: 'user', content: 'hi' }] };
 
-    const body = provider === 'Anthropic'
-      ? {
-          model: modelName,
-          max_tokens: 1,
-          messages: [{ role: 'user', content: 'hi' }],
-        }
-      : {
-          model: modelName,
-          max_tokens: 1,
-          messages: [
-            { role: 'system', content: 'You are a test assistant.' },
-            { role: 'user', content: 'hi' },
-          ],
-        };
+    const isProxy = import.meta.env.PROD;
+    const fetchHeaders = { 'content-type': 'application/json' };
+    if (!isProxy) {
+      if (provider === 'Anthropic') {
+        fetchHeaders['x-api-key'] = apiKey;
+        fetchHeaders['anthropic-version'] = '2023-06-01';
+        fetchHeaders['anthropic-dangerous-direct-browser-access'] = 'true';
+      } else {
+        fetchHeaders['Authorization'] = `Bearer ${apiKey}`;
+      }
+    }
+
+    const fetchBody = isProxy
+      ? JSON.stringify({ targetEndpoint: realEndpoint, apiKey, provider, payload: testPayload })
+      : JSON.stringify(testPayload);
 
     try {
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers,
-        body: JSON.stringify(body),
+        headers: fetchHeaders,
+        body: fetchBody,
       });
 
       if (response.status === 200) {
