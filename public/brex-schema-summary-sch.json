@@ -1,0 +1,27 @@
+{
+  "standard": "Schematron 1.0 (ISO/IEC 19757-3)",
+  "queryBinding": "xslt2",
+  "output_format": ".sch",
+  "namespaces": {
+    "sch": "http://purl.oclc.org/dsdl/schematron",
+    "xsi": "http://www.w3.org/2001/XMLSchema-instance",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "xlink": "http://www.w3.org/1999/xlink",
+    "dc": "http://www.purl.org/dc/elements/1.1/"
+  },
+  "file_header": "<?xml version='1.0' encoding='UTF-8'?>\n<sch:schema xmlns:sch=\"http://purl.oclc.org/dsdl/schematron\" queryBinding=\"xslt2\">\n  <sch:ns prefix=\"xsi\" uri=\"http://www.w3.org/2001/XMLSchema-instance\"/>\n  <sch:ns prefix=\"rdf\" uri=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"/>\n  <sch:ns prefix=\"xlink\" uri=\"http://www.w3.org/1999/xlink\"/>\n  <sch:ns prefix=\"dc\" uri=\"http://www.purl.org/dc/elements/1.1/\"/>\n",
+  "file_footer": "\n</sch:schema>",
+  "structure": {
+    "pattern": "sch:pattern id='brdp-a1-XXXXX' (lowercase)",
+    "rule": "sch:rule context='[XPath expression]'",
+    "assert": "sch:assert id='BRDP-A1-XXXXX' role='error' test='[condition]'"
+  },
+  "conversion_rules": {
+    "prohibited_flag0": "XPath from objectPath goes in sch:rule @context. test is always false(). If the context matches, the rule always fails.",
+    "mandatory_no_values_flag1": "Parent element goes in @context. test verifies the child exists.",
+    "allowed_values": "Element or attribute goes in @context. test is an exists() OR chain: exists(node[(string(.) = 'val1') or (string(.) = 'val2')])",
+    "no_flag_with_values": "Same as allowed_values but context is the element containing the values.",
+    "assert_message": "Use the objectUse text from the BREX rule as the assert message content."
+  },
+  "few_shot_examples": []
+}
