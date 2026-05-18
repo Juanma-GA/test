@@ -195,9 +195,9 @@ export default function GenerateModal({ brdps, onClose }) {
               className={styles.generateBtn}
               onClick={handleGenerate}
               disabled={!isConfigComplete || (!isBREX42 && !isBREX301 && !isSch)}
-              title={!isBREX42 && !isBREX301 ? 'Only BREX 4.2 and 3.0.1 are available' : undefined}
+              title={!isBREX42 && !isBREX301 && !isSch ? 'Only BREX 4.2, 3.0.1 and Schematron 1.0 are available' : undefined}
             >
-              {!isBREX42 && !isBREX301 ? 'Coming soon' : result ? 'Regenerate' : 'Generate'}
+              {!isBREX42 && !isBREX301 && !isSch ? 'Coming soon' : result ? 'Regenerate' : 'Generate'}
             </button>
           ) : (
             <div className={styles.loadingRow}>
