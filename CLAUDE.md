@@ -120,3 +120,46 @@ Añadir nuevos formatos requiere: nuevo generador + nuevo schema JSON + nueva ra
 - Migración automática de localStorage a SQLite en primera ejecución
 - Autenticación (no necesaria para uso local single-user)
 - Docker con SQLite (el docker-compose actual usa nginx sin backend)
+
+## Arquitectura de generación BREX 4.2 — Chunking
+
+### Problema resuelto
+Con datasets grandes (+100 BRDPs) el LLM truncaba el XML, inventaba IDs o saltaba BRDPs. Se implementó una estrategia de chunking con verificación y reintento.
+
+### Estrategia actual (generateBREX.js)
+- `CHUNK_SIZE = 10` — 10 BRDPs por llamada LLM
+- `MAX_RETRIES = 2` — reintentos individuales para BRDPs faltantes
+- Chunk 1: genera el DM completo (header + reglas del chunk)
+- Chunks 2..N: genera solo `structureObjectRule` elements
+- Ensamblaje via `assembleChunks()` — inserta antes de `</structureObjectRuleGroup>`
+- Footer fijo `XML_FOOTER` garantiza cierre correcto del XML
+
+### Funciones clave
+| Función | Responsabilidad |
+|---|---|
+| `buildBREXPrompt()` | Prompt para chunk 1 (DM completo) |
+| `buildBREXPromptChunk()` | Prompt para chunks 2..N (solo reglas) |
+| `verifyChunkRules()` | Detecta reglas faltantes e inventadas |
+| `generateSingleRule()` | Reintenta un BRDP individual hasta MAX_RETRIES |
+| `assembleChunks()` | Inserta reglas en el XML, elimina truncadas, garantiza footer |
+| `escapeXMLContent()` | Escapa `<`, `>`, `&` en objectUse, objectPath, objectValue |
+
+### Flujo completo
+```
+targetBRDPs → chunks de 10 → Chunk 1: buildBREXPrompt → LLM → extractXML → escapeXMLContent → verifyChunkRules → removeInvented → retry missing individually → Chunks 2..N: buildBREXPromptChunk → LLM → escapeXMLContent → verifyChunkRules → removeInvented → assembleChunks → retry missing individually → assembleChunks → ensure </dmodule> footer → checkWellFormed → return
+```
+
+### Pendiente
+- Replicar chunking en `generateBREX301.js` y `generateBREXSch.js`
+- Errores de validación contra XSD schema (pendiente de analizar)
+- `generateBREX301.js` y `generateBREXSch.js` no tienen chunking todavía
+
+### Proxy LLM — fix importante
+`AIConfigSection.jsx` y `llmAPI.js` modificados para que en producción (`import.meta.env.PROD`) todas las llamadas vayan a `/api/proxy` (Express) en lugar de al endpoint externo directamente. El body enviado al proxy tiene esta forma:
+```javascript
+{ targetEndpoint, apiKey, provider, payload }
+```
+
+### Guardia de validación en el chat
+`useChat.js` tiene una guardia en `sendUserMessage()` que intercepta mensajes antes de llamar al LLM. Si el mensaje contiene triggers de cambio de estado (lista en `validationTriggers`), responde directamente sin llamar al LLM. También hay una restricción en el `basePrompt` como segunda capa.
+
