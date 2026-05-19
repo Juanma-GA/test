@@ -245,19 +245,28 @@ const XML_FOOTER = `
 </dmodule>`;
 
 function assembleChunks(baseXml, additionalRules) {
-  // Extract only complete structureObjectRule elements from additional rules
-  const completeRules = [];
+  // Extraer structureObjectRule (igual que antes)
+  const structureRules = [];
   const rulePattern = /<structureObjectRule[\s\S]*?<\/structureObjectRule>/g;
   let match;
   while ((match = rulePattern.exec(additionalRules)) !== null) {
-    completeRules.push(match[0]);
+    structureRules.push(match[0]);
   }
-  const cleaned = completeRules.join('\n');
-  if (!cleaned.trim()) return baseXml;
 
-  // Strip footer from baseXml (everything from </structureObjectRuleGroup> onwards)
-  // to avoid duplicating or misplacing the closing tags
-  const footerTags = ['</structureObjectRuleGroup>', '</contextRules>', '</brex>', '</content>', '</dmodule>'];
+  // Extraer nonContextRule sueltos de los chunks
+  const nonContextRules = [];
+  const nonContextPattern = /<nonContextRule[\s\S]*?<\/nonContextRule>/g;
+  while ((match = nonContextPattern.exec(additionalRules)) !== null) {
+    nonContextRules.push(match[0]);
+  }
+
+  const cleanedStructure = structureRules.join('\n');
+  const cleanedNonContext = nonContextRules.join('\n');
+
+  if (!cleanedStructure.trim() && !cleanedNonContext.trim()) return baseXml;
+
+  // Strip footer del baseXml (igual que antes)
+  const footerTags = ['</structureObjectRuleGroup>', '</contextRules>', '</nonContextRules>', '</brex>', '</content>', '</dmodule>'];
   let stripped = baseXml;
   for (const tag of footerTags) {
     const idx = stripped.lastIndexOf(tag);
@@ -265,13 +274,34 @@ function assembleChunks(baseXml, additionalRules) {
       stripped = stripped.slice(0, idx);
     }
   }
-  // Also strip any trailing whitespace/newlines after the last complete rule
   const lastRule = stripped.lastIndexOf('</structureObjectRule>');
   if (lastRule !== -1) {
     stripped = stripped.slice(0, lastRule + '</structureObjectRule>'.length);
   }
 
-  return stripped + '\n' + cleaned + XML_FOOTER;
+  // Construir el bloque nonContextRules si hay reglas sin contexto
+  let nonContextBlock = '';
+  if (cleanedNonContext.trim()) {
+    // Verificar si baseXml ya tiene <nonContextRules> del chunk 1
+    const hasExisting = baseXml.includes('<nonContextRules>');
+    if (hasExisting) {
+      // Extraer las que ya hay en baseXml y combinar
+      const existingMatch = baseXml.match(/<nonContextRules>([\s\S]*?)<\/nonContextRules>/);
+      const existingContent = existingMatch ? existingMatch[1] : '';
+      nonContextBlock = `\n<nonContextRules>\n${existingContent}\n${cleanedNonContext}\n</nonContextRules>`;
+    } else {
+      nonContextBlock = `\n<nonContextRules>\n${cleanedNonContext}\n</nonContextRules>`;
+    }
+  } else if (baseXml.includes('<nonContextRules>')) {
+    // chunk 1 generó nonContextRules pero chunks adicionales no tienen más — preservar
+    const existingMatch = baseXml.match(/<nonContextRules>([\s\S]*?)<\/nonContextRules>/);
+    nonContextBlock = existingMatch ? `\n${existingMatch[0]}` : '';
+  }
+
+  // Ensamblar footer correcto
+  const footer = `\n</structureObjectRuleGroup>\n</contextRules>${nonContextBlock}\n</brex>\n</content>\n</dmodule>`;
+
+  return stripped + '\n' + (cleanedStructure || '') + footer;
 }
 
 const CHUNK_SIZE = 10;
