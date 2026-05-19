@@ -253,7 +253,36 @@ function assembleChunks(baseXml, additionalRules) {
   return stripped + '\n' + cleaned + XML_FOOTER;
 }
 
-const CHUNK_SIZE = 25;
+const CHUNK_SIZE = 10;
+const MAX_RETRIES = 2;
+
+function verifyChunkRules(rawResponse, expectedIds) {
+  const foundIds = new Set(
+    [...rawResponse.matchAll(/<structureObjectRule id="([^"]+)"/g)].map(m => m[1])
+  );
+  const validExpected = new Set(expectedIds);
+  const missing = expectedIds.filter(id => !foundIds.has(id));
+  const invented = [...foundIds].filter(id => !validExpected.has(id));
+  return { missing, invented };
+}
+
+async function generateSingleRule(brdp, projectConfig, schemaSummary, callLLM) {
+  const { system, user } = buildBREXPromptChunk([brdp], projectConfig, schemaSummary);
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    const raw = await callLLM(system, user);
+    if (!raw) continue;
+    const escaped = escapeXMLContent(raw.trim());
+    const ruleMatch = escaped.match(/<structureObjectRule[\s\S]*?<\/structureObjectRule>/);
+    if (ruleMatch) {
+      const idMatch = ruleMatch[0].match(/structureObjectRule id="([^"]+)"/);
+      if (idMatch && idMatch[1] === brdp.id) {
+        return ruleMatch[0];
+      }
+    }
+  }
+  console.warn(`Could not generate rule for ${brdp.id} after ${MAX_RETRIES} attempts`);
+  return null;
+}
 
 export async function generateBREX(brdps, projectConfig, options = {}) {
   const {
@@ -284,12 +313,7 @@ export async function generateBREX(brdps, projectConfig, options = {}) {
   }
 
   const schemaSummary = await loadSchemaSummary();
-
-  // Split into chunks
-  const chunks = [];
-  for (let i = 0; i < targetBRDPs.length; i += CHUNK_SIZE) {
-    chunks.push(targetBRDPs.slice(i, i + CHUNK_SIZE));
-  }
+  const validSet = new Set(targetBRDPs.map(b => b.id));
 
   const callLLM = async (system, user) => {
     const messages = [{ role: "user", content: user }];
@@ -303,23 +327,57 @@ export async function generateBREX(brdps, projectConfig, options = {}) {
     }
   };
 
-  // Chunk 1: full DM with first CHUNK_SIZE BRDPs
+  const removeInvented = (xml) =>
+    xml.replace(/<structureObjectRule[\s\S]*?<\/structureObjectRule>/g, (match) => {
+      const idMatch = match.match(/structureObjectRule id="([^"]+)"/);
+      return (idMatch && validSet.has(idMatch[1])) ? match : '';
+    });
+
+  // Split into chunks of CHUNK_SIZE
+  const chunks = [];
+  for (let i = 0; i < targetBRDPs.length; i += CHUNK_SIZE) {
+    chunks.push(targetBRDPs.slice(i, i + CHUNK_SIZE));
+  }
+
+  // Chunk 1: full DM
   const { system: sys1, user: usr1 } = buildBREXPrompt(chunks[0], projectConfig, schemaSummary);
   const raw1 = await callLLM(sys1, usr1);
   let finalXml = escapeXMLContent(extractXML(raw1));
   if (!finalXml) throw new Error("The model returned an empty response on chunk 1.");
 
+  // Verify and fix chunk 1
+  const { missing: missing1, invented: invented1 } = verifyChunkRules(finalXml, chunks[0].map(b => b.id));
+  if (invented1.length > 0) finalXml = removeInvented(finalXml);
+  for (const missingId of missing1) {
+    const brdp = chunks[0].find(b => b.id === missingId);
+    if (brdp) {
+      const rule = await generateSingleRule(brdp, projectConfig, schemaSummary, callLLM);
+      if (rule) finalXml = assembleChunks(finalXml, '\n' + rule);
+    }
+  }
+
   // Chunks 2..N: rules only
   for (let i = 1; i < chunks.length; i++) {
     const { system: sysN, user: usrN } = buildBREXPromptChunk(chunks[i], projectConfig, schemaSummary);
     const rawN = await callLLM(sysN, usrN);
-    if (rawN && rawN.trim()) {
-      const cleanedRawN = escapeXMLContent(rawN.trim());
-      finalXml = assembleChunks(finalXml, '\n' + cleanedRawN);
+    if (!rawN || !rawN.trim()) continue;
+
+    let escapedN = escapeXMLContent(rawN.trim());
+    const { missing: missingN, invented: inventedN } = verifyChunkRules(escapedN, chunks[i].map(b => b.id));
+    if (inventedN.length > 0) escapedN = removeInvented(escapedN);
+    finalXml = assembleChunks(finalXml, '\n' + escapedN);
+
+    // Retry missing individually
+    for (const missingId of missingN) {
+      const brdp = chunks[i].find(b => b.id === missingId);
+      if (brdp) {
+        const rule = await generateSingleRule(brdp, projectConfig, schemaSummary, callLLM);
+        if (rule) finalXml = assembleChunks(finalXml, '\n' + rule);
+      }
     }
   }
 
-  // Ensure XML footer is present (in case of single chunk or truncation)
+  // Ensure footer
   if (!finalXml.includes('</dmodule>')) {
     const lastRule = finalXml.lastIndexOf('</structureObjectRule>');
     if (lastRule !== -1) {
