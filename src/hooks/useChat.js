@@ -53,7 +53,8 @@ ${JSON.stringify(compactIndex, null, 0)}`;
 function buildEnhancedSystemPrompt(brdps, selectedBRDPs = []) {
   const basePrompt = `You are an S1000D / DITA and BRDP expert assistant.
 You help users understand business rules, validate decisions,
-and answer questions about S1000D, DITA, and technical publications.`;
+and answer questions about S1000D, DITA, and technical publications.
+RESTRICTION: Never change, suggest changing, or help justify changing the validation status (Validated/Refused/Pending) of any BRDP. If asked, respond in 2 sentences maximum: say you cannot do this through chat, and offer to analyse the BRDP content instead.`;
 
   const datasetSummary = buildDatasetSummary(brdps);
 
@@ -127,13 +128,19 @@ export function useChat({ apiKey, modelName, provider, customEndpoint = "", sele
       // Frontend guard: block any attempt to change validation status
       const validationTriggers = [
         'change status', 'cambiar estado', 'cambiar validación', 'cambiar validacion',
-        'set status', 'mark as validated', 'mark as refused', 'mark as pending',
-        'change to validated', 'change to refused', 'change to pending',
-        'cambia a validated', 'cambia a refused', 'cambia a pending',
-        'update status', 'actualizar estado', 'set validated', 'set refused',
+        'cambia estado', 'cambia validación', 'cambia validacion',
+        'set status', 'as validated', 'as refused', 'as pending',
+        'to validated', 'to refused', 'to pending',
+        'a validated', 'a refused', 'a pending',
+        'update status', 'actualizar estado', 'actualiza estado', 'set validated', 'set refused',
         'validate this', 'valida esto', 'valídate', 'validate all', 'valida todos',
         'status to validated', 'status to refused', 'status to pending',
         'estado a validated', 'estado a refused', 'estado a pending',
+        'ponlo como', 'ponla como', 'marcalo como', 'márcalo como', 'márcala como',
+        'aprueba este', 'aprueba esta', 'aprueba los', 'aprueba las',
+        'marca como validado', 'marca como rechazado', 'marca como pendiente',
+        'pasar a validado', 'pasar a rechazado', 'pasar a pendiente',
+        'pasa a validado', 'pasa a rechazado', 'pasa a pendiente',
       ];
       const lowerContent = content.toLowerCase();
       const isValidationRequest = validationTriggers.some(trigger => lowerContent.includes(trigger));
