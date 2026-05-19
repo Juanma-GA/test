@@ -186,22 +186,34 @@ Output ONLY the structureObjectRule elements, starting directly with <structureO
   return { system, user };
 }
 
-function escapeObjectUseContent(xml) {
-  return xml.replace(/<objectUse>([\s\S]*?)<\/objectUse>/g, (match, content) => {
-    // Unescape any existing entities first to avoid double-escaping
+function escapeXMLContent(xml) {
+  const escapeText = (content) => {
     const unescaped = content
       .replace(/&amp;/g, '&')
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
       .replace(/&quot;/g, '"')
       .replace(/&apos;/g, "'");
-    // Re-escape everything cleanly
-    const escaped = unescaped
+    return unescaped
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
-    return `<objectUse>${escaped}</objectUse>`;
-  });
+  };
+
+  // Escape text content of objectUse
+  xml = xml.replace(/<objectUse>([\s\S]*?)<\/objectUse>/g,
+    (_, c) => `<objectUse>${escapeText(c)}</objectUse>`);
+
+  // Escape text content of objectPath (preserving attributes)
+  xml = xml.replace(/(<objectPath[^>]*>)([\s\S]*?)(<\/objectPath>)/g,
+    (_, open, c, close) => `${open}${escapeText(c)}${close}`);
+
+  // Escape text content of objectValue valueAllowed attribute is already an attribute so skip
+  // But escape any objectValue text content if present
+  xml = xml.replace(/(<objectValue[^>]*>)([\s\S]*?)(<\/objectValue>)/g,
+    (_, open, c, close) => `${open}${escapeText(c)}${close}`);
+
+  return xml;
 }
 
 function assembleChunks(firstXml, additionalRules) {
@@ -282,7 +294,7 @@ export async function generateBREX(brdps, projectConfig, options = {}) {
   // Chunk 1: full DM with first CHUNK_SIZE BRDPs
   const { system: sys1, user: usr1 } = buildBREXPrompt(chunks[0], projectConfig, schemaSummary);
   const raw1 = await callLLM(sys1, usr1);
-  let finalXml = escapeObjectUseContent(extractXML(raw1));
+  let finalXml = escapeXMLContent(extractXML(raw1));
   if (!finalXml) throw new Error("The model returned an empty response on chunk 1.");
 
   // Chunks 2..N: rules only
@@ -290,7 +302,7 @@ export async function generateBREX(brdps, projectConfig, options = {}) {
     const { system: sysN, user: usrN } = buildBREXPromptChunk(chunks[i], projectConfig, schemaSummary);
     const rawN = await callLLM(sysN, usrN);
     if (rawN && rawN.trim()) {
-      const cleanedRawN = escapeObjectUseContent(rawN.trim());
+      const cleanedRawN = escapeXMLContent(rawN.trim());
       finalXml = assembleChunks(finalXml, '\n' + cleanedRawN);
     }
   }
