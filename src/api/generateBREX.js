@@ -73,6 +73,7 @@ STRICT RULES:
 </nonContextRules>
 NEVER put nonContextRule inside structureObjectRule. NEVER generate a structureObjectRule without objectPath.
 19. The id attribute of structureObjectRule must be globally unique across the entire document. NEVER use the same id value twice. If you split a BRDP into multiple structureObjectRule elements, only the first keeps the BRDP id. Additional rules use BRDP-id-b, BRDP-id-c, etc.
+20. NEVER invent attributes not in the schema. objectPath only allows allowedObjectFlag (values: 0, 1, 2) — no other attributes allowed on objectPath. Inside <simplePara> text, NEVER use raw XML tags: escape element names as &lt;elementName&gt; instead of <elementName>.
 
 ## Few-shot examples: BRDP id → structureObjectRule
 Use these real validated examples as reference for structure, XPath patterns and objectValue formatting.
@@ -188,6 +189,7 @@ STRICT RULES:
 assembleChunks() will place it correctly inside <nonContextRules>.
 NEVER put nonContextRule inside structureObjectRule. NEVER generate a structureObjectRule without objectPath.
 11. The id attribute of structureObjectRule must be globally unique across the entire document. NEVER use the same id value twice. If you split a BRDP into multiple structureObjectRule elements, only the first keeps the BRDP id. Additional rules use BRDP-id-b, BRDP-id-c, etc.
+12. NEVER invent attributes not in the schema. objectPath only allows allowedObjectFlag (values: 0, 1, 2) — no other attributes allowed on objectPath. Inside <simplePara> text, NEVER use raw XML tags: escape element names as &lt;elementName&gt; instead of <elementName>.
 
 ## Few-shot examples: BRDP id → structureObjectRule
 ${fewShotBlock}`;
@@ -234,7 +236,67 @@ function escapeXMLContent(xml) {
   xml = xml.replace(/(<objectValue[^>]*>)([\s\S]*?)(<\/objectValue>)/g,
     (_, open, c, close) => `${open}${escapeText(c)}${close}`);
 
+  // Escape text content of simplePara
+  xml = xml.replace(/<simplePara>([\s\S]*?)<\/simplePara>/g,
+    (_, c) => `<simplePara>${escapeText(c)}</simplePara>`);
+
   return xml;
+}
+
+function splitMultipleObjectPaths(xml) {
+  const original = xml;
+  const rulePattern = /<structureObjectRule[\s\S]*?<\/structureObjectRule>/g;
+
+  const rules = [];
+  let match;
+  while ((match = rulePattern.exec(original)) !== null) {
+    rules.push({ full: match[0], start: match.index, end: match.index + match[0].length });
+  }
+
+  const replacements = [];
+  for (const rule of rules) {
+    const paths = [...rule.full.matchAll(/<objectPath[^>]*>[\s\S]*?<\/objectPath>/g)];
+    if (paths.length <= 1) continue;
+
+    const idMatch = rule.full.match(/id="([^"]+)"/);
+    const severityMatch = rule.full.match(/brSeverityLevel="([^"]+)"/);
+    const brDecisionMatch = rule.full.match(/<brDecisionRef[^>]*\/>/);
+    const objectUseMatch = rule.full.match(/<objectUse>[\s\S]*?<\/objectUse>/);
+    const objectValueMatch = rule.full.match(/<objectValue[^>]*\/>/);
+
+    if (!idMatch || !brDecisionMatch) continue;
+
+    const baseId = idMatch[1];
+    const severity = severityMatch ? severityMatch[1] : 'brsl01';
+    const brDecision = brDecisionMatch[0];
+    const objectUse = objectUseMatch ? objectUseMatch[0] : '';
+    const objectValue = objectValueMatch ? objectValueMatch[0] : '';
+    const suffixes = ['', '-b', '-c', '-d', '-e'];
+
+    const newRules = paths.map((path, i) => {
+      const newId = baseId + (suffixes[i] || `-${i}`);
+      const lines = [
+        `<structureObjectRule id="${newId}" brSeverityLevel="${severity}">`,
+        `  ${brDecision}`,
+        `  ${path[0]}`,
+      ];
+      if (objectUse) lines.push(`  ${objectUse}`);
+      if (objectValue) lines.push(`  ${objectValue}`);
+      lines.push(`</structureObjectRule>`);
+      return lines.join('\n');
+    }).join('\n');
+
+    replacements.push({ start: rule.start, end: rule.end, replacement: newRules });
+  }
+
+  // Aplicar replacements de atrás hacia adelante para no desplazar índices
+  let result = original;
+  for (let i = replacements.length - 1; i >= 0; i--) {
+    const { start, end, replacement } = replacements[i];
+    result = result.slice(0, start) + replacement + result.slice(end);
+  }
+
+  return result;
 }
 
 const XML_FOOTER = `
@@ -293,7 +355,23 @@ function assembleChunks(baseXml, additionalRules) {
       // Extraer las que ya hay en baseXml y combinar
       const existingMatch = baseXml.match(/<nonContextRules>([\s\S]*?)<\/nonContextRules>/);
       const existingContent = existingMatch ? existingMatch[1] : '';
-      nonContextBlock = `\n<nonContextRules>\n${existingContent}\n${cleanedNonContext}\n</nonContextRules>`;
+
+      // Deduplicación por id
+      const existingIds = new Set();
+      const idPattern = /id="([^"]+)"/;
+      (existingContent.match(/<nonContextRule[\s\S]*?<\/nonContextRule>/g) || [])
+        .forEach(rule => {
+          const m = rule.match(idPattern);
+          if (m) existingIds.add(m[1]);
+        });
+      const deduped = (cleanedNonContext.match(/<nonContextRule[\s\S]*?<\/nonContextRule>/g) || [])
+        .filter(rule => {
+          const m = rule.match(idPattern);
+          return m ? !existingIds.has(m[1]) : true;
+        })
+        .join('\n');
+
+      nonContextBlock = `\n<nonContextRules>\n${existingContent}${deduped.trim() ? '\n' + deduped : ''}\n</nonContextRules>`;
     } else {
       nonContextBlock = `\n<nonContextRules>\n${cleanedNonContext}\n</nonContextRules>`;
     }
@@ -400,7 +478,9 @@ export async function generateBREX(brdps, projectConfig, options = {}) {
   const raw1 = await callLLM(sys1, usr1);
   let finalXml = extractXML(raw1);
   finalXml = finalXml.replace(/issueType="original"/g, 'issueType="new"');
+  finalXml = finalXml.replace(/\s+allowedObjectFlagContext="[^"]*"/g, '');
   finalXml = escapeXMLContent(finalXml);
+  finalXml = splitMultipleObjectPaths(finalXml);
   if (!finalXml) throw new Error("The model returned an empty response on chunk 1.");
 
   // Verify and fix chunk 1
@@ -420,7 +500,9 @@ export async function generateBREX(brdps, projectConfig, options = {}) {
     const rawN = await callLLM(sysN, usrN);
     if (!rawN || !rawN.trim()) continue;
 
-    let escapedN = escapeXMLContent(rawN.trim());
+    let escapedN = rawN.trim().replace(/\s+allowedObjectFlagContext="[^"]*"/g, '');
+    escapedN = escapeXMLContent(escapedN);
+    escapedN = splitMultipleObjectPaths(escapedN);
     const { missing: missingN, invented: inventedN } = verifyChunkRules(escapedN, chunks[i].map(b => b.id));
     if (inventedN.length > 0) escapedN = removeInvented(escapedN);
     finalXml = assembleChunks(finalXml, '\n' + escapedN);
