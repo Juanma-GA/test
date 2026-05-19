@@ -124,6 +124,29 @@ export function useChat({ apiKey, modelName, provider, customEndpoint = "", sele
     async (content) => {
       if (!content.trim()) return;
 
+      // Frontend guard: block any attempt to change validation status
+      const validationTriggers = [
+        'change status', 'cambiar estado', 'cambiar validación', 'cambiar validacion',
+        'set status', 'mark as validated', 'mark as refused', 'mark as pending',
+        'change to validated', 'change to refused', 'change to pending',
+        'cambia a validated', 'cambia a refused', 'cambia a pending',
+        'update status', 'actualizar estado', 'set validated', 'set refused',
+        'validate this', 'valida esto', 'valídate', 'validate all', 'valida todos',
+        'status to validated', 'status to refused', 'status to pending',
+        'estado a validated', 'estado a refused', 'estado a pending',
+      ];
+      const lowerContent = content.toLowerCase();
+      const isValidationRequest = validationTriggers.some(trigger => lowerContent.includes(trigger));
+
+      if (isValidationRequest) {
+        const blockedMessage = {
+          role: 'assistant',
+          content: 'Changing the validation status of a BRDP is not something I can do through this chat — not for one, not for many.\n\nValidation is an individual human review process that must be performed through the UI controls for each BRDP separately. This ensures the quality and traceability of every decision.\n\nI can help you analyse the content of any BRDP — its definition, proposal, or comments — to support your review.',
+        };
+        setMessages(prev => [...prev, { role: 'user', content }, blockedMessage]);
+        return;
+      }
+
       // Add user message to history
       const userMessage = { role: 'user', content };
       const updatedMessages = [...messages, userMessage];
