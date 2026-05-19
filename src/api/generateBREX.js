@@ -62,7 +62,7 @@ STRICT RULES:
 13. techName = project name; infoName = "Business Rules Exchange".
 14. qualityAssurance: <qualityAssurance><unverified/></qualityAssurance>
 15. applic: <applic><displayText><simplePara>All</simplePara></displayText></applic>
-16. Each structureObjectRule must contain EXACTLY ONE objectPath element. If a BRDP requires multiple XPath expressions, generate multiple separate structureObjectRule elements each with the same brDecisionRef, but with UNIQUE id attributes: use suffix -b, -c, -d for the additional rules (e.g. id="BRDP-S1-00093-b", id="BRDP-S1-00093-c"). The first rule keeps the original id. NEVER repeat the same id value in more than one structureObjectRule.
+16. Each structureObjectRule must contain EXACTLY ONE objectPath element. If a BRDP requires multiple XPath expressions, generate multiple separate structureObjectRule elements each with the same brDecisionRef, but with UNIQUE id attributes: use suffix -b, -c, -d for the additional rules (e.g. id="BRDP-S1-00093-b", id="BRDP-S1-00093-c"). The first rule keeps the original id. NEVER repeat the same id value in more than one structureObjectRule. This also applies when multiple objectPath elements share the same allowedObjectFlag value — each objectPath must still be in its own separate structureObjectRule with a unique id.
 17. objectValue ONLY allows two attributes: valueAllowed and valueForm. valueForm MUST be one of: single, range, pattern. NEVER use list, regex, conditional, multiple or any other value. NEVER add a condition attribute or any other attribute to objectValue.
 18. If a BRDP has no clear XPath target, do NOT generate a structureObjectRule without objectPath. Instead place it in nonContextRules using: <nonContextRule><brDecisionRef brDecisionIdentNumber="BRDP-xxx"/><simplePara>decision text</simplePara></nonContextRule>
 19. The id attribute of structureObjectRule must be globally unique across the entire document. NEVER use the same id value twice. If you split a BRDP into multiple structureObjectRule elements, only the first keeps the BRDP id. Additional rules use BRDP-id-b, BRDP-id-c, etc.
@@ -171,7 +171,7 @@ STRICT RULES:
 5. allowedObjectFlag: "0"=prohibited, "1"=mandatory, "2"=optional.
 6. objectUse = one sentence summarising the decision.
 7. Start output directly with <structureObjectRule — no preamble.
-8. Each structureObjectRule must contain EXACTLY ONE objectPath element. If a BRDP requires multiple XPath expressions, generate multiple separate structureObjectRule elements each with the same brDecisionRef, but with UNIQUE id attributes: use suffix -b, -c, -d for the additional rules (e.g. id="BRDP-S1-00093-b", id="BRDP-S1-00093-c"). The first rule keeps the original id. NEVER repeat the same id value in more than one structureObjectRule.
+8. Each structureObjectRule must contain EXACTLY ONE objectPath element. If a BRDP requires multiple XPath expressions, generate multiple separate structureObjectRule elements each with the same brDecisionRef, but with UNIQUE id attributes: use suffix -b, -c, -d for the additional rules (e.g. id="BRDP-S1-00093-b", id="BRDP-S1-00093-c"). The first rule keeps the original id. NEVER repeat the same id value in more than one structureObjectRule. This also applies when multiple objectPath elements share the same allowedObjectFlag value — each objectPath must still be in its own separate structureObjectRule with a unique id.
 9. objectValue ONLY allows two attributes: valueAllowed and valueForm. valueForm MUST be one of: single, range, pattern. NEVER use list, regex, conditional, multiple or any other value. NEVER add a condition attribute or any other attribute to objectValue.
 10. If a BRDP has no clear XPath target, do NOT generate a structureObjectRule without objectPath. Instead output: <nonContextRule><brDecisionRef brDecisionIdentNumber="BRDP-xxx"/><simplePara>decision text</simplePara></nonContextRule>
 11. The id attribute of structureObjectRule must be globally unique across the entire document. NEVER use the same id value twice. If you split a BRDP into multiple structureObjectRule elements, only the first keeps the BRDP id. Additional rules use BRDP-id-b, BRDP-id-c, etc.
@@ -350,7 +350,9 @@ export async function generateBREX(brdps, projectConfig, options = {}) {
   // Chunk 1: full DM
   const { system: sys1, user: usr1 } = buildBREXPrompt(chunks[0], projectConfig, schemaSummary);
   const raw1 = await callLLM(sys1, usr1);
-  let finalXml = escapeXMLContent(extractXML(raw1));
+  let finalXml = extractXML(raw1);
+  finalXml = finalXml.replace(/issueType="original"/g, 'issueType="new"');
+  finalXml = escapeXMLContent(finalXml);
   if (!finalXml) throw new Error("The model returned an empty response on chunk 1.");
 
   // Verify and fix chunk 1
