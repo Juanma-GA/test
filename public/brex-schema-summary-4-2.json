@@ -140,6 +140,14 @@
     "objectUse": {
       "note": "Free text. One clear sentence summarising the BRDP decision."
     },
+    "objectValue": {
+      "attributes_required": ["valueAllowed"],
+      "attributes_optional": ["valueForm"],
+      "allowed_attributes_ONLY": ["valueAllowed", "valueForm"],
+      "valueForm_enum": ["single", "range", "pattern"],
+      "valueForm_forbidden": ["list", "regex", "conditional", "multiple"],
+      "note": "ONLY valueAllowed and valueForm are allowed attributes. NO child elements. NO condition attribute. NO other attributes. valueForm defaults to single if omitted. NEVER invent other valueForm values."
+    },
     "nonContextRules": {
       "children_required": ["nonContextRule"]
     },
