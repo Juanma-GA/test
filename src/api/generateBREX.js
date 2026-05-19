@@ -391,9 +391,10 @@ const CHUNK_SIZE = 10;
 const MAX_RETRIES = 2;
 
 function verifyChunkRules(rawResponse, expectedIds) {
-  const foundIds = new Set(
-    [...rawResponse.matchAll(/<structureObjectRule id="([^"]+)"/g)].map(m => m[1])
-  );
+  const foundIds = new Set([
+    ...[...rawResponse.matchAll(/<structureObjectRule id="([^"]+)"/g)].map(m => m[1]),
+    ...[...rawResponse.matchAll(/<nonContextRule id="([^"]+)"/g)].map(m => m[1])
+  ]);
   const validExpected = new Set(expectedIds);
   const missing = expectedIds.filter(id => !foundIds.has(id));
   const invented = [...foundIds].filter(id => !validExpected.has(id));
@@ -405,12 +406,26 @@ async function generateSingleRule(brdp, projectConfig, schemaSummary, callLLM) {
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     const raw = await callLLM(system, user);
     if (!raw) continue;
-    const escaped = escapeXMLContent(raw.trim());
-    const ruleMatch = escaped.match(/<structureObjectRule[\s\S]*?<\/structureObjectRule>/);
+    const escaped = raw.trim()
+      .replace(/\s+allowedObjectFlagContext="[^"]*"/g, '');
+    const escapedContent = escapeXMLContent(escaped);
+    const splitContent = splitMultipleObjectPaths(escapedContent);
+
+    // Intentar structureObjectRule primero
+    const ruleMatch = splitContent.match(/<structureObjectRule[\s\S]*?<\/structureObjectRule>/);
     if (ruleMatch) {
       const idMatch = ruleMatch[0].match(/structureObjectRule id="([^"]+)"/);
       if (idMatch && idMatch[1] === brdp.id) {
-        return ruleMatch[0];
+        return { type: 'structure', xml: ruleMatch[0] };
+      }
+    }
+
+    // Aceptar nonContextRule si el LLM decide que no hay XPath claro
+    const nonContextMatch = splitContent.match(/<nonContextRule[\s\S]*?<\/nonContextRule>/);
+    if (nonContextMatch) {
+      const idMatch = nonContextMatch[0].match(/nonContextRule id="([^"]+)"/);
+      if (idMatch && idMatch[1] === brdp.id) {
+        return { type: 'nonContext', xml: nonContextMatch[0] };
       }
     }
   }
@@ -490,7 +505,7 @@ export async function generateBREX(brdps, projectConfig, options = {}) {
     const brdp = chunks[0].find(b => b.id === missingId);
     if (brdp) {
       const rule = await generateSingleRule(brdp, projectConfig, schemaSummary, callLLM);
-      if (rule) finalXml = assembleChunks(finalXml, '\n' + rule);
+      if (rule) finalXml = assembleChunks(finalXml, '\n' + rule.xml);
     }
   }
 
@@ -512,7 +527,7 @@ export async function generateBREX(brdps, projectConfig, options = {}) {
       const brdp = chunks[i].find(b => b.id === missingId);
       if (brdp) {
         const rule = await generateSingleRule(brdp, projectConfig, schemaSummary, callLLM);
-        if (rule) finalXml = assembleChunks(finalXml, '\n' + rule);
+        if (rule) finalXml = assembleChunks(finalXml, '\n' + rule.xml);
       }
     }
   }
