@@ -349,6 +349,14 @@ function assembleChunks(baseXml, additionalRules) {
   // Construir el bloque nonContextRules si hay reglas sin contexto
   let nonContextBlock = '';
   if (cleanedNonContext.trim()) {
+    // Recopilar TODOS los ids ya presentes en el documento (safety net global)
+    const globalIds = new Set();
+    const globalIdPattern = /\bid="([^"]+)"/g;
+    let gMatch;
+    while ((gMatch = globalIdPattern.exec(stripped)) !== null) {
+      globalIds.add(gMatch[1]);
+    }
+
     // Verificar si baseXml ya tiene <nonContextRules> del chunk 1
     const hasExisting = baseXml.includes('<nonContextRules>');
     if (hasExisting) {
@@ -356,24 +364,24 @@ function assembleChunks(baseXml, additionalRules) {
       const existingMatch = baseXml.match(/<nonContextRules>([\s\S]*?)<\/nonContextRules>/);
       const existingContent = existingMatch ? existingMatch[1] : '';
 
-      // Deduplicación por id
-      const existingIds = new Set();
-      const idPattern = /id="([^"]+)"/;
-      (existingContent.match(/<nonContextRule[\s\S]*?<\/nonContextRule>/g) || [])
-        .forEach(rule => {
-          const m = rule.match(idPattern);
-          if (m) existingIds.add(m[1]);
-        });
+      // Filtrar nonContextRule duplicados contra ids globales
       const deduped = (cleanedNonContext.match(/<nonContextRule[\s\S]*?<\/nonContextRule>/g) || [])
         .filter(rule => {
-          const m = rule.match(idPattern);
-          return m ? !existingIds.has(m[1]) : true;
+          const m = rule.match(/\bid="([^"]+)"/);
+          return m ? !globalIds.has(m[1]) : true;
         })
         .join('\n');
 
       nonContextBlock = `\n<nonContextRules>\n${existingContent}${deduped.trim() ? '\n' + deduped : ''}\n</nonContextRules>`;
     } else {
-      nonContextBlock = `\n<nonContextRules>\n${cleanedNonContext}\n</nonContextRules>`;
+      // Filtrar cleanedNonContext contra ids globales incluso sin existing block
+      const deduped = (cleanedNonContext.match(/<nonContextRule[\s\S]*?<\/nonContextRule>/g) || [])
+        .filter(rule => {
+          const m = rule.match(/\bid="([^"]+)"/);
+          return m ? !globalIds.has(m[1]) : true;
+        })
+        .join('\n');
+      nonContextBlock = deduped.trim() ? `\n<nonContextRules>\n${deduped}\n</nonContextRules>` : '';
     }
   } else if (baseXml.includes('<nonContextRules>')) {
     // chunk 1 generó nonContextRules pero chunks adicionales no tienen más — preservar
