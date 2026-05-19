@@ -187,12 +187,19 @@ Output ONLY the structureObjectRule elements, starting directly with <structureO
 }
 
 function escapeObjectUseContent(xml) {
-  // Escape unescaped < and > inside <objectUse>...</objectUse> content
   return xml.replace(/<objectUse>([\s\S]*?)<\/objectUse>/g, (match, content) => {
-    const escaped = content
-      .replace(/&(?!amp;|lt;|gt;|quot;|apos;)/g, '&amp;')
-      .replace(/<(?!\/?objectUse)/g, '&lt;')
-      .replace(/(?<!objectUse)>/g, '&gt;');
+    // Unescape any existing entities first to avoid double-escaping
+    const unescaped = content
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&apos;/g, "'");
+    // Re-escape everything cleanly
+    const escaped = unescaped
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
     return `<objectUse>${escaped}</objectUse>`;
   });
 }
