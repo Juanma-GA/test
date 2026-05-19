@@ -205,18 +205,28 @@ function escapeObjectUseContent(xml) {
 }
 
 function assembleChunks(firstXml, additionalRules) {
-  // Clean truncated rules: remove any incomplete structureObjectRule at the end
-  const cleaned = additionalRules
-    .replace(/<structureObjectRule(?:(?!<\/structureObjectRule>)[\s\S])*$/, '')
-    .trim();
+  // Remove any trailing incomplete structureObjectRule
+  // A complete rule must have both opening and closing tags
+  let cleaned = additionalRules;
+
+  // Keep only complete structureObjectRule elements
+  const completeRules = [];
+  const rulePattern = /<structureObjectRule[\s\S]*?<\/structureObjectRule>/g;
+  let match;
+  while ((match = rulePattern.exec(cleaned)) !== null) {
+    completeRules.push(match[0]);
+  }
+  cleaned = completeRules.join('\n');
+
+  if (!cleaned.trim()) return firstXml;
 
   const insertionPoint = firstXml.lastIndexOf('</structureObjectRuleGroup>');
   if (insertionPoint === -1) {
     const fallback = firstXml.lastIndexOf('</contextRules>');
-    if (fallback === -1) return firstXml + cleaned;
-    return firstXml.slice(0, fallback) + cleaned + '\n' + firstXml.slice(fallback);
+    if (fallback === -1) return firstXml + '\n' + cleaned;
+    return firstXml.slice(0, fallback) + '\n' + cleaned + '\n' + firstXml.slice(fallback);
   }
-  return firstXml.slice(0, insertionPoint) + cleaned + '\n' + firstXml.slice(insertionPoint);
+  return firstXml.slice(0, insertionPoint) + '\n' + cleaned + '\n' + firstXml.slice(insertionPoint);
 }
 
 const CHUNK_SIZE = 50;
