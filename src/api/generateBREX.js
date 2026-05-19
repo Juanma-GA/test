@@ -186,6 +186,17 @@ Output ONLY the structureObjectRule elements, starting directly with <structureO
   return { system, user };
 }
 
+function escapeObjectUseContent(xml) {
+  // Escape unescaped < and > inside <objectUse>...</objectUse> content
+  return xml.replace(/<objectUse>([\s\S]*?)<\/objectUse>/g, (match, content) => {
+    const escaped = content
+      .replace(/&(?!amp;|lt;|gt;|quot;|apos;)/g, '&amp;')
+      .replace(/<(?!\/?objectUse)/g, '&lt;')
+      .replace(/(?<!objectUse)>/g, '&gt;');
+    return `<objectUse>${escaped}</objectUse>`;
+  });
+}
+
 function assembleChunks(firstXml, additionalRules) {
   // Clean truncated rules: remove any incomplete structureObjectRule at the end
   const cleaned = additionalRules
@@ -254,7 +265,7 @@ export async function generateBREX(brdps, projectConfig, options = {}) {
   // Chunk 1: full DM with first CHUNK_SIZE BRDPs
   const { system: sys1, user: usr1 } = buildBREXPrompt(chunks[0], projectConfig, schemaSummary);
   const raw1 = await callLLM(sys1, usr1);
-  let finalXml = extractXML(raw1);
+  let finalXml = escapeObjectUseContent(extractXML(raw1));
   if (!finalXml) throw new Error("The model returned an empty response on chunk 1.");
 
   // Chunks 2..N: rules only
@@ -262,7 +273,8 @@ export async function generateBREX(brdps, projectConfig, options = {}) {
     const { system: sysN, user: usrN } = buildBREXPromptChunk(chunks[i], projectConfig, schemaSummary);
     const rawN = await callLLM(sysN, usrN);
     if (rawN && rawN.trim()) {
-      finalXml = assembleChunks(finalXml, '\n' + rawN.trim());
+      const cleanedRawN = escapeObjectUseContent(rawN.trim());
+      finalXml = assembleChunks(finalXml, '\n' + cleanedRawN);
     }
   }
 
