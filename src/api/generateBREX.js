@@ -187,15 +187,18 @@ Output ONLY the structureObjectRule elements, starting directly with <structureO
 }
 
 function assembleChunks(firstXml, additionalRules) {
-  // Insert additional rules before closing </structureObjectRuleGroup>
+  // Clean truncated rules: remove any incomplete structureObjectRule at the end
+  const cleaned = additionalRules
+    .replace(/<structureObjectRule(?:(?!<\/structureObjectRule>)[\s\S])*$/, '')
+    .trim();
+
   const insertionPoint = firstXml.lastIndexOf('</structureObjectRuleGroup>');
   if (insertionPoint === -1) {
-    // Fallback: insert before </contextRules>
     const fallback = firstXml.lastIndexOf('</contextRules>');
-    if (fallback === -1) return firstXml + additionalRules;
-    return firstXml.slice(0, fallback) + additionalRules + '\n' + firstXml.slice(fallback);
+    if (fallback === -1) return firstXml + cleaned;
+    return firstXml.slice(0, fallback) + cleaned + '\n' + firstXml.slice(fallback);
   }
-  return firstXml.slice(0, insertionPoint) + additionalRules + '\n' + firstXml.slice(insertionPoint);
+  return firstXml.slice(0, insertionPoint) + cleaned + '\n' + firstXml.slice(insertionPoint);
 }
 
 const CHUNK_SIZE = 50;
@@ -241,7 +244,7 @@ export async function generateBREX(brdps, projectConfig, options = {}) {
     try {
       return await sendMessageStream(
         messages, apiKey, modelName, provider, system,
-        onChunk, abortController, { customEndpoint }
+        onChunk, abortController, { customEndpoint, maxTokens: 8000 }
       );
     } catch (err) {
       throw new Error(`LLM call failed: ${err.message}`);
