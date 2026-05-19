@@ -274,9 +274,14 @@ function assembleChunks(baseXml, additionalRules) {
       stripped = stripped.slice(0, idx);
     }
   }
-  const lastRule = stripped.lastIndexOf('</structureObjectRule>');
-  if (lastRule !== -1) {
-    stripped = stripped.slice(0, lastRule + '</structureObjectRule>'.length);
+  const lastStructure = stripped.lastIndexOf('</structureObjectRule>');
+  const lastNonContext = stripped.lastIndexOf('</nonContextRule>');
+  const lastAny = Math.max(lastStructure, lastNonContext);
+  if (lastAny !== -1) {
+    const endTag = lastStructure >= lastNonContext
+      ? '</structureObjectRule>'
+      : '</nonContextRule>';
+    stripped = stripped.slice(0, lastAny + endTag.length);
   }
 
   // Construir el bloque nonContextRules si hay reglas sin contexto
