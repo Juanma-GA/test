@@ -128,6 +128,78 @@ export function checkWellFormed(xmlString) {
   }
 }
 
+export function buildBREXPromptChunk(chunkBRDPs, projectConfig, schemaSummary) {
+  const { few_shot_examples, ...schemaSummaryWithoutExamples } = schemaSummary;
+  const schemaJSON = JSON.stringify(schemaSummaryWithoutExamples, null, 2);
+
+  const fewShotBlock = (schemaSummary.few_shot_examples || []).map((ex, i) => {
+    const flag = ex.allowedObjectFlag;
+    const labels = [];
+    if (flag === "0") labels.push("prohibited");
+    else if (flag === "1") labels.push("mandatory");
+    else labels.push("no flag");
+    if (ex.objectPath && ex.objectPath.includes("[")) labels.push("complex XPath");
+    if (ex.objectValues && ex.objectValues.length > 1) labels.push("multi value");
+    const objectValueLines = (ex.objectValues || [])
+      .map(v => `  <objectValue valueForm="single" valueAllowed="${v}"/>`)
+      .join("\n");
+    const flagAttr = flag != null ? ` allowedObjectFlag="${flag}"` : "";
+    return `### Example ${i + 1} — ${labels.join(", ")}
+INPUT id: ${ex.id}
+OUTPUT:
+<structureObjectRule id="${ex.id}" brSeverityLevel="brsl01">
+  <brDecisionRef brDecisionIdentNumber="${ex.id}"/>
+  <objectPath${flagAttr}>${ex.objectPath}</objectPath>
+  <objectUse>${ex.objectUse}</objectUse>
+${objectValueLines}</structureObjectRule>`;
+  }).join("\n\n");
+
+  const system = `You are an S1000D Issue 4.2 expert generating structureObjectRule elements for a BREX Data Module.
+
+Follow this schema structure exactly:
+${schemaJSON}
+
+STRICT RULES:
+1. Output ONLY raw structureObjectRule XML elements — no XML declaration, no dmodule wrapper, no markdown.
+2. Each BRDP = one structureObjectRule element.
+3. Child order in structureObjectRule: brDecisionRef → objectPath → objectUse → objectValue.
+4. brDecisionRef uses ATTRIBUTE: <brDecisionRef brDecisionIdentNumber="BRDP-001"/> — NOT text content.
+5. allowedObjectFlag: "0"=prohibited, "1"=mandatory, "2"=optional.
+6. objectUse = one sentence summarising the decision.
+7. Start output directly with <structureObjectRule — no preamble.
+
+## Few-shot examples: BRDP id → structureObjectRule
+${fewShotBlock}`;
+
+  const brdpLines = chunkBRDPs
+    .map((b, i) =>
+      `${i + 1}. ID: ${b.id}\n   Definition: ${b.definition}\n   Proposal: ${b.proposal}\n   Validation: ${b.validation}`
+    )
+    .join("\n\n");
+
+  const user = `Generate structureObjectRule elements for these ${chunkBRDPs.length} BRDPs:
+
+${brdpLines}
+
+Output ONLY the structureObjectRule elements, starting directly with <structureObjectRule`;
+
+  return { system, user };
+}
+
+function assembleChunks(firstXml, additionalRules) {
+  // Insert additional rules before closing </structureObjectRuleGroup>
+  const insertionPoint = firstXml.lastIndexOf('</structureObjectRuleGroup>');
+  if (insertionPoint === -1) {
+    // Fallback: insert before </contextRules>
+    const fallback = firstXml.lastIndexOf('</contextRules>');
+    if (fallback === -1) return firstXml + additionalRules;
+    return firstXml.slice(0, fallback) + additionalRules + '\n' + firstXml.slice(fallback);
+  }
+  return firstXml.slice(0, insertionPoint) + additionalRules + '\n' + firstXml.slice(insertionPoint);
+}
+
+const CHUNK_SIZE = 50;
+
 export async function generateBREX(brdps, projectConfig, options = {}) {
   const {
     apiKey,
@@ -157,30 +229,40 @@ export async function generateBREX(brdps, projectConfig, options = {}) {
   }
 
   const schemaSummary = await loadSchemaSummary();
-  const { system, user } = buildBREXPrompt(targetBRDPs, projectConfig, schemaSummary);
-  const messages = [{ role: "user", content: user }];
 
-  let rawResponse;
-  try {
-    rawResponse = await sendMessageStream(
-      messages,
-      apiKey,
-      modelName,
-      provider,
-      system,
-      onChunk,
-      abortController,
-      {
-        customEndpoint,
-      }
-    );
-  } catch (err) {
-    throw new Error(`LLM call failed: ${err.message}`);
+  // Split into chunks
+  const chunks = [];
+  for (let i = 0; i < targetBRDPs.length; i += CHUNK_SIZE) {
+    chunks.push(targetBRDPs.slice(i, i + CHUNK_SIZE));
   }
 
-  const xml = extractXML(rawResponse);
-  if (!xml) throw new Error("The model returned an empty response. Check your API key and model settings.");
+  const callLLM = async (system, user) => {
+    const messages = [{ role: "user", content: user }];
+    try {
+      return await sendMessageStream(
+        messages, apiKey, modelName, provider, system,
+        onChunk, abortController, { customEndpoint }
+      );
+    } catch (err) {
+      throw new Error(`LLM call failed: ${err.message}`);
+    }
+  };
 
-  const { valid, error } = checkWellFormed(xml);
-  return { xml, valid, error, brdpCount: targetBRDPs.length };
+  // Chunk 1: full DM with first CHUNK_SIZE BRDPs
+  const { system: sys1, user: usr1 } = buildBREXPrompt(chunks[0], projectConfig, schemaSummary);
+  const raw1 = await callLLM(sys1, usr1);
+  let finalXml = extractXML(raw1);
+  if (!finalXml) throw new Error("The model returned an empty response on chunk 1.");
+
+  // Chunks 2..N: rules only
+  for (let i = 1; i < chunks.length; i++) {
+    const { system: sysN, user: usrN } = buildBREXPromptChunk(chunks[i], projectConfig, schemaSummary);
+    const rawN = await callLLM(sysN, usrN);
+    if (rawN && rawN.trim()) {
+      finalXml = assembleChunks(finalXml, '\n' + rawN.trim());
+    }
+  }
+
+  const { valid, error } = checkWellFormed(finalXml);
+  return { xml: finalXml, valid, error, brdpCount: targetBRDPs.length };
 }
