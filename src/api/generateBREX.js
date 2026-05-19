@@ -216,29 +216,41 @@ function escapeXMLContent(xml) {
   return xml;
 }
 
-function assembleChunks(firstXml, additionalRules) {
-  // Remove any trailing incomplete structureObjectRule
-  // A complete rule must have both opening and closing tags
-  let cleaned = additionalRules;
+const XML_FOOTER = `
+</structureObjectRuleGroup>
+</contextRules>
+</brex>
+</content>
+</dmodule>`;
 
-  // Keep only complete structureObjectRule elements
+function assembleChunks(baseXml, additionalRules) {
+  // Extract only complete structureObjectRule elements from additional rules
   const completeRules = [];
   const rulePattern = /<structureObjectRule[\s\S]*?<\/structureObjectRule>/g;
   let match;
-  while ((match = rulePattern.exec(cleaned)) !== null) {
+  while ((match = rulePattern.exec(additionalRules)) !== null) {
     completeRules.push(match[0]);
   }
-  cleaned = completeRules.join('\n');
+  const cleaned = completeRules.join('\n');
+  if (!cleaned.trim()) return baseXml;
 
-  if (!cleaned.trim()) return firstXml;
-
-  const insertionPoint = firstXml.lastIndexOf('</structureObjectRuleGroup>');
-  if (insertionPoint === -1) {
-    const fallback = firstXml.lastIndexOf('</contextRules>');
-    if (fallback === -1) return firstXml + '\n' + cleaned;
-    return firstXml.slice(0, fallback) + '\n' + cleaned + '\n' + firstXml.slice(fallback);
+  // Strip footer from baseXml (everything from </structureObjectRuleGroup> onwards)
+  // to avoid duplicating or misplacing the closing tags
+  const footerTags = ['</structureObjectRuleGroup>', '</contextRules>', '</brex>', '</content>', '</dmodule>'];
+  let stripped = baseXml;
+  for (const tag of footerTags) {
+    const idx = stripped.lastIndexOf(tag);
+    if (idx !== -1) {
+      stripped = stripped.slice(0, idx);
+    }
   }
-  return firstXml.slice(0, insertionPoint) + '\n' + cleaned + '\n' + firstXml.slice(insertionPoint);
+  // Also strip any trailing whitespace/newlines after the last complete rule
+  const lastRule = stripped.lastIndexOf('</structureObjectRule>');
+  if (lastRule !== -1) {
+    stripped = stripped.slice(0, lastRule + '</structureObjectRule>'.length);
+  }
+
+  return stripped + '\n' + cleaned + XML_FOOTER;
 }
 
 const CHUNK_SIZE = 50;
@@ -304,6 +316,14 @@ export async function generateBREX(brdps, projectConfig, options = {}) {
     if (rawN && rawN.trim()) {
       const cleanedRawN = escapeXMLContent(rawN.trim());
       finalXml = assembleChunks(finalXml, '\n' + cleanedRawN);
+    }
+  }
+
+  // Ensure XML footer is present (in case of single chunk or truncation)
+  if (!finalXml.includes('</dmodule>')) {
+    const lastRule = finalXml.lastIndexOf('</structureObjectRule>');
+    if (lastRule !== -1) {
+      finalXml = finalXml.slice(0, lastRule + '</structureObjectRule>'.length) + XML_FOOTER;
     }
   }
 
