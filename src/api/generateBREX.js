@@ -415,7 +415,8 @@ async function generateSingleRule(brdp, projectConfig, schemaSummary, callLLM) {
     const raw = await callLLM(system, user);
     if (!raw) continue;
     const escaped = raw.trim()
-      .replace(/\s+allowedObjectFlagContext="[^"]*"/g, '');
+      .replace(/\s+allowedObjectFlagContext="[^"]*"/g, '')
+      .replace(/<brDecisionIdentNumber brDecisionIdentNumber="([^"]+)"\/>/g, '<brDecisionRef brDecisionIdentNumber="$1"/>');
     const escapedContent = escapeXMLContent(escaped);
     const splitContent = splitMultipleObjectPaths(escapedContent);
 
@@ -502,6 +503,7 @@ export async function generateBREX(brdps, projectConfig, options = {}) {
   let finalXml = extractXML(raw1);
   finalXml = finalXml.replace(/issueType="original"/g, 'issueType="new"');
   finalXml = finalXml.replace(/\s+allowedObjectFlagContext="[^"]*"/g, '');
+  finalXml = finalXml.replace(/<brDecisionIdentNumber brDecisionIdentNumber="([^"]+)"\/>/g, '<brDecisionRef brDecisionIdentNumber="$1"/>');
   finalXml = escapeXMLContent(finalXml);
   finalXml = splitMultipleObjectPaths(finalXml);
   if (!finalXml) throw new Error("The model returned an empty response on chunk 1.");
