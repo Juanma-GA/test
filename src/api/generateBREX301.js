@@ -361,6 +361,66 @@ async function generateSingleRule301(brdp, projectConfig, schemaSummary, callLLM
   return null;
 }
 
+// ===== Finalización determinista del documento (S1000D 3.0.1) =====
+
+function forceDmoduleTag301(xml, dmoduleOpeningTag) {
+  if (!dmoduleOpeningTag) return xml;
+  return xml.replace(/<dmodule\b[^>]*>/, dmoduleOpeningTag);
+}
+
+function fixObjapplPlacement301(xml) {
+  return xml.replace(/<objrule\b[^>]*>[\s\S]*?<\/objrule>/g, (rule) => {
+    const openMatch = rule.match(/<objrule\b([^>]*)>/);
+    if (!openMatch) return rule;
+    const apMatch = openMatch[1].match(/\sobjappl="([01])"/);
+    if (!apMatch) return rule;
+    const flag = apMatch[1];
+    let fixed = rule.replace(/(<objrule\b[^>]*?)\sobjappl="[01]"([^>]*>)/, '$1$2');
+    let injected = false;
+    fixed = fixed.replace(/<objpath\b([^>]*)>/, (pm, pattrs) => {
+      if (injected) return pm;
+      injected = true;
+      if (/objappl=/.test(pattrs)) return pm;
+      return `<objpath objappl="${flag}"${pattrs}>`;
+    });
+    return fixed;
+  });
+}
+
+function resolveAveeFields301(projectConfig) {
+  const cfg = projectConfig || {};
+  const useIfValid = (val, pattern, def) =>
+    (typeof val === 'string' && pattern.test(val)) ? val : def;
+  return {
+    modelic:  useIfValid(cfg.modelIdentCode, /^[A-Za-z0-9]{2,14}$/, cfg.modelIdentCode || 'UNKNOWN'),
+    sdc:      useIfValid(cfg.systemDiffCode, /^[A-Za-z0-9]{1,4}$/, 'A'),
+    chapnum:  '00',
+    section:  '0',
+    subsect:  '0',
+    subject:  '00',
+    discode:  '00',
+    discodev: '00A',
+    incode:   '022',
+    incodev:  'A',
+    itemloc:  'D',
+  };
+}
+
+function forceAveeFields301(xml, fields) {
+  for (const [el, val] of Object.entries(fields)) {
+    xml = xml.replace(new RegExp(`<${el}\\s*/>`, 'g'), `<${el}>${val}</${el}>`);
+    xml = xml.replace(new RegExp(`<${el}>[\\s\\S]*?</${el}>`, 'g'), `<${el}>${val}</${el}>`);
+  }
+  return xml;
+}
+
+function finalizeDocument301(xml, projectConfig, schemaSummary) {
+  xml = forceDmoduleTag301(xml, schemaSummary && schemaSummary.dmodule_opening_tag);
+  xml = fixObjapplPlacement301(xml);
+  xml = forceAveeFields301(xml, resolveAveeFields301(projectConfig));
+  return xml;
+}
+
 export async function generateBREX301(brdps, projectConfig, options = {}) {
   const {
     apiKey,
@@ -472,6 +532,9 @@ export async function generateBREX301(brdps, projectConfig, options = {}) {
       finalXml = finalXml.slice(0, lastRule + '</objrule>'.length) + XML_FOOTER_301;
     }
   }
+
+  // Finalización determinista: tag dmodule, objappl en objpath, campos avee
+  finalXml = finalizeDocument301(finalXml, projectConfig, schemaSummary);
 
   const { valid, error } = checkWellFormed(finalXml);
   return { xml: finalXml, valid, error, brdpCount: targetBRDPs.length };
