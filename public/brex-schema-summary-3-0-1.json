@@ -24,8 +24,17 @@
     "rule_element": "objrule (@id)",
     "objectPath": "objpath (@objappl for flag)",
     "objectUse": "objuse",
-    "objectValue": "objval (@val1, @valtype='single')",
-    "applic": "idstatus > status > applic > displaytext > p"
+    "objectValue": {
+      "element": "objval",
+      "attributes_required": [],
+      "attributes_optional": ["val1", "val2", "valtype"],
+      "allowed_attributes_ONLY": ["val1", "val2", "valtype"],
+      "valtype_enum": ["single", "range"],
+      "valtype_forbidden": ["pattern", "list", "regex", "conditional", "multiple"],
+      "note": "ONLY val1, val2 and valtype are allowed attributes. NO child elements. NO other attributes. valtype defaults to single if omitted. val2 only used when valtype=range. NEVER invent other valtype values. Pattern is NOT valid in S1000D 3.0.1."
+    },
+    "applic": "idstatus > status > applic > displaytext > p",
+    "nonContextRule_handling": "S1000D 3.0.1 does NOT have nonContextRules element. If a BRDP has no clear XPath target, generate a valid objrule with a best-effort XPath, then add an XML comment immediately after: <!-- nonContextRule id=\"BRDP-xxx\": one sentence describing the conceptual rule -->"
   },
   "generation_rules": {
     "rule_id": "atributo id en objrule — valor igual al BRDP identifier",
