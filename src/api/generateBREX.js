@@ -613,9 +613,8 @@ export async function generateBREX(brdps, projectConfig, options = {}) {
   for (let i = 1; i < chunks.length; i++) {
     const { system: sysN, user: usrN } = buildBREXPromptChunk(chunks[i], projectConfig, schemaSummary);
     const rawN = await callLLM(sysN, usrN);
-    if (!rawN || !rawN.trim()) continue;
 
-    let escapedN = rawN.trim().replace(/\s+allowedObjectFlagContext="[^"]*"/g, '')
+    let escapedN = (rawN && rawN.trim() ? rawN.trim() : '').replace(/\s+allowedObjectFlagContext="[^"]*"/g, '')
       .replace(/<brDecisionIdentNumber brDecisionIdentNumber="([^"]+)"\/>/g, '<brDecisionRef brDecisionIdentNumber="$1"/>');
     escapedN = escapeXMLContent(escapedN);
     escapedN = splitMultipleObjectPaths(escapedN);
@@ -633,6 +632,33 @@ export async function generateBREX(brdps, projectConfig, options = {}) {
     }
   }
 
+  // Barrido final de cobertura: ningún BRDP debe perderse en silencio
+  {
+    const present = new Set(
+      [...finalXml.matchAll(/<structureObjectRule id="([^"]+)"/g)].map(m => m[1].replace(/-[bcde]$/, ''))
+    );
+    const presentNonCtx = new Set(
+      [...finalXml.matchAll(/<nonContextRule\b[^>]*id="([^"]+)"/g)].map(m => m[1])
+    );
+    const stillMissing = targetBRDPs.filter(b => !present.has(b.id) && !presentNonCtx.has(b.id));
+    for (const brdp of stillMissing) {
+      const rule = await generateSingleRule(brdp, projectConfig, schemaSummary, callLLM);
+      if (rule) {
+        finalXml = assembleChunks(finalXml, '\n' + rule.xml);
+      } else {
+        // Red de seguridad: nunca perder un BRDP -> nonContextRule formal de trazabilidad
+        const desc = String(brdp.definition || brdp.proposal || 'Regla sin contexto')
+          .replace(/[\r\n]+/g, ' ')
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .trim().slice(0, 300);
+        const safety = '<nonContextRule id="' + brdp.id + '" brSeverityLevel="brsl01">'
+          + '<brDecisionRef brDecisionIdentNumber="' + brdp.id + '"/>'
+          + '<simplePara>' + desc + '</simplePara></nonContextRule>';
+        finalXml = assembleChunks(finalXml, '\n' + safety);
+      }
+    }
+  }
+
   // Ensure footer
   if (!finalXml.includes('</dmodule>')) {
     const lastRule = finalXml.lastIndexOf('</structureObjectRule>');
@@ -640,6 +666,10 @@ export async function generateBREX(brdps, projectConfig, options = {}) {
       finalXml = finalXml.slice(0, lastRule + '</structureObjectRule>'.length) + XML_FOOTER;
     }
   }
+
+  // Finalización determinista: tag dmodule, allowedObjectFlag en objectPath,
+  // promoción de huérfanos, campos dmCode, dedup de nonContextRule
+  finalXml = finalizeDocument(finalXml, projectConfig, schemaSummary);
 
   const { valid, error } = checkWellFormed(finalXml);
   return { xml: finalXml, valid, error, brdpCount: targetBRDPs.length };
