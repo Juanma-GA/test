@@ -414,10 +414,36 @@ function forceAveeFields301(xml, fields) {
   return xml;
 }
 
+// Promueve la primera regla split huérfana (id-b/-c sin su id base) al id base, restaurando trazabilidad
+function promoteOrphanSplitRules301(xml) {
+  const ids = new Set([...xml.matchAll(/<objrule id="([^"]+)"/g)].map(m => m[1]));
+  const promoted = new Set();
+  return xml.replace(/<objrule id="([^"]+)"/g, (full, id) => {
+    const m = id.match(/^(.*)-([bcde])$/);
+    if (!m) return full;
+    const base = m[1];
+    if (ids.has(base) || promoted.has(base)) return full;
+    promoted.add(base);
+    return `<objrule id="${base}"`;
+  });
+}
+
+// Elimina comentarios nonContextRule duplicados por id (conserva el primero)
+function dedupeNonContextComments301(xml) {
+  const seen = new Set();
+  return xml.replace(/[ \t]*<!--\s*nonContextRule id="([^"]+)":[\s\S]*?-->\n?/g, (full, id) => {
+    if (seen.has(id)) return '';
+    seen.add(id);
+    return full;
+  });
+}
+
 function finalizeDocument301(xml, projectConfig, schemaSummary) {
   xml = forceDmoduleTag301(xml, schemaSummary && schemaSummary.dmodule_opening_tag);
   xml = fixObjapplPlacement301(xml);
+  xml = promoteOrphanSplitRules301(xml);
   xml = forceAveeFields301(xml, resolveAveeFields301(projectConfig));
+  xml = dedupeNonContextComments301(xml);
   return xml;
 }
 
