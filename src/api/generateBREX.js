@@ -523,11 +523,23 @@ function forceDmCodeFields(xml, fields) {
   });
 }
 
+function dropRedundantNonContextRules(xml) {
+  // Si un BRDP ya existe como structureObjectRule (ejecutable), elimina su nonContextRule
+  // redundante para no duplicar el id xs:ID. Gana la regla ejecutable.
+  const sorBase = new Set(
+    [...xml.matchAll(/<structureObjectRule id="([^"]+)"/g)].map(m => m[1].replace(/-[bcde]$/, ''))
+  );
+  return xml.replace(/<nonContextRule\b[^>]*id="([^"]+)"[\s\S]*?<\/nonContextRule>/g, (full, id) => {
+    return sorBase.has(id.replace(/-[bcde]$/, '')) ? '' : full;
+  });
+}
+
 function finalizeDocument(xml, projectConfig, schemaSummary) {
   xml = forceDmoduleTag(xml, schemaSummary && schemaSummary.dmodule_opening_tag);
   xml = fixFlagPlacement(xml);
   xml = promoteOrphanSplitRules(xml);
   xml = forceDmCodeFields(xml, resolveDmCodeFields(projectConfig));
+  xml = dropRedundantNonContextRules(xml);
   xml = dedupeNonContextRules(xml);
   return xml;
 }
