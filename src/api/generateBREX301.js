@@ -530,9 +530,8 @@ export async function generateBREX301(brdps, projectConfig, options = {}) {
   for (let i = 1; i < chunks.length; i++) {
     const { system: sysN, user: usrN } = buildBREXPromptChunk301(chunks[i], projectConfig, schemaSummary);
     const rawN = await callLLM(sysN, usrN);
-    if (!rawN || !rawN.trim()) continue;
 
-    let escapedN = rawN.trim()
+    let escapedN = (rawN && rawN.trim() ? rawN.trim() : '')
       .replace(/\s+allowedObjectFlagContext="[^"]*"/g, '')
       .replace(/<brDecisionIdentNumber brDecisionIdentNumber="([^"]+)"\/>/g, '');
     escapedN = escapeXMLContent301(escapedN);
@@ -547,6 +546,27 @@ export async function generateBREX301(brdps, projectConfig, options = {}) {
       if (brdp) {
         const rule = await generateSingleRule301(brdp, projectConfig, schemaSummary, callLLM);
         if (rule) finalXml = assembleChunks301(finalXml, '\n' + rule);
+      }
+    }
+  }
+
+  // Barrido final de cobertura: ningún BRDP debe perderse en silencio
+  {
+    const present = new Set(
+      [...finalXml.matchAll(/<objrule id="([^"]+)"/g)].map(m => m[1].replace(/-[bcde]$/, ''))
+    );
+    const stillMissing = targetBRDPs.filter(b =>
+      !present.has(b.id) && !finalXml.includes('nonContextRule id="' + b.id + '"')
+    );
+    for (const brdp of stillMissing) {
+      const rule = await generateSingleRule301(brdp, projectConfig, schemaSummary, callLLM);
+      if (rule) {
+        finalXml = assembleChunks301(finalXml, '\n' + rule);
+      } else {
+        // Red de seguridad: nunca perder un BRDP -> comentario de trazabilidad
+        const desc = String(brdp.definition || brdp.proposal || 'Regla sin contexto')
+          .replace(/--+/g, '-').replace(/[\r\n]+/g, ' ').trim().slice(0, 300);
+        finalXml = assembleChunks301(finalXml, '\n<!-- nonContextRule id="' + brdp.id + '": ' + desc + ' -->');
       }
     }
   }
