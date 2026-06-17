@@ -42,7 +42,8 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
   const [error, setError] = useState(null);
   const [mergeMode, setMergeMode] = useState('add');
   const [extractingMsg, setExtractingMsg] = useState('Reading document...');
-  const [sourceType, setSourceType] = useState('Style Guide');
+  const [inputMode, setInputMode] = useState('file');
+  const [pastedText, setPastedText] = useState('');
   const [excludedIds, setExcludedIds] = useState([]);
   const abortRef = useRef(null);
   const inputRef = useRef(null);
@@ -107,8 +108,12 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
       setError('API key not configured. Go to Settings.');
       return;
     }
-    if (!file) {
+    if (inputMode === 'file' && !file) {
       setError('Please select a file first.');
+      return;
+    }
+    if (inputMode === 'text' && pastedText.trim().length < 100) {
+      setError('Please paste at least 100 characters of text.');
       return;
     }
 
@@ -120,12 +125,12 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
     abortRef.current = new AbortController();
 
     try {
-      const res = await extractBRDPs(file, existingBRDPs, {
+      const res = await extractBRDPs(inputMode === 'file' ? file : null, existingBRDPs, {
         apiKey,
         modelName,
         provider,
         customEndpoint,
-        sourceType,
+        rawText: inputMode === 'text' ? pastedText : null,
         onProgress: (current, total, foundCount) => {
           setExtracting(false);
           setProgress({ current, total, foundCount });
@@ -174,23 +179,35 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
 
         <div className={styles.content}>
 
-          {/* Source Type Selector */}
+          {/* Input mode selector */}
           <div className={styles.sourceTypeSection}>
-            <label className={styles.sourceTypeLabel}>Document type</label>
+            <label className={styles.sourceTypeLabel}>Input</label>
             <div className={styles.sourceTypeGroup}>
-              {['Style Guide', 'BREX Doc', 'Others'].map((type) => (
+              {[['file', 'Upload file'], ['text', 'Paste text']].map(([mode, label]) => (
                 <button
-                  key={type}
-                  className={`${styles.sourceTypeBtn} ${sourceType === type ? styles.sourceTypeBtnActive : ''}`}
-                  onClick={() => setSourceType(type)}
+                  key={mode}
+                  className={`${styles.sourceTypeBtn} ${inputMode === mode ? styles.sourceTypeBtnActive : ''}`}
+                  onClick={() => { setInputMode(mode); setError(null); setResult(null); }}
                 >
-                  {type}
+                  {label}
                 </button>
               ))}
             </div>
           </div>
 
+          {/* Paste text */}
+          {inputMode === 'text' && (
+            <textarea
+              className={styles.dropZone}
+              style={{ width: '100%', minHeight: '160px', resize: 'vertical', fontFamily: 'inherit', fontSize: '0.9rem', padding: '12px', boxSizing: 'border-box' }}
+              placeholder="Paste your document text here (rules, style guide, BREX text, etc.)"
+              value={pastedText}
+              onChange={(e) => { setPastedText(e.target.value); setError(null); setResult(null); }}
+            />
+          )}
+
           {/* Drop zone */}
+          {inputMode === 'file' && (
           <div
             className={`${styles.dropZone} ${dragging ? styles.dragging : ''} ${file ? styles.hasFile : ''}`}
             onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
@@ -223,6 +240,7 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
               </div>
             )}
           </div>
+          )}
 
           {/* Error */}
           {error && <div className={styles.errorBox}>{error}</div>}
@@ -232,7 +250,7 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
             <button
               className={styles.extractBtn}
               onClick={handleExtract}
-              disabled={!file}
+              disabled={inputMode === 'file' ? !file : pastedText.trim().length < 100}
             >
               {result ? 'Re-extract' : 'Extract BRDPs'}
             </button>

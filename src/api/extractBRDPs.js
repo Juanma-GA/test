@@ -166,28 +166,24 @@ export function generateIds(existingBRDPs, count) {
 // Prompt builder
 // ─────────────────────────────────────────────
 
-function buildExtractionPrompt(chunkText, sourceType) {
-  let baseSystem = `You are an S1000D BRDP expert. Extract all Business Rules Decision Points from the provided document section.
+function buildExtractionPrompt(chunkText) {
+  const system = `You are an S1000D BRDP expert. Extract ALL Business Rules Decision Points (BRDPs) from the provided document section.
 
-The document may be in English or Spanish. Extract rules in the original language of the document.
+The document may be any kind of source: a style guide, a BREX document, a procedural or technical document, or free text. It may be in English or Spanish. Extract rules in the original language of the document.
 
 Identify rules by these patterns:
 - Sentences containing: shall, must, must not, should not, is required, is mandatory
-- Paragraphs prefixed with: "Regla SOPTE:", "Decisión específica", "Regla de edición", or equivalent rule markers in any language
-- Any statement that defines how something must or must not be done`;
+- Paragraphs prefixed with rule markers in any language, e.g.: "Regla SOPTE:", "Decisión específica", "Regla de edición", "Business Rule", or equivalent
+- Any statement that defines how something must or must not be done
+- Any statement that defines a rule, decision, requirement, constraint, or recommendation
 
-  if (sourceType === 'Others') {
-    baseSystem += `
-- The document may be any type of technical or procedural document. Extract any statement that defines a rule, decision, requirement, constraint, or recommendation.`;
-  }
-
-  const system = `${baseSystem}
+If the source text already contains an explicit BRDP identifier for a rule (for example "BRDP-S1-00123", "BR002", "Rule 4.2.1", or similar), DO NOT use it as the output id. Instead, mention that original identifier inside the "comment" field (e.g. "Source id: BRDP-S1-00123"). The output ids are always assigned automatically downstream.
 
 For each rule generate exactly this JSON object:
 {
   "title": "Short title max 8 words summarising the rule",
   "proposal": "The exact rule text — do not paraphrase or shorten",
-  "comment": "Source: [chapter or section reference if available]"
+  "comment": "Source: [chapter or section reference if available]; include any original rule identifier found in the text"
 }
 
 STRICT OUTPUT RULES:
@@ -198,7 +194,7 @@ STRICT OUTPUT RULES:
 5. If a paragraph contains multiple rules, create one BRDP per rule
 6. proposal must be the exact original text`;
 
-  const user = `Extract all BRDPs from this ${sourceType} section:
+  const user = `Extract all BRDPs from this document section:
 
 ${chunkText}`;
 
@@ -258,23 +254,27 @@ export async function extractBRDPs(file, existingBRDPs, options = {}) {
     modelName,
     provider = "Anthropic",
     customEndpoint = "",
-    sourceType = "document",
+    rawText = null,
     onProgress,
     abortController,
   } = options;
 
   if (!apiKey) throw new Error("API key is required. Please configure it in Settings.");
 
-  // Step 1 — Extract text from file
+  // Step 1 — Obtain document text: pasted plain text takes precedence over file
   let documentText;
-  try {
-    documentText = await extractTextFromFile(file);
-  } catch (err) {
-    throw new Error(`Could not read file: ${err.message}`);
+  if (rawText && rawText.trim().length > 0) {
+    documentText = rawText;
+  } else {
+    try {
+      documentText = await extractTextFromFile(file);
+    } catch (err) {
+      throw new Error(`Could not read file: ${err.message}`);
+    }
   }
 
   if (!documentText || documentText.trim().length < 100) {
-    throw new Error("The document appears to be empty or could not be read.");
+    throw new Error("The document appears to be empty or too short (minimum 100 characters).");
   }
 
   // Step 2 — Split into chunks
@@ -289,7 +289,7 @@ export async function extractBRDPs(file, existingBRDPs, options = {}) {
     }
 
     try {
-      const { system, user } = buildExtractionPrompt(chunks[i], sourceType);
+      const { system, user } = buildExtractionPrompt(chunks[i]);
       const messages = [{ role: "user", content: user }];
 
       const response = await sendMessage(
