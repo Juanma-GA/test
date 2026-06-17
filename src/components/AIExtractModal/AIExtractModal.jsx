@@ -112,8 +112,12 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
       setError('Please select a file first.');
       return;
     }
-    if (inputMode === 'text' && pastedText.trim().length < 3000) {
-      setError(`Please paste at least 3000 characters (about one page). Current: ${pastedText.trim().length}.`);
+    if (inputMode === 'text' && pastedText.trim().length === 0) {
+      setError('Please paste some text first.');
+      return;
+    }
+    if (inputMode === 'text' && pastedText.trim().length > 3000) {
+      setError(`Text is too long: ${pastedText.trim().length} characters. Maximum is 3000 (about one page). For longer documents, use "Upload file".`);
       return;
     }
 
