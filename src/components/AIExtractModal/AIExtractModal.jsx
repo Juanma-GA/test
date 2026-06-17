@@ -199,7 +199,7 @@ export default function AIExtractModal({ onClose, existingBRDPs, onImport }) {
           {inputMode === 'text' && (
             <textarea
               className={styles.dropZone}
-              style={{ width: '100%', minHeight: '160px', resize: 'vertical', fontFamily: 'inherit', fontSize: '0.9rem', padding: '12px', boxSizing: 'border-box' }}
+              style={{ width: '100%', minHeight: '160px', resize: 'vertical', fontFamily: 'inherit', fontSize: '0.9rem', padding: '12px', boxSizing: 'border-box', textAlign: 'left', verticalAlign: 'top' }}
               placeholder="Paste your document text here (rules, style guide, BREX text, etc.)"
               value={pastedText}
               onChange={(e) => { setPastedText(e.target.value); setError(null); setResult(null); }}
