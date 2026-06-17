@@ -28,9 +28,9 @@ export async function extractTextFromDOCX(file) {
  * @returns {Promise<string>}
  */
 export async function extractTextFromPDF(file) {
-  const pdfjsLib = await import("https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js");
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
+  const pdfjsLib = await import("pdfjs-dist");
+  const workerUrl = (await import("pdfjs-dist/build/pdf.worker.min.mjs?url")).default;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
 
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -280,6 +280,7 @@ export async function extractBRDPs(file, existingBRDPs, options = {}) {
   // Step 2 — Split into chunks
   const chunks = splitIntoChunks(documentText);
   const allExtracted = [];
+  let lastChunkError;
 
   // Step 3 — Process each chunk
   for (let i = 0; i < chunks.length; i++) {
@@ -308,7 +309,8 @@ export async function extractBRDPs(file, existingBRDPs, options = {}) {
         allExtracted.push(...extracted);
       }
     } catch (err) {
-      // Silently skip failed chunks
+      console.error(`Extraction chunk failed:`, err);
+      if (lastChunkError === undefined) lastChunkError = err;
     }
 
     if (onProgress) {
@@ -334,6 +336,10 @@ export async function extractBRDPs(file, existingBRDPs, options = {}) {
     comment: b.comment || '',
     history: [],
   }));
+
+  if (deduplicated.length === 0 && lastChunkError) {
+    throw new Error(`Extraction failed: ${lastChunkError.message}`);
+  }
 
   return { brdps, rawCount: deduplicated.length };
 }
