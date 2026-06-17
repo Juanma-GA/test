@@ -273,7 +273,7 @@ export async function extractBRDPs(file, existingBRDPs, options = {}) {
     }
   }
 
-  if (!documentText || documentText.trim().length < 100) {
+  if (!documentText || documentText.trim().length === 0) {
     throw new Error("The document appears to be empty or could not be read.");
   }
 
